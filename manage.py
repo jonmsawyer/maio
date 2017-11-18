@@ -2,7 +2,13 @@
 import os
 import sys
 
+def whereis_python():
+    import json
+    print('sys.path =', json.dumps(sys.path, indent=4))
+    print(sys.executable)
+
 if __name__ == "__main__":
+    #whereis_python()  # debug
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "maio.settings")
     try:
         from django.core.management import execute_from_command_line
