@@ -4,6 +4,7 @@ conf/maio-apache.conf
 conf/maio-nginx.conf
 conf/site_settings.py
 static/*
+filestore/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
