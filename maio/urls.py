@@ -16,9 +16,9 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib import admin
 
-from maio import views
+from maio.views.home import home
 
 urlpatterns = [
-    url(r'^admin/', admin.site.urls),
-    url(r'', views.home), 
+    #url(r'^django_admin/', admin.site.urls),
+    url(r'', home),
 ]

@@ -101,8 +101,8 @@ Change this to something else. DON'T USE THIS KEY ON A PRODUCTION WEB SERVER!
 ```python
 MAIO_SETTINGS = {
     'thumbnail_directory': os.path.join(BASE_DIR, 'filestore', 'thumbnails'),
-    'media_directory': os.path.join(BASE_DIR, 'filestore', 'maio_media'),
-    'images_directory': os.path.join(BASE_DIR, 'filestore', 'maio_media', 'images'),
+    'media_directory': os.path.join(BASE_DIR, 'filestore', 'media'),
+    'images_directory': os.path.join(BASE_DIR, 'filestore', 'media', 'images'),
     'images_min_width': 200,
     'images_min_height': 200,
     'images_min_inclusive': 'OR',
