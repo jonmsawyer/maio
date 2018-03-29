@@ -1,9 +1,17 @@
 {% extends 'base/base.html' %}
+{% load staticfiles %}
 
 
 {% block title %}Home{% endblock title %}
 
 
 {% block content %}
+    {% for image in images %}
+        <a href="{% static image.file.file_path %}"
+        ><img style="height: 128px;" src="{% static image.file.tn_path %}"
+        ></a>
+    {% empty %}
+    No images?
+    {% endfor %}
     Maio is working correctly!
 {% endblock content %}

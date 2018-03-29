@@ -3,23 +3,17 @@ import uuid
 from django.db import models
 from django.db.models import Q
 
+from .File import File
 from .maiofields import FixedCharField
 
 
-mimetype_extension = {
-    'image': {
-        'image/gif': '.gif',
-        'image/jpeg': '.jpg',
-        'image/pjpeg': '.jpg',
-        'image/png': '.png',
-        'image/svg+xml': '.svg',
-        'image/tiff': '.tiff',
-        'image/bmp': '.bmp',
-        'image/x-windows-bmp': '.bmp',
-        'image/x-tiff': '.tiff',
-    }
-}
-
 class FileCaption(models.Model):
-    file = models.OneToOneField(File, primary_key=True) 
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    file = models.ForeignKey(File, on_delete=models.CASCADE)
+    author = models.CharField(max_length=1024)
+    date_added = models.DateTimeField(auto_now_add=True)
+    caption_date = models.DateTimeField(null=True, blank=True)
     caption = models.TextField()
+    
+    class Meta:
+        ordering = ['date_added']

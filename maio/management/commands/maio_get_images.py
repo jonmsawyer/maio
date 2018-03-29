@@ -1,6 +1,7 @@
 import os
 import sys
 import hashlib
+from pprint import pprint
 
 import magic
 from PIL import Image
@@ -9,45 +10,28 @@ from django.conf import settings
 from django.core.management.base import CommandError
 import django.db.utils
 
-from maio.models import File
+from maio import lib
+from maio.models.File import File
+from maio.models.ImageFile import ImageFile
+
 from ._base import MaioBaseCommand
+
 
 class Command(MaioBaseCommand):
     args = '<None>'
     help = 'Scrapes images in one or more directories.'
-
+    
     def add_arguments(self, parser):
+        # Optional arguments
+        parser.add_argument('--no-copy', '-nc', action='store_true',
+                            help=('Do not copy images to the filestore'))
         # Positional arguments
         parser.add_argument('directory', nargs='+', type=str, metavar='DIRECTORY',
-                            dest='directory',
                             help=('Scrape images from %(metavar)s'))
-
+    
     def handle(self, *args, **kwargs):
         BASE_DIR = settings.BASE_DIR
         MAIO_SETTINGS = settings.MAIO_SETTINGS
-
-        mimetype_extension = {
-            'image': {
-                'image/gif': '.gif',
-                'image/jpeg': '.jpg',
-                'image/pjpeg': '.jpg',
-                'image/png': '.png',
-                'image/svg+xml': '.svg',
-                'image/tiff': '.tiff',
-                'image/bmp': '.bmp',
-                'image/x-windows-bmp': '.bmp',
-                'image/x-tiff': '.tiff',
-            }
-        }
-        
-        def usage():
-            self.out("Usage:")
-            self.out("")
-            self.out("%s DIR" % (sys.argv[0],))
-            self.out("")
-            self.out("    DIR")
-            self.out("    The directory to recursively walk for images to store in the database.")
-            self.out("")
         
         def mk_md5_dir(md5, root):
             if len(md5) == 32:
@@ -62,25 +46,19 @@ class Command(MaioBaseCommand):
                     return dirtomake
         
         def is_image(mimetype):
-            for key, value in mimetype_extension['image'].iteritems():
+            for key, value in lib.MIMETYPE_EXTENSION['image'].items():
                 if mimetype == key:
                     return True
             return False
         
-        #directory = sys.argv[1]
         directory = kwargs.get('directory', '')
-        self.out('Directory is:', str(directory))
-
-        if len(directory) == 0:
-            self.out("Please provide a directory to recursively walk for pictures.")
-            self.out("")
-            usage()
-            exit(1)
+        self.out('Directory is:', directory)
+        no_copy = kwargs.get('no_copy')
+        self.out('No copy:', no_copy)
         
         if not os.path.isdir(directory[0]):
-            self.out("\"%s\" is not a valid directory." % (directory,))
-            self.out("")
-            usage()
+            self.out('"{}" is not a valid directory.'.format(directory))
+            self.out('')
             exit(1)
         
         mime = magic.Magic(mime=True)
@@ -88,10 +66,11 @@ class Command(MaioBaseCommand):
         for root, subdirs, files in os.walk(directory[0]):
             for filename in files:
                 try:
-                    file_path = os.path.join(root, filename).decode('utf-8')
+                    file_path = os.path.join(root, filename)
                 except UnicodeDecodeError as e:
                     if "'utf8' codec can't decode bytes" in str(e):
-                        self.out("Error processing %s, unreadable file name ..." % (os.path.join(root, filename),))
+                        self.out('Error processing {}, unreadable file name ...'
+                                 .format(os.path.join(root, filename)))
                         continue
                     else:
                         raise
@@ -103,23 +82,35 @@ class Command(MaioBaseCommand):
                     mimetype = mime.from_file(file_path)
                 except IOError as e:
                     if 'File does not exist' in str(e):
-                        self.out('file %s does not exist' % (file_path,))
+                        self.out('file {} does not exist'.format(file_path))
                         continue
                     else:
                         raise
                 except UnicodeDecodeError as e:
-                    self.out("File: ", file_path)
+                    self.out('File: ', file_path)
                     raise
                 except:
                     raise
-        
+                
                 if not is_image(mimetype):
-                    self.out('%s is not a valid image type... (it might be a symlink?)' % (file_path,))
+                    self.out('{} is not a valid image type... (it might be a symlink?)'
+                             .format(file_path))
                     continue
-        
+                
+                # get file extension
+                filename_ext = lib.MIMETYPE_EXTENSION['image'].get(mimetype)[0]
+                if filename_ext is None:
+                    try:
+                        filename_ext = '.' + file_path.split('.')[-1]
+                    except IndexError:
+                        filename_ext = ''
+                
+                # get name of file
+                name_of_file = file_path.split(os.sep)[-1].replace(filename_ext, '')
+                
                 # stat file
                 sfile = os.stat(file_path)
-        
+                
                 # open image
                 truncated = False
                 try:
@@ -135,10 +126,10 @@ class Command(MaioBaseCommand):
                     else:
                         pass
                     im.load()
-                    if im.mode != "RGB":
-                        im = im.convert("RGB")
+                    if im.mode != 'RGB':
+                        im = im.convert('RGB')
                 except IOError as e:
-                    self.out('Error in processing %s ...' % (file_path,),)
+                    self.out('Error in processing {} ...'.format(file_path))
                     if 'truncated' in str(e):
                         self.out('truncated')
                         truncated = True
@@ -151,36 +142,84 @@ class Command(MaioBaseCommand):
                         continue
                     else:
                         raise
-        
+                
                 # get md5sum
                 md5sum = hashlib.md5()
                 with open(file_path, 'rb') as fh:
                     md5sum.update(fh.read())
                 md5 = md5sum.hexdigest()
-        
+                
+                # process image
+                if no_copy is False:
+                    img_dir = mk_md5_dir(md5, settings.MAIO_SETTINGS['images_directory'])
+                    img = os.path.join(img_dir, md5 + lib.MIMETYPE_EXTENSION['image'][mimetype][0])
+                    if not os.path.isfile(img):
+                        im.save(img)
+                    file_path = img
+                
                 # process thumbnail
                 thumb_dir = mk_md5_dir(md5, settings.MAIO_SETTINGS['thumbnail_directory'])
-                thumb = os.path.join(thumb_dir,
-                                     md5 + '.jpg')
+                thumb = os.path.join(thumb_dir, md5 + '.jpg')
                 if not os.path.isfile(thumb):
                     im.thumbnail((128, 128), Image.ANTIALIAS)
                     im.save(thumb)
-        
-                self.out(md5sum.hexdigest(), mimetype, file_path)
-        
+                
+                # save the width, height, and comments
+                width = im.width
+                height = im.height
+                comments = str(im.info)
+                
+                # close image file
+                im.close()
+                
+                self.out(md5sum.hexdigest(), mimetype, filename, file_path)
+                
                 # save file information to the database
                 try:
-                    file_path_hash = hashlib.md5()
-                    file_path_hash.update(file_path.encode('utf-8'))
-                    fph = file_path_hash.hexdigest()
-        
-                    f = File(mime_type=mimetype, size=sfile.st_size, mtime=sfile.st_mtime,
-                             md5sum=md5, tn_path=thumb, file_path=file_path, file_path_hash=fph)
+                    thumb_uri = thumb.replace(BASE_DIR, '').replace(os.sep, '/')
+                    file_uri = file_path.replace(BASE_DIR, '').replace(os.sep, '/')
+                    file_path_md5sum = hashlib.md5()
+                    file_path_md5sum.update(file_path.encode('utf-8'))
+                    fph = file_path_md5sum.hexdigest()
+                    
+                    try:
+                        name_of_file_parts = name_of_file.split('.')
+                        if len(name_of_file_parts) != 1:
+                            name = '.'.join(name_of_file_parts[0:-1])
+                            extension = name_of_file_parts[-1]
+                        else:
+                            raise Exception('File must have an extension')
+                    except (Exception, IndexError):
+                        name = name_of_file
+                        extension = None
+                    
+                    f = File(**{
+                             'media_class': 'image',
+                             'name': name,
+                             'extension': extension,
+                             'mime_type': mimetype,
+                             'num_bytes': sfile.st_size,
+                             'mtime': sfile.st_mtime,
+                             'md5sum': md5,
+                             'tn_path': thumb_uri,
+                             'file_path': file_uri,
+                             'file_path_md5sum': fph})
                     f.save()
+                    fn = ImageFile(**{
+                                   'file': f,
+                                   'name': name,
+                                   'extension': extension,
+                                   'mtime': sfile.st_mtime,
+                                   'width': width,
+                                   'height': height,
+                                   'comments': comments
+                                   })
+                    fn.save()
                 except django.db.utils.IntegrityError:
-                    f = File.objects.get(file_path_hash=fph)
+                    f = File.objects.get(file_path_md5sum=fph)
                     if sfile.st_mtime == f.mtime:
-                        self.out("Already in database and up-to-date, skipping %s ..." % (file_path,))
+                        self.out('Already in database and up-to-date, skipping {} ...'
+                                 .format(file_path))
                         continue
                     f.mime_type = mimetype
                     f.size = sfile.st_size
