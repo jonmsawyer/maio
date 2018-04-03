@@ -98,8 +98,8 @@ class Command(MaioBaseCommand):
                     continue
                 
                 # get file extension
-                filename_ext = lib.MIMETYPE_EXTENSION['image'].get(mimetype)[0]
-                if filename_ext is None:
+                filename_ext = lib.MIMETYPE_EXTENSION['image'].get(mimetype, [[]])[0]
+                if filename_ext in (None, [[]]):
                     try:
                         filename_ext = '.' + file_path.split('.')[-1]
                     except IndexError:
@@ -151,14 +151,16 @@ class Command(MaioBaseCommand):
                 
                 # process image
                 if no_copy is False:
-                    img_dir = mk_md5_dir(md5, settings.MAIO_SETTINGS['images_directory'])
+                    img_dir = mk_md5_dir(md5, os.path.join(MAIO_SETTINGS['filestore_directory'],
+                                                           'media', 'images'))
                     img = os.path.join(img_dir, md5 + lib.MIMETYPE_EXTENSION['image'][mimetype][0])
                     if not os.path.isfile(img):
                         im.save(img)
                     file_path = img
                 
                 # process thumbnail
-                thumb_dir = mk_md5_dir(md5, settings.MAIO_SETTINGS['thumbnail_directory'])
+                thumb_dir = mk_md5_dir(md5, os.path.join(MAIO_SETTINGS['filestore_directory'],
+                                                         'thumbnails'))
                 thumb = os.path.join(thumb_dir, md5 + '.jpg')
                 if not os.path.isfile(thumb):
                     im.thumbnail((128, 128), Image.ANTIALIAS)
@@ -172,14 +174,13 @@ class Command(MaioBaseCommand):
                 # close image file
                 im.close()
                 
-                self.out(md5sum.hexdigest(), mimetype, filename, file_path)
-                
                 # save file information to the database
                 try:
-                    thumb_uri = thumb.replace(BASE_DIR, '').replace(os.sep, '/')
-                    file_uri = file_path.replace(BASE_DIR, '').replace(os.sep, '/')
+                    filestore = MAIO_SETTINGS['filestore_directory']
+                    thumb_uri = thumb.replace(filestore, '').replace(os.sep, '/')
+                    file_uri = file_path.replace(filestore, '').replace(os.sep, '/')
                     file_path_md5sum = hashlib.md5()
-                    file_path_md5sum.update(file_path.encode('utf-8'))
+                    file_path_md5sum.update(file_uri.encode('UTF-8'))
                     fph = file_path_md5sum.hexdigest()
                     
                     try:
@@ -192,28 +193,28 @@ class Command(MaioBaseCommand):
                     except (Exception, IndexError):
                         name = name_of_file
                         extension = None
+                
+                    self.out(md5sum.hexdigest(), mimetype, filename, file_path, file_uri, thumb_uri)
+                    self.out('\n')
                     
-                    f = File(**{
-                             'media_class': 'image',
-                             'name': name,
-                             'extension': extension,
-                             'mime_type': mimetype,
-                             'num_bytes': sfile.st_size,
-                             'mtime': sfile.st_mtime,
-                             'md5sum': md5,
-                             'tn_path': thumb_uri,
-                             'file_path': file_uri,
-                             'file_path_md5sum': fph})
+                    f = File(**{'media_class': 'image',
+                                'name': name,
+                                'extension': extension,
+                                'mime_type': mimetype,
+                                'num_bytes': sfile.st_size,
+                                'mtime': sfile.st_mtime,
+                                'md5sum': md5,
+                                'tn_path': thumb_uri,
+                                'file_path': file_uri,
+                                'file_path_md5sum': fph})
                     f.save()
-                    fn = ImageFile(**{
-                                   'file': f,
-                                   'name': name,
-                                   'extension': extension,
-                                   'mtime': sfile.st_mtime,
-                                   'width': width,
-                                   'height': height,
-                                   'comments': comments
-                                   })
+                    fn = ImageFile(**{'file': f,
+                                      'name': name,
+                                      'extension': extension,
+                                      'mtime': sfile.st_mtime,
+                                      'width': width,
+                                      'height': height,
+                                      'comments': comments})
                     fn.save()
                 except django.db.utils.IntegrityError:
                     f = File.objects.get(file_path_md5sum=fph)

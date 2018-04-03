@@ -6,12 +6,50 @@
 
 
 {% block content %}
-    {% for image in images %}
-        <a href="{% static image.file.file_path %}"
-        ><img style="height: 128px;" src="{% static image.file.tn_path %}"
-        ></a>
-    {% empty %}
-    No images?
-    {% endfor %}
-    Maio is working correctly!
+      <!-- Main jumbotron for a primary marketing message or call to action -->
+      <div class="jumbotron">
+        {% include 'base/login.html' %}
+        <div class="container" style="">
+          <h1 class="display-3" style="margin-top: 0em;">Maio</h1>
+          <h2 class="display-5">Media All In One</h2>
+        </div>
+        <div style="clear: both;"></div>
+      </div>
+
+      <div class="container">
+        <!-- Example row of columns -->
+        <div class="row">
+          <div class="col-md-3">
+            <h2>Images</h2>
+            <p>
+                There are N images in Maio.<br />
+                Size of images: 1.2 KB
+            </p>
+          </div>
+          <div class="col-md-3">
+            <h2>Audio</h2>
+            <p>
+                There are M audio tracks in Maio.<br />
+                Size of audio: 438 MB
+            </p>
+          </div>
+          <div class="col-md-3">
+            <h2>Video</h2>
+            <p>
+                There are J videos in Maio.<br />
+                Size of video: 1.2 MB
+           </p>
+          </div>
+          <div class="col-md-3">
+            <h2>Documents</h2>
+            <p>
+                There are K documents in Maio.<br />
+                Size of documents: 7.2 GB
+            </p>
+          </div>
+        </div>
+
+        <hr>
+
+      </div> <!-- /container -->
 {% endblock content %}

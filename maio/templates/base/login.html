@@ -1,0 +1,34 @@
+            {% if not request.user.is_authenticated %}
+            <div style="text-align: center; float: right;">
+              <form action="" method="post">
+                {% csrf_token %}
+                <div style="width: 600px;
+                            /* border: 1px solid #212529; */
+                            margin: 0 auto;
+                            padding: 20px;
+                            border-radius: 10px;">
+                    <h3>Maio Login</h3>
+                    <div class="input-group input-group-lg">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text" id="inputGroup-sizing-lg">Username</span>
+                      </div>
+                      <input type="text" class="form-control" aria-label="Username"
+                             aria-describedby="inputGroup-sizing-sm" name="username">
+                    </div>
+                    <div class="input-group input-group-lg" style="margin-top: 10px;">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text" id="inputGroup-sizing-lg">Password</span>
+                      </div>
+                      <input type="password" class="form-control" aria-label="Password"
+                             aria-describedby="inputGroup-sizing-sm" name="password">
+                    </div>
+                    <div style="margin-top: 10px">
+                        <button type="submit" class="btn btn-primary btn-lg">Log In</button>
+                    </div>
+                </div>
+              </form>
+            </div>
+            {% else %}
+                {{ request.user }}
+            {% endif %}
+            {{ request.user }}

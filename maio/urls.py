@@ -1,4 +1,5 @@
-"""maio URL Configuration
+"""
+ maio URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/1.11/topics/http/urls/
@@ -14,11 +15,19 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
 from django.conf.urls import url
-from django.contrib import admin
+from django.conf.urls import include
 
-from maio.views.home import home
+from maio.admin import admin_site
+
+from maio.views import home
+from maio.views import dashboard
+from maio.views import logout
+
 
 urlpatterns = [
-    #url(r'^django_admin/', admin.site.urls),
-    url(r'', home),
+    url(r'^admin/?', admin_site.urls),
+    #url(r'^portal/?', include(portal.urls, namespace='portal')),
+    url(r'^dashboard/?', dashboard, name='dashboard'),
+    url(r'^logout/?', logout, name='logout'),
+    url(r'^$', home, name='home'),
 ]

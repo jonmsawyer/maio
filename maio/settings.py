@@ -85,6 +85,10 @@ USE_L10N = True
 
 USE_TZ = True
 
+APPEND_SLASH = True
+
+LOGIN_URL = '/'
+
 # Maio's site settings loader
 # Import conf.site_settings and add references to its attributes.
 # THIS WILL OVERRIDE SETTINGS LISTED ABOVE

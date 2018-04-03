@@ -1,8 +1,10 @@
+# Maio
 *~
 db/*
 conf/maio-apache.conf
 conf/maio-nginx.conf
 conf/site_settings.py
+conf/virtualenv.py
 static/*
 filestore/*
 
