@@ -1,6 +1,10 @@
 from django.contrib import admin
 from django.contrib.admin import AdminSite
 
+from django.contrib.auth.models import User
+from django.contrib.auth.models import Group
+from django.contrib.auth.models import Permission
+
 from maio.models import File
 from maio.models import FileCaption
 from maio.models import ImageFile
@@ -36,4 +40,16 @@ class PlaylistFileAssocAdmin(admin.ModelAdmin):
 
 admin_site.register(Tag)
 class TagAdmin(admin.ModelAdmin):
+    pass
+
+admin_site.register(User)
+class UserAdmin(admin.ModelAdmin):
+    pass
+
+admin_site.register(Group)
+class GroupAdmin(admin.ModelAdmin):
+    pass
+
+admin_site.register(Permission)
+class PermissionAdmin(admin.ModelAdmin):
     pass

@@ -31,11 +31,9 @@
     <div style="margin-top: 55px"></div>
     {% block content %}{% endblock content %}
     </main>
-
-    <footer class="container">
-      <p>&copy; Maio {% now 'Y' %}</p>
-    </footer>
-
+    
+    {% include 'base/footer.html' %}
+    
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->

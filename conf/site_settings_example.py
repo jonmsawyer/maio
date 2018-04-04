@@ -38,5 +38,17 @@ TIME_ZONE = 'UTC'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
 STATIC_URL = '/static/'
 
+MAIO_SETTINGS = {
+    'filestore_directory': os.path.join(BASE_DIR, 'filestore'),
+    'images_min_width': 200,
+    'images_min_height': 200,
+    'images_min_inclusive': 'OR',
+}
+
+STATICFILES_DIRS = [
+    MAIO_SETTINGS['filestore_directory'],
+]

@@ -1,11 +1,48 @@
 {% extends 'base/base.html' %}
 {% load staticfiles %}
 
-
 {% block title %}Dashboard{% endblock title %}
 
-
-
 {% block content %}
-      <h1>Dashboard</h1>
+      <div class="container">
+        <h1>Dashboard</h1>
+        <div>
+        {% for image in images %}
+            <a href="{% static image.file.file_path %}"
+            ><img src="{% static image.file.tn_path %}"></a>
+        {% empty %}
+            No images.
+        {% endfor %}
+        </div>
+        <div class="row" style="margin-top: 20px">
+          <div class="col-md-3">
+            <h2>Images</h2>
+            <p>
+                There are N images in Maio.<br />
+                Size of images: 1.2 KB
+            </p>
+          </div>
+          <div class="col-md-3">
+            <h2>Audio</h2>
+            <p>
+                There are M audio tracks in Maio.<br />
+                Size of audio: 438 MB
+            </p>
+          </div>
+          <div class="col-md-3">
+            <h2>Video</h2>
+            <p>
+                There are J videos in Maio.<br />
+                Size of video: 1.2 MB
+           </p>
+          </div>
+          <div class="col-md-3">
+            <h2>Documents</h2>
+            <p>
+                There are K documents in Maio.<br />
+                Size of documents: 7.2 GB
+            </p>
+          </div>
+        </div>
+      </div> <!-- /container -->
 {% endblock content %}

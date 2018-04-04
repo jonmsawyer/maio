@@ -1,15 +1,13 @@
 {% extends 'base/base.html' %}
 {% load staticfiles %}
 
-
 {% block title %}Home{% endblock title %}
-
 
 {% block content %}
       <!-- Main jumbotron for a primary marketing message or call to action -->
       <div class="jumbotron">
-        {% include 'base/login.html' %}
         <div class="container" style="">
+          {% include 'base/login.html' %}
           <h1 class="display-3" style="margin-top: 0em;">Maio</h1>
           <h2 class="display-5">Media All In One</h2>
         </div>
@@ -17,7 +15,6 @@
       </div>
 
       <div class="container">
-        <!-- Example row of columns -->
         <div class="row">
           <div class="col-md-3">
             <h2>Images</h2>
@@ -48,8 +45,5 @@
             </p>
           </div>
         </div>
-
-        <hr>
-
       </div> <!-- /container -->
 {% endblock content %}

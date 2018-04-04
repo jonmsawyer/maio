@@ -4,6 +4,8 @@ from collections import OrderedDict
 from django.db import models
 from django.db.models import Q
 
+from django.contrib.auth.models import User
+
 from maio import lib
 
 from .File import File
@@ -24,6 +26,9 @@ class ImageFile(models.Model):
     
     #: The File that this ImageFile points to.
     file = models.ForeignKey(File, on_delete=models.CASCADE)
+    
+    #: Owner of the File
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
     
     #: The base name for the File.
     name = models.CharField(max_length=1024)
