@@ -54,9 +54,6 @@ class File(models.Model):
     #: The File path stored in ./filestore/media/images.
     file_path = models.CharField(max_length=1024)
     
-    #: The md5sum of the ``file_path`` field, ensures 1 unique File per ``file_path``
-    file_path_md5sum = FixedCharField(max_length=32, unique=True)
-    
     #: The date time when this File was added to Maio.
     date_added = models.DateTimeField(auto_now_add=True)
     

@@ -3,6 +3,7 @@ import sys
 import hashlib
 from pprint import pprint
 from getpass import getpass
+from datetime import datetime
 
 import magic
 from PIL import Image
@@ -15,8 +16,10 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 
 from maio import lib
-from maio.models.File import File
-from maio.models.ImageFile import ImageFile
+from maio.models import File
+from maio.models import ImageFile
+from maio.models import Tag
+from maio.models import TagImageFileAssoc
 
 from ._base import MaioBaseCommand
 
@@ -32,6 +35,24 @@ class Command(MaioBaseCommand):
         
         parser.add_argument('directories', nargs='+', type=str, metavar='DIRECTORIES',
                             help=('Scrape images from %(metavar)s'))
+        
+        # Optional arguments
+        parser.add_argument('--tag-directories', '-td', action='store_true',
+                            help=('Tag the supplied directories for Image Tags. Does not tag '
+                                  'subdirectories under the supplied directories.'))
+        
+        parser.add_argument('--tag-subfolders', '-ts', action='store_true',
+                            help=('Tag the subdirectories under the supplied directories. Does '
+                                  'not tag the supplied directories.'))
+        
+        parser.add_argument('--tag-filenames', '-tf', action='store_true',
+                            help=('Tag the file names of the files.'))
+        
+        parser.add_argument('--tag-all', '-ta', action='store_true',
+                            help=('Equivalent to options -td -ts -tf.'))
+        
+        parser.add_argument('--tags', '-t', nargs='*', type=str, metavar='TAGS',
+                            help=('Tag each image with %(metavar)s'))
     
     def handle(self, *args, **kwargs):
         BASE_DIR = settings.BASE_DIR
@@ -58,16 +79,30 @@ class Command(MaioBaseCommand):
         # grab the username from the options
         username = kwargs.get('username', [''])[0]
         
+        # tag flags
+        tag_directories = kwargs.get('tag_directories')
+        tag_subfolders = kwargs.get('tag_subfolders')
+        tag_filenames = kwargs.get('tag_filenames')
+        tag_all = kwargs.get('tag_all')
+        tags_input = kwargs.get('tags')
+        
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            self.out('User {} does not exist.'.format(username))
+            self.out('')
+            exit(1)
+        
         # grab the directories to scrape images from
         directories = kwargs.get('directories', [])
         
         # get the User object from the username
-        password = getpass('Password for "{}": '.format(username), self.stdout)
-        user = authenticate(username=username, password=password)
-        if not user:
-            self.out('Could not authenticate user "{}". Please try again.'.format(username))
-            self.out('')
-            exit(1)
+        #password = getpass('Password for "{}": '.format(username), self.stdout)
+        #user = authenticate(username=username, password=password)
+        #if not user:
+        #    self.out('Could not authenticate user "{}". Please try again.'.format(username))
+        #    self.out('')
+        #    exit(1)
         
         # walk through each directory and make sure each one exists
         for directory in directories:
@@ -132,6 +167,13 @@ class Command(MaioBaseCommand):
                     
                     # stat file
                     sfile = os.stat(file_path)
+                    
+                    mtime = datetime.fromtimestamp(sfile.st_mtime)
+                    
+                    #test
+                    #self.out(mtime, file_path)
+                    #continue
+                    #/test
                     
                     # open image
                     truncated = False
@@ -201,7 +243,7 @@ class Command(MaioBaseCommand):
                                                              'thumbnails'))
                     thumb = os.path.join(thumb_dir, md5 + '.jpg')
                     if not os.path.isfile(thumb):
-                        im.thumbnail((128, 128), Image.ANTIALIAS)
+                        im.thumbnail((300, 300), Image.ANTIALIAS)
                         im.save(thumb)
                     
                     # save the width, height, and comments
@@ -212,61 +254,99 @@ class Command(MaioBaseCommand):
                     # close image file
                     im.close()
                     
+                    # process tag flags
+                    tags = [] + tags_input
+                    if tag_all or tag_directories:
+                        dir_tags = directory.split(os.sep)
+                        
+                        # don't include Windows drive letters
+                        if dir_tags[0][1] == ':':
+                            dir_tags = dir_tags[1:]
+                        
+                        tags.extend(dir_tags)
+                    
+                    if tag_all or tag_subfolders:
+                        dir_tags = os.path.join(root, filename) \
+                                           .replace(directory+os.sep, '') \
+                                           .split(os.sep)
+                        
+                        # don't include the filename for this option
+                        dir_tags = dir_tags[:-1]
+                        
+                        tags.extend(dir_tags)
+                    
+                    if tag_all or tag_filenames:
+                        dir_tags = file_path.replace(directory, '').split(os.sep)
+                        
+                        # get only the filename for this option
+                        dir_tags = dir_tags[-1:]
+                        
+                        # split the filename from the extension
+                        dir_tags = dir_tags[0].split('.')
+                        
+                        tags.extend(dir_tags)
+                    
                     # save file information to the database
                     try:
                         filestore = MAIO_SETTINGS['filestore_directory']
                         thumb_uri = thumb.replace(filestore, '').replace(os.sep, '/')
                         file_uri = file_path.replace(filestore, '').replace(os.sep, '/')
-                        file_path_md5sum = hashlib.md5()
-                        file_path_md5sum.update(file_uri.encode('UTF-8'))
-                        fph = file_path_md5sum.hexdigest()
                         
-                        try:
-                            name_of_file_parts = name_of_file.split('.')
-                            if len(name_of_file_parts) != 1:
-                                name = '.'.join(name_of_file_parts[0:-1])
-                                extension = name_of_file_parts[-1]
-                            else:
-                                raise Exception('File must have an extension')
-                        except (Exception, IndexError):
-                            name = name_of_file
-                            extension = None
-                    
                         self.out(md5sum.hexdigest(), mimetype, filename,
                                  file_path, file_uri, thumb_uri)
-                        self.out('\n')
                         
                         f = File(**{'media_class': 'image',
-                                    'name': name,
-                                    'extension': extension,
+                                    'name': name_of_file,
+                                    'extension': filename_ext,
                                     'mime_type': mimetype,
                                     'num_bytes': sfile.st_size,
+                                    'date_modified': mtime,
                                     'mtime': sfile.st_mtime,
                                     'md5sum': md5,
                                     'tn_path': thumb_uri,
-                                    'file_path': file_uri,
-                                    'file_path_md5sum': fph})
+                                    'file_path': file_uri})
                         f.save()
-                        fn = ImageFile(**{'file': f,
-                                          'owner': user,
-                                          'name': name,
-                                          'extension': extension,
-                                          'mtime': sfile.st_mtime,
-                                          'width': width,
-                                          'height': height,
-                                          'comments': comments})
-                        fn.save()
                     except django.db.utils.IntegrityError:
-                        f = File.objects.get(file_path_md5sum=fph)
+                        f = File.objects.get(md5sum=md5)
                         if sfile.st_mtime == f.mtime:
-                            self.out('Already in database and up-to-date, skipping {} ...'
+                            self.out('Already in database and up-to-date, skipping {}'
                                      .format(file_path))
                             continue
-                        f.mime_type = mimetype
-                        f.size = sfile.st_size
+                        self.out('Already in database and not up-to-date, processing {}'
+                                 .format(file_path))
                         f.mtime = sfile.st_mtime
-                        f.md5sum = md5
-                        f.tn_path = thumb
+                        f.date_modified = mtime
                         f.save()
                     except:
                         raise
+                    fn = ImageFile(**{'file': f,
+                                      'owner': user,
+                                      'name': name_of_file,
+                                      'extension': filename_ext,
+                                      'mtime': sfile.st_mtime,
+                                      'date_modified': mtime,
+                                      'width': width,
+                                      'height': height,
+                                      'comments': comments})
+                    fn.save()
+                    
+                    self.out('Tagging tag "{}" to "{}{}"'
+                             .format(tags, name_of_file, filename_ext))
+                    self.out('')
+                    
+                    # tag the image
+                    for tag in tags:
+                        # get DB tag if exists, if not create it
+                        try:
+                            tag = tag.lower()
+                            t = Tag.objects.get(name=tag)
+                        except Tag.DoesNotExist:
+                            t = Tag(name=tag)
+                            t.save()
+                        
+                        # now associate the tag to the ImageFile
+                        try:
+                            tifa = TagImageFileAssoc.objects.get(tag=t, image_file=fn)
+                        except TagImageFileAssoc.DoesNotExist:
+                            tifa = TagImageFileAssoc(tag=t, image_file=fn)
+                            tifa.save()

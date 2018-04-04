@@ -5,16 +5,62 @@
 
 {% block content %}
       <div class="container">
-        <h1>Dashboard</h1>
-        <div>
-        {% for image in images %}
-            <a href="{% static image.file.file_path %}"
-            ><img src="{% static image.file.tn_path %}"></a>
-        {% empty %}
-            No images.
-        {% endfor %}
-        </div>
-        <div class="row" style="margin-top: 20px">
+          <h1>Dashboard</h1>
+          
+          <div class="row">
+              {% for image in images %}
+              <div class="card m-2 p-0" style="width: 260px;">
+                  <a href="{% static image.file.file_path %}"
+                  ><img class="card-img-top"
+                        src="{% static image.file.tn_path %}"
+                        alt="{{ image.name }}{{ image.extension }}"
+                  ></a>
+                  <div class="card-body p-1">
+                      <h5 class="card-title">{{ image.name }}{{ image.extension }}</h5>
+                      <p class="card-text" style="font-size: 10pt;">
+                          {% if image.author %}
+                              {% if image.url %}
+                                  <a href="{{ image.url }}">
+                              {% endif %}
+                                  {{ image.author }}
+                              {% if image.url %}
+                                  </a> -
+                              {% endif %}
+                          {% endif %}
+                          {{ image.date_modified }}<br>
+                          {{ image.width }}x{{ image.height }}
+                      </p>
+                  </div>
+                  <div class="card-body p-1 border-top border-bottom" style="font-size: 10pt;">
+                      Loves: {{ image.loves }},
+                      Likes: {{ image.likes }},
+                      Dislikes: {{ image.dislikes }},
+                      Views: {{ image.views }}
+                  </div>
+                  <div class="card-body p-1 border-bottom" style="font-size: 10pt;">
+                      Tags: 
+                      {% for tag in image.tag_set.all %}
+                          {{ tag }}
+                      {% empty %}
+                          No tags
+                      {% endfor %}
+                  </div>
+                  <div class="card-body p-1" style="font-size: 10pt;">
+                      Source: {{ image.source }}
+                  </div>
+                  <!-- <a href="{% static image.file.file_path %}"
+                  ><img src="{% static image.file.tn_path %}"></a> -->
+              </div>
+              {% empty %}
+              <div>
+                  No images.
+              </div>
+              {% endfor %}
+          </div> <!-- /row -->
+      </div>
+        
+        <!-- stats? -->
+        <div class="row mt-5">
           <div class="col-md-3">
             <h2>Images</h2>
             <p>

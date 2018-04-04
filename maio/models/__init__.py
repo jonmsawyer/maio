@@ -4,3 +4,4 @@ from .ImageFile import ImageFile
 from .Playlist import Playlist
 from .PlaylistFileAssoc import PlaylistFileAssoc
 from .Tag import Tag
+from .TagImageFileAssoc import TagImageFileAssoc

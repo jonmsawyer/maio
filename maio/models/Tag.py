@@ -9,6 +9,5 @@ from .maiofields import FixedCharField
 class Tag(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     name = models.CharField(max_length=255, unique=True)
-    count = models.PositiveIntegerField(default=0)
     date_added = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
