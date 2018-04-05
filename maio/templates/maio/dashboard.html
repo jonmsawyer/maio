@@ -9,12 +9,25 @@
           
           <div class="row">
               {% for image in images %}
-              <div class="card m-2 p-0" style="width: 260px;">
-                  <a href="{% static image.file.file_path %}"
-                  ><img class="card-img-top"
-                        src="{% static image.file.tn_path %}"
-                        alt="{{ image.name }}{{ image.extension }}"
-                  ></a>
+              <div class="card m-2 p-0" style="width: {{width}}px;">
+                  <div style="height: {{width}}px;
+                              overflow: hidden;">
+                    <a href="{% static image.file.file_path %}"
+                       style="{% if image.width > image.height %}
+                              margin-left: {{image.margin_left}}px;
+                              {% else %}
+                              margin-top: {{image.margin_top}}px;
+                              {% endif %}"
+                    ><img class="card-img-top"
+                          src="{% static image.file.tn_path %}"
+                          alt="{{ image.name }}.{{ image.extension }}"
+                          style="{% if image.width > image.height %}
+                                 height: {{width}}px; width: auto;
+                                 {% else %}
+                                 width: {{width}}px; height: auto;
+                                 {% endif %}"
+                    ></a>
+                  </div>
                   <div class="card-body p-1">
                       <h5 class="card-title">{{ image.name }}.{{ image.extension }}</h5>
                       <div class="card-text" style="font-size: 10pt;">
@@ -28,6 +41,7 @@
                                   </a> -
                               {% endif %}
                           {% endif %}
+                          left: {{ image.margin_left }}, top: {{ image.margin_top }}
                           </div>
                       </div>
                   </div>
