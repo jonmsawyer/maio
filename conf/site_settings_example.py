@@ -46,7 +46,7 @@ MAIO_SETTINGS = {
     'filestore_directory': os.path.join(BASE_DIR, 'filestore'),
     'images_min_width': 200,
     'images_min_height': 200,
-    'images_min_inclusive': 'OR',
+    'images_min_inclusive': 'and',
 }
 
 STATICFILES_DIRS = [

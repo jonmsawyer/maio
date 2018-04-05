@@ -7,6 +7,7 @@ from datetime import datetime
 
 import magic
 from PIL import Image
+import pytz
 
 from django.conf import settings
 from django.core.management.base import CommandError
@@ -17,9 +18,8 @@ from django.contrib.auth.models import User
 
 from maio import lib
 from maio.models import File
-from maio.models import ImageFile
+from maio.models import Media
 from maio.models import Tag
-from maio.models import TagImageFileAssoc
 
 from ._base import MaioBaseCommand
 
@@ -55,10 +55,19 @@ class Command(MaioBaseCommand):
                             help=('Tag each image with %(metavar)s'))
     
     def handle(self, *args, **kwargs):
-        BASE_DIR = settings.BASE_DIR
+        # shortcut settings
         MAIO_SETTINGS = settings.MAIO_SETTINGS
+        TIME_ZONE = settings.TIME_ZONE
+        TZ = pytz.timezone(TIME_ZONE)
         
         def mk_md5_dir(md5, root):
+            '''
+            Make MD5 directory. Makes 3 directories under ``root``, where the first 2 characters
+            in ``md5`` make up the first directory, the next 2 characters make up the second
+            directory, and the next 2 characters make up the third directory.
+            
+            :returns: (str) The path to final directory structure.
+            '''
             if len(md5) == 32:
                 part1 = md5[0:2]
                 part2 = md5[2:4]
@@ -71,6 +80,12 @@ class Command(MaioBaseCommand):
                     return dirtomake
         
         def is_image(mimetype):
+            '''
+            Check to see if the supplied ``mimetype`` is an image, according to
+            ``lib.MIMETYPE_EXTENSION``.
+            
+            :returns: (bool) True if ``mimetype`` is an image, False otherwise.
+            '''
             for key, value in lib.MIMETYPE_EXTENSION['image'].items():
                 if mimetype == key:
                     return True
@@ -79,13 +94,16 @@ class Command(MaioBaseCommand):
         # grab the username from the options
         username = kwargs.get('username', [''])[0]
         
-        # tag flags
+        # tag flag options
         tag_directories = kwargs.get('tag_directories')
         tag_subfolders = kwargs.get('tag_subfolders')
         tag_filenames = kwargs.get('tag_filenames')
         tag_all = kwargs.get('tag_all')
         tags_input = kwargs.get('tags')
+        if tags_input is None:
+            tags_input = []
         
+        # validate user
         try:
             user = User.objects.get(username=username)
         except User.DoesNotExist:
@@ -95,14 +113,6 @@ class Command(MaioBaseCommand):
         
         # grab the directories to scrape images from
         directories = kwargs.get('directories', [])
-        
-        # get the User object from the username
-        #password = getpass('Password for "{}": '.format(username), self.stdout)
-        #user = authenticate(username=username, password=password)
-        #if not user:
-        #    self.out('Could not authenticate user "{}". Please try again.'.format(username))
-        #    self.out('')
-        #    exit(1)
         
         # walk through each directory and make sure each one exists
         for directory in directories:
@@ -120,6 +130,7 @@ class Command(MaioBaseCommand):
             for root, subdirs, files in os.walk(directory):
                 # for each file
                 for filename in files:
+                    # read and join the file path
                     try:
                         file_path = os.path.join(root, filename)
                     except UnicodeDecodeError as e:
@@ -127,8 +138,7 @@ class Command(MaioBaseCommand):
                             self.out('Error processing {}, unreadable file name ...'
                                      .format(os.path.join(root, filename)))
                             continue
-                        else:
-                            raise
+                        raise
                     except:
                         raise
                     
@@ -139,8 +149,7 @@ class Command(MaioBaseCommand):
                         if 'File does not exist' in str(e):
                             self.out('file {} does not exist'.format(file_path))
                             continue
-                        else:
-                            raise
+                        raise
                     except UnicodeDecodeError as e:
                         self.out('File: ', file_path)
                         raise
@@ -158,37 +167,33 @@ class Command(MaioBaseCommand):
                     filename_ext = lib.MIMETYPE_EXTENSION['image'].get(mimetype, [[]])[0]
                     if filename_ext in (None, [[]]):
                         try:
-                            filename_ext = '.' + file_path.split('.')[-1]
+                            filename_ext = file_path.split('.')[-1]
                         except IndexError:
                             filename_ext = ''
+                    else:
+                        filename_ext = filename_ext.replace('.', '')
                     
                     # get name of file
-                    name_of_file = file_path.split(os.sep)[-1].replace(filename_ext, '')
+                    name_of_file = file_path.split(os.sep)[-1].split('.')[:-1][0]
                     
                     # stat file
                     sfile = os.stat(file_path)
                     
-                    mtime = datetime.fromtimestamp(sfile.st_mtime)
+                    # obtain modified datetime
+                    mtime = TZ.localize(datetime.fromtimestamp(sfile.st_mtime))
                     
-                    #test
-                    #self.out(mtime, file_path)
-                    #continue
-                    #/test
-                    
-                    # open image
-                    truncated = False
+                    # open image and check to make sure its width and height values
+                    # are within configured constraints
                     try:
                         im = Image.open(file_path)
-                        if MAIO_SETTINGS.get('images_min_inclusive', '').lower() == 'and':
-                            if im.size[0] < MAIO_SETTINGS.get('images_min_width', 0) or \
-                               im.size[1] < MAIO_SETTINGS.get('images_min_height', 0):
-                                continue
-                        elif MAIO_SETTINGS.get('images_min_inclusive', '').lower() == 'or':
-                            if im.size[0] < MAIO_SETTINGS.get('images_min_width', 0) and \
-                               im.size[1] < MAIO_SETTINGS.get('images_min_height', 0):
-                                continue
-                        else:
-                            pass
+                        if MAIO_SETTINGS.get('images_min_inclusive', 'and').lower() == 'or':
+                            if im.size[0] < MAIO_SETTINGS.get('images_min_width', 200) or \
+                               im.size[1] < MAIO_SETTINGS.get('images_min_height', 200):
+                                    continue
+                        elif MAIO_SETTINGS.get('images_min_inclusive', 'and').lower() == 'and':
+                            if im.size[0] < MAIO_SETTINGS.get('images_min_width', 200) and \
+                               im.size[1] < MAIO_SETTINGS.get('images_min_height', 200):
+                                    continue
                         im.load()
                         if im.mode != 'RGB':
                             im = im.convert('RGB')
@@ -196,8 +201,7 @@ class Command(MaioBaseCommand):
                         self.out('Error in processing {} ...'.format(file_path))
                         if 'truncated' in str(e):
                             self.out('truncated')
-                            truncated = True
-                            pass
+                            continue
                         elif 'cannot identify image file' in str(e):
                             self.out('invalid image file')
                             continue
@@ -207,49 +211,53 @@ class Command(MaioBaseCommand):
                         else:
                             raise
                     
-                    # get md5sum
+                    # get md5sum hash of the image
                     md5sum = hashlib.md5()
                     with open(file_path, 'rb') as fh:
                         md5sum.update(fh.read())
                     md5 = md5sum.hexdigest()
                     
-                    # make filestore directories if they don't exist
+                    # make filestore directories if they don't exist                   
                     if not os.path.isdir(MAIO_SETTINGS['filestore_directory']):
+                        # ./filestore
                         os.mkdir(MAIO_SETTINGS['filestore_directory'])
-                    
                     if not os.path.isdir(os.path.join(MAIO_SETTINGS['filestore_directory'],
                                                       'media')):
-                        os.mkdir(os.path.join(MAIO_SETTINGS['filestore_directory'], 'media'))
-                    
+                        # ./filestore/media
+                        os.mkdir(os.path.join(MAIO_SETTINGS['filestore_directory'],
+                                              'media'))
                     if not os.path.isdir(os.path.join(MAIO_SETTINGS['filestore_directory'],
                                                       'media', 'images')):
+                        # ./filestore/media/images
                         os.mkdir(os.path.join(MAIO_SETTINGS['filestore_directory'],
                                               'media', 'images'))
-                    
                     if not os.path.isdir(os.path.join(MAIO_SETTINGS['filestore_directory'],
                                                       'thumbnails')):
-                        os.mkdir(os.path.join(MAIO_SETTINGS['filestore_directory'], 'thumbnails'))
+                        # ./filestore/thumbnails
+                        os.mkdir(os.path.join(MAIO_SETTINGS['filestore_directory'],
+                                              'thumbnails'))
                     
-                    # process image
+                    # process and save image to filestore
                     img_dir = mk_md5_dir(md5, os.path.join(MAIO_SETTINGS['filestore_directory'],
                                                            'media', 'images'))
-                    img = os.path.join(img_dir, md5 + lib.MIMETYPE_EXTENSION['image'][mimetype][0])
+                    img = os.path.join(img_dir, md5+'.'+filename_ext)
                     if not os.path.isfile(img):
+                        # copy the image to the filestore if it doesn't already exist
                         im.save(img)
                     file_path = img
                     
-                    # process thumbnail
+                    # process and save thumbnail to filestore
                     thumb_dir = mk_md5_dir(md5, os.path.join(MAIO_SETTINGS['filestore_directory'],
                                                              'thumbnails'))
-                    thumb = os.path.join(thumb_dir, md5 + '.jpg')
+                    thumb = os.path.join(thumb_dir, md5+'.jpg')
                     if not os.path.isfile(thumb):
                         im.thumbnail((300, 300), Image.ANTIALIAS)
                         im.save(thumb)
                     
-                    # save the width, height, and comments
+                    # save the width, height, and comment
                     width = im.width
                     height = im.height
-                    comments = str(im.info)
+                    comment = str(im.info)
                     
                     # close image file
                     im.close()
@@ -257,31 +265,55 @@ class Command(MaioBaseCommand):
                     # process tag flags
                     tags = [] + tags_input
                     if tag_all or tag_directories:
+                        # split up a directory such as
+                        #     C:\Users\bob\Pictures
+                        # into
+                        #     ['C:', 'Users', 'bob', 'Pictures']
                         dir_tags = directory.split(os.sep)
                         
                         # don't include Windows drive letters
-                        if dir_tags[0][1] == ':':
+                        #     ['C:', 'Users', 'bob', 'Pictures']
+                        # into
+                        #     ['Users', 'bob', 'Pictures']
+                        if ':' in dir_tags[0]:
                             dir_tags = dir_tags[1:]
                         
                         tags.extend(dir_tags)
                     
                     if tag_all or tag_subfolders:
+                        # split up a directory such as
+                        #     C:\Users\bob\Pictures\foo\bar\baz\beef.jpg
+                        # where the supplied directory is
+                        #     C:\Users\bob\Pictures
+                        # into
+                        #     ['foo', 'bar', 'baz', 'beef.jpg']
                         dir_tags = os.path.join(root, filename) \
-                                           .replace(directory+os.sep, '') \
-                                           .split(os.sep)
+                                          .replace(directory+os.sep, '') \
+                                          .split(os.sep)
                         
                         # don't include the filename for this option
+                        #     ['foo', 'bar', 'baz']
                         dir_tags = dir_tags[:-1]
                         
                         tags.extend(dir_tags)
                     
                     if tag_all or tag_filenames:
-                        dir_tags = file_path.replace(directory, '').split(os.sep)
+                        # split up a directory such as
+                        #     C:\Users\bob\Pictures\foo\bar\baz\beef.jpg
+                        # where the supplied directory is
+                        #     C:\Users\bob\Pictures
+                        # into
+                        #     ['foo', 'bar', 'baz', 'beef.jpg']
+                        dir_tags = os.path.join(root, filename) \
+                                          .replace(directory+os.sep, '') \
+                                          .split(os.sep)
                         
                         # get only the filename for this option
+                        #     ['beef.jpg']
                         dir_tags = dir_tags[-1:]
                         
                         # split the filename from the extension
+                        #     ['beef', 'jpg']
                         dir_tags = dir_tags[0].split('.')
                         
                         tags.extend(dir_tags)
@@ -295,42 +327,49 @@ class Command(MaioBaseCommand):
                         self.out(md5sum.hexdigest(), mimetype, filename,
                                  file_path, file_uri, thumb_uri)
                         
-                        f = File(**{'media_class': 'image',
-                                    'name': name_of_file,
-                                    'extension': filename_ext,
+                        if filename_ext == '':
+                            filename_ext = None
+                        
+                        f = File(**{'md5sum': md5,
+                                    'original_name': name_of_file,
+                                    'original_extension': filename_ext,
                                     'mime_type': mimetype,
-                                    'num_bytes': sfile.st_size,
-                                    'date_modified': mtime,
+                                    'size': sfile.st_size,
                                     'mtime': sfile.st_mtime,
-                                    'md5sum': md5,
                                     'tn_path': thumb_uri,
-                                    'file_path': file_uri})
+                                    'file_path': file_uri,
+                                    'date_modified': mtime,})
                         f.save()
                     except django.db.utils.IntegrityError:
                         f = File.objects.get(md5sum=md5)
                         if sfile.st_mtime == f.mtime:
                             self.out('Already in database and up-to-date, skipping {}'
                                      .format(file_path))
+                            self.out('')
                             continue
-                        self.out('Already in database and not up-to-date, processing {}'
-                                 .format(file_path))
-                        f.mtime = sfile.st_mtime
-                        f.date_modified = mtime
-                        f.save()
+                        else:
+                            self.out('Already in database and not up-to-date, processing {}'
+                                     .format(file_path))
+                            f.mtime = sfile.st_mtime
+                            f.date_modified = mtime
+                            f.save()
                     except:
                         raise
-                    fn = ImageFile(**{'file': f,
-                                      'owner': user,
-                                      'name': name_of_file,
-                                      'extension': filename_ext,
-                                      'mtime': sfile.st_mtime,
-                                      'date_modified': mtime,
-                                      'width': width,
-                                      'height': height,
-                                      'comments': comments})
-                    fn.save()
                     
-                    self.out('Tagging tag "{}" to "{}{}"'
+                    media = Media(**{'file': f,
+                                     'media_type': 'image',
+                                     'owner': user,
+                                     'name': name_of_file,
+                                     'extension': filename_ext,
+                                     'mtime': sfile.st_mtime,
+                                     'date_modified': mtime,
+                                     'width': width,
+                                     'height': height,
+                                     'length': None,
+                                     'comment': comment})
+                    media.save()
+                    
+                    self.out('Tagging tags {} to "{}.{}"'
                              .format(tags, name_of_file, filename_ext))
                     self.out('')
                     
@@ -345,8 +384,4 @@ class Command(MaioBaseCommand):
                             t.save()
                         
                         # now associate the tag to the ImageFile
-                        try:
-                            tifa = TagImageFileAssoc.objects.get(tag=t, image_file=fn)
-                        except TagImageFileAssoc.DoesNotExist:
-                            tifa = TagImageFileAssoc(tag=t, image_file=fn)
-                            tifa.save()
+                        media.tags.add(t)

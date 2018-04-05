@@ -16,8 +16,9 @@
                         alt="{{ image.name }}{{ image.extension }}"
                   ></a>
                   <div class="card-body p-1">
-                      <h5 class="card-title">{{ image.name }}{{ image.extension }}</h5>
-                      <p class="card-text" style="font-size: 10pt;">
+                      <h5 class="card-title">{{ image.name }}.{{ image.extension }}</h5>
+                      <div class="card-text" style="font-size: 10pt;">
+                          <div>
                           {% if image.author %}
                               {% if image.url %}
                                   <a href="{{ image.url }}">
@@ -27,26 +28,28 @@
                                   </a> -
                               {% endif %}
                           {% endif %}
-                          {{ image.date_modified }}<br>
-                          {{ image.width }}x{{ image.height }}
-                      </p>
+                          </div>
+                      </div>
                   </div>
-                  <div class="card-body p-1 border-top border-bottom" style="font-size: 10pt;">
-                      Loves: {{ image.loves }},
-                      Likes: {{ image.likes }},
-                      Dislikes: {{ image.dislikes }},
-                      Views: {{ image.views }}
+                  <div class="card-body p-0 border-bottom clearfix" style="font-size: 14pt;">
+                      <span class="oi oi-heart float-right mr-2" title="Love this image" aria-hidden="true"></span>
+                      <span class="oi oi-thumb-up ml-2" title="Like this image" aria-hidden="true"></span>
+                      <span class="oi oi-star float-right mr-2" title="star" aria-hidden="true"></span>
                   </div>
                   <div class="card-body p-1 border-bottom" style="font-size: 10pt;">
                       Tags: 
-                      {% for tag in image.tag_set.all %}
-                          {{ tag }}
+                      {% for tag in image.tags.all %}
+                          <span class="badge badge-secondary">#{{ tag.name }}</span>
                       {% empty %}
                           No tags
                       {% endfor %}
                   </div>
-                  <div class="card-body p-1" style="font-size: 10pt;">
+                  <div class="card-body p-1 border-bottom" style="font-size: 10pt;">
                       Source: {{ image.source }}
+                  </div>
+                  <div class="card-body p-1 clearfix" style="font-size: 10pt;">
+                    <span class="float-left">{{ image.date_modified }}</span>
+                    <span class="float-right">{{ image.width }}x{{ image.height }}</span>
                   </div>
                   <!-- <a href="{% static image.file.file_path %}"
                   ><img src="{% static image.file.tn_path %}"></a> -->

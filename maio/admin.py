@@ -6,10 +6,9 @@ from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
 
 from maio.models import File
-from maio.models import FileCaption
-from maio.models import ImageFile
+from maio.models import Caption
+from maio.models import Media
 from maio.models import Playlist
-from maio.models import PlaylistFileAssoc
 from maio.models import Tag
 
 class MaioAdminSite(AdminSite):
@@ -22,20 +21,16 @@ admin_site.register(File)
 class FileAdmin(admin.ModelAdmin):
     pass
 
-admin_site.register(FileCaption)
-class FileCaptionAdmin(admin.ModelAdmin):
+admin_site.register(Caption)
+class CaptionAdmin(admin.ModelAdmin):
     pass
 
-admin_site.register(ImageFile)
-class ImageFileAdmin(admin.ModelAdmin):
+admin_site.register(Media)
+class MediaAdmin(admin.ModelAdmin):
     pass
 
 admin_site.register(Playlist)
 class PlaylistAdmin(admin.ModelAdmin):
-    pass
-
-admin_site.register(PlaylistFileAssoc)
-class PlaylistFileAssocAdmin(admin.ModelAdmin):
     pass
 
 admin_site.register(Tag)
