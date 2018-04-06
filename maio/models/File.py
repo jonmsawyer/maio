@@ -57,7 +57,7 @@ class File(models.Model):
         ordering = ['-date_modified']
     
     def __str__(self):
-        return '({}) {}.{} - {} {} bytes'.format(str(self.id)[0:6],
+        return '({}) {}.{} - {} - {} bytes'.format(str(self.id)[0:6],
                                    self.original_name,
                                    self.original_extension,
                                    self.mime_type,

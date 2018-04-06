@@ -58,6 +58,9 @@ class Media(models.Model):
     #: File modified date, as a Unix time stamp.
     mtime = models.FloatField(default=0.0)
     
+    #: The File size.
+    size = models.PositiveIntegerField(default=0)
+    
     #: The date time when this File was added to Maio.
     date_added = models.DateTimeField(auto_now_add=True)
     
@@ -69,6 +72,12 @@ class Media(models.Model):
     
     #: The height in pixes of the ImageFile
     height = models.PositiveIntegerField(**NULL)
+    
+    #: The thumbnail width
+    tn_width = models.PositiveIntegerField(**NULL)
+    
+    #: The thumbnail height
+    tn_height = models.PositiveIntegerField(**NULL)
     
     #: The length (in milliseconds for Audio or Video, null for Image and Document)
     length = models.FloatField(**NULL)
@@ -121,6 +130,15 @@ class Media(models.Model):
     
     class Meta:
         ordering = ['-date_modified']
+    
+    def __str__(self):
+        if self.extension:
+            ext = '.'+self.extension
+        return '({}) [{}] {}{} - {} bytes'.format(str(self.id)[:6],
+                                                self.media_type,
+                                                self.name,
+                                                ext,
+                                                self.size)
     
     @staticmethod
     def get_all_images(request):

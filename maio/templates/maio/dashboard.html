@@ -13,11 +13,6 @@
                   <div style="height: {{width}}px;
                               overflow: hidden;">
                     <a href="{% static image.file.file_path %}"
-                       style="{% if image.width > image.height %}
-                              margin-left: {{image.margin_left}}px;
-                              {% else %}
-                              margin-top: {{image.margin_top}}px;
-                              {% endif %}"
                     ><img class="card-img-top"
                           src="{% static image.file.tn_path %}"
                           alt="{{ image.name }}.{{ image.extension }}"
@@ -25,6 +20,11 @@
                                  height: {{width}}px; width: auto;
                                  {% else %}
                                  width: {{width}}px; height: auto;
+                                 {% endif %}
+                                 {% if image.width > image.height %}
+                                 margin-left: {{image.margin_left}}px;
+                                 {% else %}
+                                 margin-top: {{image.margin_top}}px;
                                  {% endif %}"
                     ></a>
                   </div>

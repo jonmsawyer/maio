@@ -43,9 +43,20 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = '/static/'
 
 MAIO_SETTINGS = {
+    # The directory where Maio will store the media and thumbnails.
     'filestore_directory': os.path.join(BASE_DIR, 'filestore'),
+    
+    # Restrict the importing of an image if that image's width is less than N.
     'images_min_width': 200,
+    
+    # Restrict the importing of an image if that image's height is less than N.
     'images_min_height': 200,
+    
+    # Set to 'and' if you want both images_min_* to fail in order to exclude an image.
+    # With 'and', if one of the dimensions fail and the other passes, the image will
+    # be included. Set to 'or' if you want one of images_min_* to fail in order to
+    # exclude an image. With 'or', if one of the dimensions fail, regardless of the
+    # other dimension, the image will be excluded from import.
     'images_min_inclusive': 'and',
 }
 

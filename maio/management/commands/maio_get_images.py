@@ -186,11 +186,18 @@ class Command(MaioBaseCommand):
                     # are within configured constraints
                     try:
                         im = Image.open(file_path)
-                        if MAIO_SETTINGS.get('images_min_inclusive', 'and').lower() == 'or':
+                        
+                        # this next if/elif statement looks backwards, but it's not.
+                        
+                        # we want to continue onto the next image if the user chooses
+                        # 'and' and the image's x 'or' y are out of range.
+                        if MAIO_SETTINGS.get('images_min_inclusive', 'and').lower() == 'and':
                             if im.size[0] < MAIO_SETTINGS.get('images_min_width', 200) or \
                                im.size[1] < MAIO_SETTINGS.get('images_min_height', 200):
                                     continue
-                        elif MAIO_SETTINGS.get('images_min_inclusive', 'and').lower() == 'and':
+                        # we want to continue onto the next image if the user chooses
+                        # 'or' and the image's x 'and' y are both out of range.
+                        elif MAIO_SETTINGS.get('images_min_inclusive', 'and').lower() == 'or':
                             if im.size[0] < MAIO_SETTINGS.get('images_min_width', 200) and \
                                im.size[1] < MAIO_SETTINGS.get('images_min_height', 200):
                                     continue
@@ -245,6 +252,9 @@ class Command(MaioBaseCommand):
                         # copy the image to the filestore if it doesn't already exist
                         im.save(img)
                     file_path = img
+                    width = im.width
+                    height = im.height
+                    comment = str(im.info)
                     
                     # process and save thumbnail to filestore
                     thumb_dir = mk_md5_dir(md5, os.path.join(MAIO_SETTINGS['filestore_directory'],
@@ -253,11 +263,8 @@ class Command(MaioBaseCommand):
                     if not os.path.isfile(thumb):
                         im.thumbnail((300, 300), Image.ANTIALIAS)
                         im.save(thumb)
-                    
-                    # save the width, height, and comment
-                    width = im.width
-                    height = im.height
-                    comment = str(im.info)
+                    tn_width = im.width
+                    tn_height = im.height
                     
                     # close image file
                     im.close()
@@ -362,9 +369,12 @@ class Command(MaioBaseCommand):
                                      'name': name_of_file,
                                      'extension': filename_ext,
                                      'mtime': sfile.st_mtime,
+                                     'size': sfile.st_size,
                                      'date_modified': mtime,
                                      'width': width,
                                      'height': height,
+                                     'tn_width': tn_width,
+                                     'tn_height': tn_height,
                                      'length': None,
                                      'comment': comment})
                     media.save()

@@ -14,3 +14,6 @@ class Tag(models.Model):
     
     class Meta:
         ordering = ['name']
+    
+    def __str__(self):
+        return '({}) {}'.format(str(self.id)[:6], self.name)
