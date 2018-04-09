@@ -142,6 +142,8 @@ class Command(MaioBaseCommand):
                     except:
                         raise
                     
+                    self.out('For file: {}'.format(file_path))
+                    
                     # get mime type
                     try:
                         mimetype = mime.from_file(file_path)
