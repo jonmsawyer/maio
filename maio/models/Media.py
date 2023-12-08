@@ -30,14 +30,14 @@ MEDIA_TYPE_CHOICES = (
 class Media(models.Model):
     '''
     Media class. Represents a sort of Meta class for a given File. Files may
-    have many ImageFiles, but there's at least one ImageFile per File is that File's
+    have many Media, but there's at least one Media per File is that File's
     ``media_class`` is ``image``.
     '''
     
     #: UUID unique ID.
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     
-    #: The File that this ImageFile points to.
+    #: The File that this Media points to.
     file = models.ForeignKey(File, on_delete=models.CASCADE)
     
     #: The media's tags
@@ -67,10 +67,10 @@ class Media(models.Model):
     #: The date time when this File was modified by Maio.
     date_modified = models.DateTimeField()
     
-    #: The width in pixels of the ImageFile
+    #: The width in pixels of the Media
     width = models.PositiveIntegerField(**NULL)
     
-    #: The height in pixes of the ImageFile
+    #: The height in pixes of the Media
     height = models.PositiveIntegerField(**NULL)
     
     #: The thumbnail width
@@ -82,7 +82,7 @@ class Media(models.Model):
     #: The length (in milliseconds for Audio or Video, null for Image and Document)
     length = models.FloatField(**NULL)
     
-    #: The number of loves that this ImageFile has received. Loves is a higher
+    #: The number of loves that this Media has received. Loves is a higher
     #: order likes.
     is_loved = models.BooleanField(default=False)
     
@@ -90,18 +90,18 @@ class Media(models.Model):
     is_liked = models.BooleanField(default=False)
     
     #: The rating given by the user.
-    rating = models.FloatField(default=0.0)
+    rating = models.PositiveSmallIntegerField(default=0)
     
-    #: The author of this ImageFile, if there is one.
+    #: The author of this Media, if there is one.
     author = models.CharField(max_length=1024, **NULL)
     
-    #: The URL source of this ImageFile, if there is one.
+    #: The URL source of this Media, if there is one.
     url = models.URLField(max_length=1024, **NULL)
     
-    #: The text source of this ImageFile, if there is one.
+    #: The text source of this Media, if there is one.
     source = models.CharField(max_length=1024, **NULL)
     
-    #: The Copyright info of this ImageFile, if there is one.
+    #: The Copyright info of this Media, if there is one.
     copyright = models.CharField(max_length=128, **NULL)
     
     #: Some image formats store other meta data in the file, such as GPS location,

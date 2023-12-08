@@ -22,22 +22,23 @@
     <link href="{% static 'open-iconic/font/css/open-iconic-bootstrap.css' %}" rel="stylesheet">
     
     <link href="{% static 'maio/css/site.css' %}" rel="stylesheet">
+    {% block head %}{% endblock head %}
+    {% block style %}{% endblock style %}
   </head>
 
   <body>
-
     {% include 'base/nav.html' %}
 
     <main role="main">
-    <div style="margin-top: 55px"></div>
-    {% block content %}{% endblock content %}
+      <div class="mt-5"></div>
+      {% block content %}{% endblock content %}
     </main>
     
     {% include 'base/footer.html' %}
     
     <!-- Bootstrap core JavaScript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
+         ==========================================================
+         Placed at the end of the document so the pages load faster -->
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
             integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
             crossorigin="anonymous"
@@ -50,5 +51,6 @@
             integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
             crossorigin="anonymous"
     ></script>
+    {% block script %}{% endblock script %}
   </body>
 </html>

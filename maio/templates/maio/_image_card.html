@@ -1,0 +1,92 @@
+{# image card file #}
+{# requires a Media instance named 'image' and an integer named 'width' context variables #}
+
+{% load staticfiles %}
+
+{% if image and width %}
+<div class="card m-2 p-0" style="width: {{width}}px;">
+  <!-- top of card, image -->
+  <div style="height: {{width}}px;
+              overflow: hidden;">
+    <a href="{% static image.file.file_path %}"
+    ><img class="card-img-top"
+          src="{% static image.file.tn_path %}"
+          alt="{{ image.name }}.{{ image.extension }}"
+          style="{% if image.width > image.height %}
+                   height: {{width}}px; width: auto;
+                 {% else %}
+                   width: {{width}}px; height: auto;
+                 {% endif %}
+                 {% if image.width > image.height %}
+                   margin-left: {{image.margin_left}}px;
+                 {% else %}
+                   margin-top: {{image.margin_top}}px;
+                 {% endif %}"
+    >
+    </a>
+  </div>
+  <!-- /image -->
+  
+  <div class="card-body p-1"> <!-- title -->
+    <h5 class="card-title">
+      {{ image.name }}.{{ image.extension }}
+    </h5>
+    {% if image.author %}
+    <!-- author -->
+    <div class="card-text" style="font-size: 10pt;">
+      Author:
+      {% if image.url %}
+        <a href="{{ image.url }}">
+      {% endif %}
+      
+      {{ image.author }}
+      
+      {% if image.url %}
+        </a>
+      {% endif %}
+    </div> <!-- /author -->
+    {% endif %}
+    
+    {% if image.copyright %}
+    <!-- copyright -->
+    <div class="card-text" style="font-size: 10pt;">
+      Copyright: {{ image.copyright }}
+    </div> <!-- /copyright -->
+    {% endif %}
+  </div>  <!-- /title -->
+  
+  <!-- rating -->
+  <div class="card-body p-0 border-bottom clearfix pb-1" style="font-size: 14pt;">
+    <span class="oi oi-heart float-right mr-2" title="Love this image" aria-hidden="true"></span>
+    <span class="oi oi-thumb-up float-right mr-2" title="Like this image" aria-hidden="true"></span>
+    <span class="oi oi-star float-left ml-2" title="star" aria-hidden="true"></span>
+  </div>
+  <!-- /rating -->
+  
+  <!-- tags -->
+  <div class="card-body p-1 border-bottom" style="font-size: 10pt;">
+    Tags: 
+    {% for tag in image.tags.all %}
+      <span class="badge badge-secondary">#{{ tag.name }}</span>
+    {% empty %}
+      No tags
+    {% endfor %}
+  </div>
+  <!-- /tags -->
+  
+  {% if image.source %}
+  <!-- source -->
+  <div class="card-body p-1 border-bottom" style="font-size: 10pt;">
+    Source: {{ image.source }}
+  </div>
+  <!-- /source -->
+  {% endif %}
+  
+  <!-- date modified and dimensions -->
+  <div class="card-body p-1 clearfix" style="font-size: 10pt;">
+    <span class="float-left">{{ image.date_modified }}</span>
+    <span class="float-right">{{ image.width }}x{{ image.height }}</span>
+  </div>
+  <!-- /date modified and dimensions -->
+</div>
+{% endif %}

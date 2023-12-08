@@ -1,3 +1,10 @@
+'''
+:File: maio_get_images.py
+:Module: ``maio.management.commands.maio_get_images.py``
+'''
+
+# pylint:
+
 import os
 import sys
 import hashlib
@@ -25,18 +32,28 @@ from ._base import MaioBaseCommand
 
 
 class Command(MaioBaseCommand):
+    '''
+    This class is extended from :mod:`MaioBaseCommand` and is the driver for Maio's
+    Django command to ingest images into Maio. Call this command with::
+        $ manage.py maio_get_images /path/to/images/dir [options]
+    
+    For help, and to see other options, issue::
+        $ manage.py maio_get_images --help
+    '''
     args = '<None>'
-    help = 'Scrapes images in one or more directories.'
+    help = 'Scrapes images into Maio in one or more directories.'
     
     def add_arguments(self, parser):
         # Positional arguments
-        parser.add_argument('username', nargs=1, type=str, metavar='USERNAME',
+        parser.add_argument('username', type=str, metavar='USERNAME',
                             help=('Set owner of each file to %(metavar)s'))
         
         parser.add_argument('directories', nargs='+', type=str, metavar='DIRECTORIES',
                             help=('Scrape images from %(metavar)s'))
         
         # Optional arguments
+        
+        # Tagging
         parser.add_argument('--tag-directories', '-td', action='store_true',
                             help=('Tag the supplied directories for Image Tags. Does not tag '
                                   'subdirectories under the supplied directories.'))
@@ -51,8 +68,46 @@ class Command(MaioBaseCommand):
         parser.add_argument('--tag-all', '-ta', action='store_true',
                             help=('Equivalent to options -td -ts -tf.'))
         
-        parser.add_argument('--tags', '-t', nargs='*', type=str, metavar='TAGS',
-                            help=('Tag each image with %(metavar)s'))
+        parser.add_argument('--tags', '-t', nargs='*', type=str, metavar='TAG',
+                            help=('Tag each image with %(metavar)s.'))
+        
+        # Meta
+        parser.add_argument('--love', '-lv', action='store_true',
+                            help=('Mark each image with a "Love" rating.'))
+        
+        parser.add_argument('--like', '-lk', action='store_true',
+                            help=('Mark each image with a "Like" rating.'))
+        
+        parser.add_argument('--rating', '-r', type=int, metavar='RATING',
+                            help=('Rate each image with %(metavar)s. Choices are integers '
+                                  'from 0 to 5, inclusive.'))
+        
+        parser.add_argument('--author', '-a', type=str, metavar='AUTHOR',
+                            help=('Set the %(metavar)s for each image.'))
+        
+        parser.add_argument('--url', '-u', type=str, metavar='URL',
+                            help=('Set the %(metavar)s for each image.'))
+        
+        parser.add_argument('--source', '-s', type=str, metavar='SOURCE',
+                            help=('Set the %(metavar)s for each image.'))
+        
+        parser.add_argument('--copyright', '-cr', type=str, metavar='COPYRIGHT',
+                            help=('Set the %(metavar)s for each image.'))
+        
+        parser.add_argument('--comment', '-co', type=str, metavar='COMMENT',
+                            help=('Set the %(metavar)s for each image.'))
+        
+        parser.add_argument('--set-inactive', '-si', action='store_true',
+                            help=('By default, all images are set to an active state. '
+                                  'Use this flag to set each image as inactive.'))
+        
+        parser.add_argument('--set-hidden', '-sh', action='store_true',
+                            help=('By default, all images are not hidden. '
+                                  'Use this flag to set each image as hidden.'))
+        
+        parser.add_argument('--set-deleted', '-sd', action='store_true',
+                            help=('By default, all images are not delete. '
+                                  'Use this flag to set each image as deleted.'))
     
     def handle(self, *args, **kwargs):
         # shortcut settings
@@ -92,7 +147,7 @@ class Command(MaioBaseCommand):
             return False
         
         # grab the username from the options
-        username = kwargs.get('username', [''])[0]
+        username = kwargs.get('username')
         
         # tag flag options
         tag_directories = kwargs.get('tag_directories')
@@ -100,6 +155,37 @@ class Command(MaioBaseCommand):
         tag_filenames = kwargs.get('tag_filenames')
         tag_all = kwargs.get('tag_all')
         tags_input = kwargs.get('tags')
+        is_loved = kwargs.get('love')
+        is_liked = kwargs.get('like')
+        rating = kwargs.get('rating')
+        author = kwargs.get('author')
+        url = kwargs.get('url')
+        source = kwargs.get('source')
+        copyright = kwargs.get('copyright')
+        comment = kwargs.get('comment')
+        set_inactive = kwargs.get('set_inactive')
+        set_hidden = kwargs.get('set_hidden')
+        set_deleted = kwargs.get('set_deleted')
+        
+        if set_inactive:
+            is_active = False
+        else:
+            is_active = True
+        if set_hidden:
+            is_hidden = True
+        else:
+            is_hidden = False
+        if set_deleted:
+            is_deleted = True
+        else:
+            is_deleted = False
+        kwargs.update({'is_active': is_active,
+                       'is_hidden': is_hidden,
+                       'is_deleted': is_deleted})
+        
+        if not rating:
+            rating = 0
+        
         if tags_input is None:
             tags_input = []
         
@@ -251,12 +337,21 @@ class Command(MaioBaseCommand):
                                                            'media', 'images'))
                     img = os.path.join(img_dir, md5+'.'+filename_ext)
                     if not os.path.isfile(img):
-                        # copy the image to the filestore if it doesn't already exist
-                        im.save(img)
+                        try:
+                            # copy the image to the filestore if it doesn't already exist
+                            im.save(img)
+                        except TypeError:
+                            # TODO: file is probably a gif movie, just skip this sort of error
+                            #       and deal with this later
+                            continue
                     file_path = img
                     width = im.width
                     height = im.height
-                    comment = str(im.info)
+                    if comment:
+                        comment = comment + '\n\n-----------------\n\n' + str(im.info)
+                    else:
+                        if str(im.info):
+                            comment = str(im.info)
                     
                     # process and save thumbnail to filestore
                     thumb_dir = mk_md5_dir(md5, os.path.join(MAIO_SETTINGS['filestore_directory'],
@@ -377,8 +472,17 @@ class Command(MaioBaseCommand):
                                      'height': height,
                                      'tn_width': tn_width,
                                      'tn_height': tn_height,
-                                     'length': None,
-                                     'comment': comment})
+                                     'is_loved': is_loved,
+                                     'is_liked': is_liked,
+                                     'rating': rating,
+                                     'author': author,
+                                     'url': url,
+                                     'source': source,
+                                     'copyright': copyright,
+                                     'comment': comment,
+                                     'is_active': is_active,
+                                     'is_hidden': is_hidden,
+                                     'is_deleted': is_deleted})
                     media.save()
                     
                     self.out('Tagging tags {} to "{}.{}"'
@@ -395,5 +499,5 @@ class Command(MaioBaseCommand):
                             t = Tag(name=tag)
                             t.save()
                         
-                        # now associate the tag to the ImageFile
+                        # now associate the tag to the image
                         media.tags.add(t)

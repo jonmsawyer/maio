@@ -14,6 +14,9 @@ import re
 from conf import site_settings
 
 
+# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -53,6 +56,35 @@ TEMPLATES = [
         },
     },
 ]
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'maio': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs', 'maio.log'),
+        },
+        'maio.DEBUG': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs', 'maio.DEBUG.log'),
+        },
+    },
+    'loggers': {
+        'maio': {
+            'handlers': ['maio'],
+            'level': 'DEBUG',
+            'proagate': False,
+        },
+        'maio.DEBUG': {
+            'handlers': ['maio.DEBUG'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}
 
 WSGI_APPLICATION = 'maio.wsgi.application'
 

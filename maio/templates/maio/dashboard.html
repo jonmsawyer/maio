@@ -4,108 +4,19 @@
 {% block title %}Dashboard{% endblock title %}
 
 {% block content %}
-      <div class="container">
-          <h1>Dashboard</h1>
-          
-          <div class="row">
-              {% for image in images %}
-              <div class="card m-2 p-0" style="width: {{width}}px;">
-                  <div style="height: {{width}}px;
-                              overflow: hidden;">
-                    <a href="{% static image.file.file_path %}"
-                    ><img class="card-img-top"
-                          src="{% static image.file.tn_path %}"
-                          alt="{{ image.name }}.{{ image.extension }}"
-                          style="{% if image.width > image.height %}
-                                 height: {{width}}px; width: auto;
-                                 {% else %}
-                                 width: {{width}}px; height: auto;
-                                 {% endif %}
-                                 {% if image.width > image.height %}
-                                 margin-left: {{image.margin_left}}px;
-                                 {% else %}
-                                 margin-top: {{image.margin_top}}px;
-                                 {% endif %}"
-                    ></a>
-                  </div>
-                  <div class="card-body p-1">
-                      <h5 class="card-title">{{ image.name }}.{{ image.extension }}</h5>
-                      <div class="card-text" style="font-size: 10pt;">
-                          <div>
-                          {% if image.author %}
-                              {% if image.url %}
-                                  <a href="{{ image.url }}">
-                              {% endif %}
-                                  {{ image.author }}
-                              {% if image.url %}
-                                  </a> -
-                              {% endif %}
-                          {% endif %}
-                          left: {{ image.margin_left }}, top: {{ image.margin_top }}
-                          </div>
-                      </div>
-                  </div>
-                  <div class="card-body p-0 border-bottom clearfix" style="font-size: 14pt;">
-                      <span class="oi oi-heart float-right mr-2" title="Love this image" aria-hidden="true"></span>
-                      <span class="oi oi-thumb-up ml-2" title="Like this image" aria-hidden="true"></span>
-                      <span class="oi oi-star float-right mr-2" title="star" aria-hidden="true"></span>
-                  </div>
-                  <div class="card-body p-1 border-bottom" style="font-size: 10pt;">
-                      Tags: 
-                      {% for tag in image.tags.all %}
-                          <span class="badge badge-secondary">#{{ tag.name }}</span>
-                      {% empty %}
-                          No tags
-                      {% endfor %}
-                  </div>
-                  <div class="card-body p-1 border-bottom" style="font-size: 10pt;">
-                      Source: {{ image.source }}
-                  </div>
-                  <div class="card-body p-1 clearfix" style="font-size: 10pt;">
-                    <span class="float-left">{{ image.date_modified }}</span>
-                    <span class="float-right">{{ image.width }}x{{ image.height }}</span>
-                  </div>
-                  <!-- <a href="{% static image.file.file_path %}"
-                  ><img src="{% static image.file.tn_path %}"></a> -->
-              </div>
-              {% empty %}
-              <div>
-                  No images.
-              </div>
-              {% endfor %}
-          </div> <!-- /row -->
-      </div>
-        
-        <!-- stats? -->
-        <div class="row mt-5">
-          <div class="col-md-3">
-            <h2>Images</h2>
-            <p>
-                There are N images in Maio.<br />
-                Size of images: 1.2 KB
-            </p>
-          </div>
-          <div class="col-md-3">
-            <h2>Audio</h2>
-            <p>
-                There are M audio tracks in Maio.<br />
-                Size of audio: 438 MB
-            </p>
-          </div>
-          <div class="col-md-3">
-            <h2>Video</h2>
-            <p>
-                There are J videos in Maio.<br />
-                Size of video: 1.2 MB
-           </p>
-          </div>
-          <div class="col-md-3">
-            <h2>Documents</h2>
-            <p>
-                There are K documents in Maio.<br />
-                Size of documents: 7.2 GB
-            </p>
-          </div>
+  <div class="container"> <!-- container -->
+    <h1>Dashboard</h1>
+    {% include 'maio/_pagination.html' %}
+    <div class="row justify-content-center">
+      {% for image in images %}
+        {% include 'maio/_image_card.html' %}
+      {% empty %}
+        <div>
+          No images.
         </div>
-      </div> <!-- /container -->
+      {% endfor %}
+    </div> <!-- /row -->
+    {% include 'maio/_pagination.html' %}
+    {% include 'maio/_stats.html' %}
+  </div> <!-- /container -->
 {% endblock content %}
