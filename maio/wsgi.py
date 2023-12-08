@@ -1,11 +1,17 @@
-"""
-WSGI config for maio project.
+'''
+File: wsgi.py
+
+Module: ``maio.wsgi``
+
+WSGI config for Maio project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
 For more information on this file, see
-https://docs.djangoproject.com/en/1.11/howto/deployment/wsgi/
-"""
+https://docs.djangoproject.com/en/4.2/howto/deployment/wsgi/
+'''
+
+from __future__ import annotations
 
 import os
 import sys
@@ -19,7 +25,7 @@ if env_path not in sys.path:
 from conf import virtualenv
 
 try:
-    venv = os.path.join(virtualenv.PATH, virtualenv.NAME)
+    venv = os.path.join(virtualenv.path, virtualenv.name)
     activate_this = os.path.join(venv, 'Scripts', 'activate_this.py')
     new_site = os.path.join(venv, 'Lib', 'site-packages')
     if not os.path.isfile(activate_this):

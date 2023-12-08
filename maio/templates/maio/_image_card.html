@@ -1,7 +1,7 @@
 {# image card file #}
 {# requires a Media instance named 'image' and an integer named 'width' context variables #}
 
-{% load staticfiles %}
+{% load static %}
 
 {% if image and width %}
 <div class="card m-2 p-0" style="width: {{width}}px;">
@@ -26,7 +26,7 @@
     </a>
   </div>
   <!-- /image -->
-  
+
   <div class="card-body p-1"> <!-- title -->
     <h5 class="card-title">
       {{ image.name }}.{{ image.extension }}
@@ -38,15 +38,15 @@
       {% if image.url %}
         <a href="{{ image.url }}">
       {% endif %}
-      
+
       {{ image.author }}
-      
+
       {% if image.url %}
         </a>
       {% endif %}
     </div> <!-- /author -->
     {% endif %}
-    
+
     {% if image.copyright %}
     <!-- copyright -->
     <div class="card-text" style="font-size: 10pt;">
@@ -54,7 +54,7 @@
     </div> <!-- /copyright -->
     {% endif %}
   </div>  <!-- /title -->
-  
+
   <!-- rating -->
   <div class="card-body p-0 border-bottom clearfix pb-1" style="font-size: 14pt;">
     <span class="oi oi-heart float-right mr-2" title="Love this image" aria-hidden="true"></span>
@@ -62,10 +62,10 @@
     <span class="oi oi-star float-left ml-2" title="star" aria-hidden="true"></span>
   </div>
   <!-- /rating -->
-  
+
   <!-- tags -->
   <div class="card-body p-1 border-bottom" style="font-size: 10pt;">
-    Tags: 
+    Tags:
     {% for tag in image.tags.all %}
       <span class="badge badge-secondary">#{{ tag.name }}</span>
     {% empty %}
@@ -73,7 +73,7 @@
     {% endfor %}
   </div>
   <!-- /tags -->
-  
+
   {% if image.source %}
   <!-- source -->
   <div class="card-body p-1 border-bottom" style="font-size: 10pt;">
@@ -81,7 +81,7 @@
   </div>
   <!-- /source -->
   {% endif %}
-  
+
   <!-- date modified and dimensions -->
   <div class="card-body p-1 clearfix" style="font-size: 10pt;">
     <span class="float-left">{{ image.date_modified }}</span>

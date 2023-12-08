@@ -1,4 +1,4 @@
-{% load staticfiles %}
+{% load static %}
 <!doctype html>
 <html lang="en">
   <head>
@@ -10,7 +10,7 @@
     <link rel="icon" href="{% static 'maio/imgs/favicon.ico' %}" type="image/x-icon">
     <link rel="apple-touch-icon" sizes="52x52" href="{% static 'maio/imgs/favicon.png' %}">
     <link rel="icon" type="image/png" sizes="52x52" href="{% static 'maio/imgs/favicon.png' %}">
-    
+
     <title>{% block title %}Maio{% endblock title %} | Maio</title>
 
     <!-- Bootstrap core CSS -->
@@ -18,9 +18,9 @@
           href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
           integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
           crossorigin="anonymous">
-    
+
     <link href="{% static 'open-iconic/font/css/open-iconic-bootstrap.css' %}" rel="stylesheet">
-    
+
     <link href="{% static 'maio/css/site.css' %}" rel="stylesheet">
     {% block head %}{% endblock head %}
     {% block style %}{% endblock style %}
@@ -33,9 +33,9 @@
       <div class="mt-5"></div>
       {% block content %}{% endblock content %}
     </main>
-    
+
     {% include 'base/footer.html' %}
-    
+
     <!-- Bootstrap core JavaScript
          ==========================================================
          Placed at the end of the document so the pages load faster -->

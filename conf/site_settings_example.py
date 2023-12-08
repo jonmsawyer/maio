@@ -1,31 +1,62 @@
+'''
+File: site_settings_example.py
+
+Module: ``maio.conf.site_settings_example``
+
+Copy and rename this file to ``site_settings.py`` to configure local site settings.
+'''
+
 import os
+from pathlib import Path
 
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Execute the lines below in a Python shell to generate your secret key.
+# >>> from random import choice
+# >>> from string import printable
+# >>> ''.join([choice(printable[:-6]) for _ in range(66)])
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '50 random characters'
+SECRET_KEY = '66 character secret key'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
 # Application definition
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost']
 
-MAIO_INSTALLED_APPS = []
-
-MAIO_MIDDLEWARE = []
-
-# Database
-# https://docs.djangoproject.com/en/1.11/ref/settings/#databases
-
+# DATABASES
+# A dictionary containing the settings for all databases to be used with Django. It is a nested
+# dictionary whose contents map a database alias to a dictionary containing the options for an
+# individual database. The DATABASES setting must configure a default database; any number of
+# additional databases may also be specified.
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db', 'db.sqlite3'),
-    }
+        'ENGINE': 'mssql',
+        'NAME': 'maio',
+        'HOST': r'HOSTNAME\SQLEXPRESS',
+        #'PORT': '1433',
+        'USER': 'maio',
+        'PASSWORD': '*********',
+        'OPTIONS': {
+            # driver
+            # String. ODBC Driver to use ("ODBC Driver 17 for SQL Server" etc). See
+            # http://msdn.microsoft.com/en-us/library/ms130892.aspx. Default is "SQL Server" on
+            # Windows and "FreeTDS" on other platforms.
+            'driver': 'ODBC Driver 17 for SQL Server',
+
+            # isolation_level
+            'isolation_level': 'READ UNCOMMITTED',
+
+            # unicode_results
+            'unicode_results': True,
+        },
+        'AUTOCOMMIT': True,
+        'ATOMIC_REQUESTS': True,
+        'Trusted_Connection': True,
+    },
 }
 
 # Internationalization
@@ -36,30 +67,15 @@ LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.11/howto/static-files/
+# https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-STATIC_URL = '/static/'
+# Maio specific settings
 
 MAIO_SETTINGS = {
-    # The directory where Maio will store the media and thumbnails.
     'filestore_directory': os.path.join(BASE_DIR, 'filestore'),
-    
-    # Restrict the importing of an image if that image's width is less than N.
     'images_min_width': 200,
-    
-    # Restrict the importing of an image if that image's height is less than N.
     'images_min_height': 200,
-    
-    # Set to 'and' if you want both images_min_* to fail in order to exclude an image.
-    # With 'and', if one of the dimensions fail and the other passes, the image will
-    # be included. Set to 'or' if you want one of images_min_* to fail in order to
-    # exclude an image. With 'or', if one of the dimensions fail, regardless of the
-    # other dimension, the image will be excluded from import.
-    'images_min_inclusive': 'and',
+    'images_min_inclusive': 'OR',
 }
-
-STATICFILES_DIRS = [
-    MAIO_SETTINGS['filestore_directory'],
-]

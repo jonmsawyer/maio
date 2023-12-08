@@ -10,6 +10,7 @@ follow.
 ### Create a Maio virtual environment
 
 `$ pip install virtualenv virtualenvwrapper virtualenvwrapper-win`
+
 `$ mkvirtualenv maio`
 
 After the `maio` virtual environment is created, you'll automatically be in the environment:

@@ -14,7 +14,7 @@ from django.conf import settings
 import django
 django.setup()
 
-from maio_core.models import File
+from maio.models import File
 
 MAIO_SETTINGS = settings.MAIO_SETTINGS
 
@@ -87,7 +87,7 @@ for root, subdirs, files in os.walk(directory):
                 raise
         except:
             raise
-       
+
         # get mime type
         try:
             mimetype = mime.from_file(file_path)
