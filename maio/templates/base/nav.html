@@ -1,92 +1,38 @@
-    {% if request.user.is_authenticated %}
-    <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-      <a class="navbar-brand" href="{% url 'home' %}">Maio</a>
-      <button class="navbar-toggler"
-              type="button"
-              data-toggle="collapse"
-              data-target="#navbarsExampleDefault"
-              aria-controls="navbarsExampleDefault"
-              aria-expanded="false"
-              aria-label="Toggle navigation"
-      >
-        <span class="navbar-toggler-icon"></span>
-      </button>
-
-      <div class="collapse navbar-collapse" id="navbarsExampleDefault">
-        <ul class="navbar-nav mr-auto">
-          <!-- <li class="nav-item active">
-            <a class="nav-link" href="{% url 'home' %}">Home</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Images</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Audio</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Video</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Documents</a>
-          </li> -->
-          <!-- <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle"
-               href="http://example.com"
-               id="dropdown01"
-               data-toggle="dropdown"
-               aria-haspopup="true"
-               aria-expanded="false"
-            >Options</a>
-            <div class="dropdown-menu" aria-labelledby="dropdown01">
-              <a class="dropdown-item" href="#">Sign In</a>
-              <a class="dropdown-item" href="#">Register</a>
-            </div>
-          </li> -->
-          <!-- <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle"
-               href="http://example.com"
-               id="dropdown01"
-               data-toggle="dropdown"
-               aria-haspopup="true"
-               aria-expanded="false"
-            >Settings</a>
-            <div class="dropdown-menu" aria-labelledby="dropdown01">
-              <a class="dropdown-item" href="#">Maio Settings</a>
-            </div>
-          </li> -->
-        </ul>
-        <span style="color: #eee; margin-right: 20px;">{{ request.user }}</span>
-        
+<nav class="navbar navbar-expand-md bg-body-tertiary" data-bs-theme="dark">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="{% url 'home' %}">Maio</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         {% if request.user.is_staff %}
-        <a class="btn btn-danger btn-md mr-1" href="{% url 'admin:index' %}">Admin</a>
+        <li class="nav-item" style="margin-right: 10px;">
+          <a class="btn btn-danger btn-md mr-1" href="{% url 'admin:index' %}">Admin</a>
+        </li>
         {% endif %}
-        
         {% if request.user.is_authenticated %}
-        <a class="btn btn-success btn-md" href="{% url 'logout' %}">Log Out</a>
+        <li class="nav-item">
+          <a class="btn btn-success btn-md" href="{% url 'logout' %}">Log Out</a>
+        </li>
         {% endif %}
-        <!-- <form class="form-inline my-2 my-lg-0">
-          <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">
-          <button class="btn btn-success my-2 my-sm-0" type="submit">Search</button>
-        </form>-->
-      </div>
-    </nav>
-    {% else %}
-    <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-      <a class="navbar-brand" href="{% url 'home' %}">Maio</a>
-      <button class="navbar-toggler"
-              type="button"
-              data-toggle="collapse"
-              data-target="#navbarsExampleDefault"
-              aria-controls="navbarsExampleDefault"
-              aria-expanded="false"
-              aria-label="Toggle navigation"
-      >
-        <span class="navbar-toggler-icon"></span>
-      </button>
-
-      <div class="collapse navbar-collapse" id="navbarsExampleDefault">
-        <ul class="navbar-nav mr-auto"></ul>
-        <span style="color: #eee; margin-right: 20px;">{{ request.user }}</span>
-      </div>
-    </nav>
-    {% endif %}
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            {{request.user}}
+          </a>
+          {% if request.user.is_authenticated %}
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="{% url 'upload_media' %}">Upload Media</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="{% url 'edit_profile' %}">Edit Profile</a></li>
+            </ul>
+          {% endif %}
+        </li>
+      </ul>
+      <form class="d-flex" role="search" action="{% url 'search' %}">
+        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+        <button class="btn btn-outline-success" type="submit">Search</button>
+      </form>
+    </div>
+  </div>
+</nav>

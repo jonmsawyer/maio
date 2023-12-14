@@ -9,12 +9,12 @@ Module: ``maio.lib``
 from collections import OrderedDict
 
 
-MIMETYPE_EXTENSION = {
+MIMETYPE_EXTENSION: dict[str, OrderedDict[str, tuple[str, ...]]] = {
     'image': OrderedDict([
         # GIF
         ('image/gif', ('.gif',)),
         ('image/gi_', ('.gif',)),
-        
+
         # JPG
         ('image/jpeg', ('.jpg', '.jpeg')),
         ('image/pjpeg', ('.pjpg', '.pjpeg')),
@@ -24,15 +24,15 @@ MIMETYPE_EXTENSION = {
         ('application/x-jpg', ('.jpg', '.jpeg')),
         ('image/pipeg', ('.jpg', '.jpeg')),
         ('image/vnd.swiftview-jpeg', ('.jpg', '.jpeg')),
-        
+
         # JPEG 2000
         ('image/jp2', ('.jp2', '.j2k', '.jpf')),
         ('image/jpx', ('.jpx',)),
         ('image/jpm', ('.jpm',)),
-        
+
         # PNG
         ('image/png', ('.png',)),
-        
+
         # TIFF
         ('image/tiff', ('.tiff', '.tif')),
         ('image/x-tiff', ('.tiff', '.tif')),
@@ -42,11 +42,11 @@ MIMETYPE_EXTENSION = {
         ('application/x-tif', ('.tif', '.tiff')),
         ('application/tiff', ('.tiff', '.tif')),
         ('application/x-tiff', ('.tiff', '.tif')),
-        
+
         # BMP
         ('image/bmp', ('.bmp',)),
         ('image/x-windows-bmp', ('.bmp',)),
-        
+
         # PCX
         ('image/vnd.zbrush.pcx', ('.pcx',)),
         ('image/x-pcx', ('.pcx',)),
@@ -56,7 +56,7 @@ MIMETYPE_EXTENSION = {
         ('image/x-pc-paintbrush', ('.pcx',)),
         ('image/x-pcx', ('.pcx',)),
         ('zz-application/zz-winassoc-pcx', ('.pcx',)),
-        
+
         # PPM
         ('image/x-portable-pixmap', ('.ppm', '.pbm', '.pgm', '.pnm')),
         ('image/x-portable-bitmap', ('.pbm', '.ppm', '.pgm', '.pnm')),
@@ -66,16 +66,16 @@ MIMETYPE_EXTENSION = {
         ('application/x-ppm', ('.ppm', '.pbm', '.pgm', '.pnm')),
         ('image/x-p', ('.ppm', '.pbm', '.pgm', '.pnm')),
         ('image/x-ppm', ('.ppm', '.pbm', '.pgm', '.pnm')),
-        
+
         # WEBP
         ('image/webp', ('.webp',)),
-        
+
         # PPM
         ('image/x-portable-bitmap', ('.ppm', '.pbm', '.pgm', '.pnm')),
         ('image/x-portable-graymap', ('.ppm', '.pbm', '.pgm', '.pnm')),
         ('image/x-portable-pixmap', ('.ppm', '.pbm', '.pgm', '.pnm')),
         ('image/x-portable-anymap', ('.ppm', '.pbm', '.pgm', '.pnm')),
-        
+
         #XBM
         ('image/x-xbitmap', ('.xbm',)),
         ('image/xbm', ('.xbm',)),

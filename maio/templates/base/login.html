@@ -1,57 +1,57 @@
-            {% if not request.user.is_authenticated %}
-            <div style="text-align: center; float: right;">
-              <form action="" method="post">
-                {% csrf_token %}
-                <div style="width: 600px;
-                            border: 1px solid #212529;
-                            margin: 0 auto;
-                            padding: 20px;
-                            border-radius: 10px;">
-                    <h3>Maio Login</h3>
-                    <div class="input-group input-group-lg">
-                      <div class="input-group-prepend">
-                        <label class="input-group-text"
-                               id="inputGroup-sizing-lg"
-                               for="{{ form.username.id_for_label }}"
-                        >{{ form.username.label }}</label>
-                      </div>
-                      <input type="text"
-                             class="form-control"
-                             aria-label="{{ form.username.label }}"
-                             aria-describedby="inputGroup-sizing-sm"
-                             name="{{ form.username.name }}"
-                             id="{{ form.username.id_for_label }}">
-                    </div>
-                    <div class="input-group input-group-lg" style="margin-top: 10px;">
-                      <div class="input-group-prepend">
-                        <label class="input-group-text"
-                               id="inputGroup-sizing-lg"
-                               for="{{ form.password.id_for_label }}"
-                        >{{ form.password.label }}</label>
-                      </div>
-                      <input type="password"
-                             class="form-control"
-                             aria-label="{{ form.password.label }}"
-                             aria-describedby="inputGroup-sizing-sm"
-                             name="{{ form.password.name }}"
-                             id="{{ form.password.id_for_label }}">
-                    </div>
-                    <div style="margin-top: 10px">
-                        <button type="submit" class="btn btn-primary btn-lg">Log In</button>
-                    </div>
-                </div>
-              </form>
-            </div>
-            {% else %}
-            <div style="text-align: center; float: right;">
-                <div style="width: 600px;
-                            border: 1px solid #212529;
-                            margin: 0 auto;
-                            padding: 20px;
-                            border-radius: 10px;">
-                    <h3>Maio Dashboard</h3>
-                    <a class="btn btn-primary btn-lg" href="{% url 'dashboard' %}"
-                    >Go to the Maio Dashboard</a>
-                </div>
-            </div>
-            {% endif %}
+{% if not request.user.is_authenticated %}
+<div style="text-align: center; float: right;">
+  <form action="" method="post">
+    {% csrf_token %}
+    <div style="width: 600px;
+                border: 1px solid #212529;
+                margin: 0 auto;
+                padding: 20px;
+                border-radius: 10px;">
+        <h3>Maio Login</h3>
+        <div class="input-group input-group-lg">
+          <div class="input-group-prepend">
+            <label class="input-group-text"
+                    id="inputGroup-sizing-lg"
+                    for="{{ form.username.id_for_label }}"
+            >{{ form.username.label }}</label>
+          </div>
+          <input type="text"
+                  class="form-control"
+                  aria-label="{{ form.username.label }}"
+                  aria-describedby="inputGroup-sizing-sm"
+                  name="{{ form.username.name }}"
+                  id="{{ form.username.id_for_label }}">
+        </div>
+        <div class="input-group input-group-lg" style="margin-top: 10px;">
+          <div class="input-group-prepend">
+            <label class="input-group-text"
+                    id="inputGroup-sizing-lg"
+                    for="{{ form.password.id_for_label }}"
+            >{{ form.password.label }}</label>
+          </div>
+          <input type="password"
+                  class="form-control"
+                  aria-label="{{ form.password.label }}"
+                  aria-describedby="inputGroup-sizing-sm"
+                  name="{{ form.password.name }}"
+                  id="{{ form.password.id_for_label }}">
+        </div>
+        <div style="margin-top: 10px">
+            <button type="submit" class="btn btn-primary btn-lg">Log In</button>
+        </div>
+    </div>
+  </form>
+</div>
+{% else %}
+<div style="text-align: center; float: right;">
+    <div style="width: 600px;
+                border: 1px solid #212529;
+                margin: 0 auto;
+                padding: 20px;
+                border-radius: 10px;">
+        <h3>Maio Dashboard</h3>
+        <a class="btn btn-primary btn-lg" href="{% url 'dashboard' %}"
+        >Go to the Maio Dashboard</a>
+    </div>
+</div>
+{% endif %}

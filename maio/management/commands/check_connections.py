@@ -26,7 +26,7 @@ class Command(BaseCommand):
             self.stdout.write('{} ... '.format(key), ending='')
             try:
                 db_conn = connections[key]
-                with db_conn.cursor() as c:
+                with db_conn.cursor() as _cursor:
                     self.stdout.write('OK')
             except Exception as e:
                 self.stdout.write('FAIL: {}'.format(e))

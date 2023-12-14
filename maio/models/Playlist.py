@@ -1,26 +1,37 @@
+'''
+File: Playlist.py
+
+Module: ``maio.models.Playlist``
+'''
+
+from __future__ import annotations
+
 import uuid
 
-from django.db import models
-from django.db.models import Q
+from django.db.models import (
+    Model, UUIDField, ManyToManyField, CharField, DateTimeField, PositiveSmallIntegerField,
+    FloatField, TextField, ForeignKey, DO_NOTHING,
+)
+from django.db.models.base import ModelBase
 
 from .Media import Media
-
-from .maiofields import FixedCharField
-
-
-#: Quick way of saying "NULL" for Django models
-NULL = {'null': True, 'blank': True}
+from .MaioMapType import MaioMapType
 
 
-class Playlist(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
-    media = models.ManyToManyField(Media)
-    name = models.CharField(max_length=1024)
-    tn_path = models.CharField(max_length=1024)
-    date_added = models.DateTimeField(auto_now_add=True)
-    date_modified = models.DateTimeField(auto_now=True)
-    default_order = models.PositiveSmallIntegerField(default=0) # 0 random, 1 descending, 2 ascending
-    seconds_between = models.FloatField(default=5.0)
-    caption = models.TextField(**NULL)
-    class Meta:
-        ordering = ['-date_modified']
+class PlaylistMeta(ModelBase):
+    '''Metaclass for Playlist model.'''
+    ordering = ['-date_modified']
+
+
+class Playlist(Model, metaclass=PlaylistMeta):
+    '''Playlist model.'''
+    id = UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    media: ManyToManyField[Media, Playlist] = ManyToManyField(Media)
+    name = CharField(max_length=1024)
+    tn_path = CharField(max_length=1024)
+    date_added = DateTimeField(auto_now_add=True)
+    date_modified = DateTimeField(auto_now=True)
+    default_order = PositiveSmallIntegerField(default=0) # 0 random, 1 descending, 2 ascending
+    seconds_between = FloatField(default=5.0)
+    caption_type = ForeignKey(to=MaioMapType, on_delete=DO_NOTHING, default=MaioMapType.default)
+    caption = TextField(null=True, blank=True)

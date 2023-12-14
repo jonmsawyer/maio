@@ -1,149 +1,142 @@
+'''
+File: Media.py
+
+Module: ``maio.models.Media``
+'''
+
+from __future__ import annotations
+
 import uuid
-from collections import OrderedDict
 
-from django.db import models
-from django.db.models import Q
-
+from django.http import HttpRequest
+from django.db.models import (
+    Model, UUIDField, ForeignKey, ManyToManyField, CharField, FloatField, PositiveIntegerField,
+    DateTimeField, BooleanField, URLField, TextField, QuerySet, CASCADE, DO_NOTHING,
+)
+from django.db.models.base import ModelBase
 from django.contrib.auth.models import User
-
-from maio import lib
 
 from .File import File
 from .Tag import Tag
-
-from .maiofields import FixedCharField
-
-
-#: Quick way of saying "NULL" for Django models
-NULL = {'null': True, 'blank': True}
-
-#: Choices for ``media_type`` field
-MEDIA_TYPE_CHOICES = (
-    ('image', 'Image'),
-    ('video', 'Video'),
-    ('audio', 'Audio'),
-    ('document', 'Document'),
-    ('other', 'Other'),
-)
+from .MaioType import MaioType, MaioTypeChoices
+from .MaioMapType import MaioMapType
 
 
-class Media(models.Model):
+class MediaMeta(ModelBase):
+    '''Metaclass for Media model.'''
+    name = 'Media'
+    verbose_name = 'Media'
+    app_label = 'maio'
+    db_table_comment = 'More than one Media may map onto one File.'
+    get_latest_by = ['file', '-date_modified']
+    order_with_respect_to = ['file', '-date_modified']
+
+
+class Media(Model, metaclass=MediaMeta):
     '''
-    Media class. Represents a sort of Meta class for a given File. Files may
+    Media model. Represents a sort of Meta object for a given File. Files may
     have many Media, but there's at least one Media per File is that File's
     ``media_class`` is ``image``.
     '''
-    
+
     #: UUID unique ID.
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
-    
+    id = UUIDField('UUID', primary_key=True, default=uuid.uuid4, editable=False)
+
     #: The File that this Media points to.
-    file = models.ForeignKey(File, on_delete=models.CASCADE)
-    
-    #: The media's tags
-    tags = models.ManyToManyField(Tag)
-    
-    #: One of ``['image', 'video', 'audio', 'document', 'other']``.
-    media_type = models.CharField(max_length=8, choices=MEDIA_TYPE_CHOICES)
-    
+    file = ForeignKey(File, on_delete=CASCADE)
+
+    #: The Maio Type of this Media.
+    maio_type = ForeignKey(to=MaioType, on_delete=DO_NOTHING, default=MaioType.default)
+
     #: Owner of the File
-    owner = models.ForeignKey(User, on_delete=models.CASCADE)
-    
+    owner = ForeignKey(User, on_delete=CASCADE)
+
+    #: The media's tags
+    tags: ManyToManyField[Tag, Media] = ManyToManyField(Tag)
+
     #: The base name for the File.
-    name = models.CharField(max_length=1024)
-    
+    name = CharField('Name', max_length=1024)
+
     #: The File extension, if known.
-    extension = models.CharField(max_length=8, **NULL)
-    
-    #: File modified date, as a Unix time stamp.
-    mtime = models.FloatField(default=0.0)
-    
-    #: The File size.
-    size = models.PositiveIntegerField(default=0)
-    
+    extension = CharField('Extension', max_length=8, null=True, blank=True)
+
     #: The date time when this File was added to Maio.
-    date_added = models.DateTimeField(auto_now_add=True)
-    
+    date_added = DateTimeField('Date Added', auto_now_add=True)
+
     #: The date time when this File was modified by Maio.
-    date_modified = models.DateTimeField()
-    
+    date_modified = DateTimeField('Date Modified', auto_now=True)
+
     #: The width in pixels of the Media
-    width = models.PositiveIntegerField(**NULL)
-    
+    width = PositiveIntegerField('Width (Pixels)', null=True, blank=True)
+
     #: The height in pixes of the Media
-    height = models.PositiveIntegerField(**NULL)
-    
+    height = PositiveIntegerField('Height (Pixels)', null=True, blank=True)
+
     #: The thumbnail width
-    tn_width = models.PositiveIntegerField(**NULL)
-    
+    tn_width = PositiveIntegerField('Thumbnail Width (Pixels)', null=True, blank=True)
+
     #: The thumbnail height
-    tn_height = models.PositiveIntegerField(**NULL)
-    
+    tn_height = PositiveIntegerField('Thumbnail Height (Pixels)', null=True, blank=True)
+
     #: The length (in milliseconds for Audio or Video, null for Image and Document)
-    length = models.FloatField(**NULL)
-    
-    #: The number of loves that this Media has received. Loves is a higher
-    #: order likes.
-    is_loved = models.BooleanField(default=False)
-    
-    #: Whether or not this media is liked by the owner.
-    is_liked = models.BooleanField(default=False)
-    
-    #: The rating given by the user.
-    rating = models.PositiveSmallIntegerField(default=0)
-    
+    length = FloatField('Length (Milliseconsd)', null=True, blank=True)
+
     #: The author of this Media, if there is one.
-    author = models.CharField(max_length=1024, **NULL)
-    
+    author = CharField('Author', max_length=1024, null=True, blank=True)
+
     #: The URL source of this Media, if there is one.
-    url = models.URLField(max_length=1024, **NULL)
-    
+    url = URLField('URL', max_length=1024, null=True, blank=True)
+
     #: The text source of this Media, if there is one.
-    source = models.CharField(max_length=1024, **NULL)
-    
+    source = CharField('Source', max_length=1024, null=True, blank=True)
+
     #: The Copyright info of this Media, if there is one.
-    copyright = models.CharField(max_length=128, **NULL)
-    
+    copyright = CharField('Copyright', max_length=1024, null=True, blank=True)
+
+    #: Comment type
+    comment_type = ForeignKey(to=MaioMapType, on_delete=DO_NOTHING, default=MaioMapType.default)
+
     #: Some image formats store other meta data in the file, such as GPS location,
     #: lense information, type of camera, etc. What doesn't fit neatly into the
     #: fields above, goes into the ``comments`` field. Can be set to ``None``.
-    comment = models.TextField(**NULL)
-    
+    comment = TextField('Comment', null=True, blank=True)
+
     #: Set to ``True`` to mark this File "active". An active File means that the File is
     #: searchable and is a valid file to include in Playlists, etc. A non-active File is
     #: hidden from the regular views and filters.
     #:
     #: Default: ``True``
-    is_active = models.BooleanField(default=True)
-    
+    is_active = BooleanField('Is Active?', default=True)
+
     #: Set to ``True`` to mark this File as hidden. Only the owner of the File can see the
     #: File. Set to ``False`` to show this file in default views and filters.
     #:
     #: Default: ``False``
-    is_hidden = models.BooleanField(default=False)
-    
+    is_hidden = BooleanField('Is Hidden?', default=False)
+
     #: Set to ``True`` if this File shall be marked for deletion. Akin to the Recycle Bin
-    #: in Windows. Set to ``False`` to prevent this File from getting deleted. 
+    #: in Windows. Set to ``False`` to prevent this File from getting deleted.
     #:
     #: Default: ``False``
-    is_deleted = models.BooleanField(default=False)
-    
-    class Meta:
-        ordering = ['-date_modified']
-    
-    def __str__(self):
+    is_deleted = BooleanField('Is Deleted?', default=False)
+
+    def __str__(self) -> str:
+        id = str(self.id)[0:6]
+        maio_type = self.file.maio_type
+        name = self.name
         if self.extension:
             ext = '.'+self.extension
-        return '({}) [{}] {}{} - {} bytes'.format(str(self.id)[:6],
-                                                self.media_type,
-                                                self.name,
-                                                ext,
-                                                self.size)
-    
+        else:
+            ext = ''
+        size = self.file.size
+        return f"({id}) [{maio_type}] {name}{ext} - {size} bytes"
+
     @staticmethod
-    def get_all_images(request):
-        return Media.objects.filter(owner=request.user,
-                                    media_type='image',
-                                    is_active=True,
-                                    is_hidden=False,
-                                    is_deleted=False)
+    def get_all_images(request: HttpRequest) -> QuerySet[Media]:
+        return Media.objects.filter(
+            owner=request.user,
+            maio_type=MaioType.objects.get(maio_type=MaioTypeChoices.IMAGE),
+            is_active=True,
+            is_hidden=False,
+            is_deleted=False
+        )

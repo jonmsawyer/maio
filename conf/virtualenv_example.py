@@ -10,7 +10,7 @@ Requires ``virtualenvwrapper-win``::
     D:\\> pip install virtualenv virtualenvwrapper virtualenvwrapper-win
     D:\\> mkvirtualenv <the name>
 
-Copy and rename this file from to ``virtualenv.py`` and change the settings below.
+Copy and rename this file to ``virtualenv.py`` and change the settings below.
 '''
 
 #: Set this to be the directory path to the root of your virtualenv

@@ -29,15 +29,21 @@ try:
     activate_this = os.path.join(venv, 'Scripts', 'activate_this.py')
     new_site = os.path.join(venv, 'Lib', 'site-packages')
     if not os.path.isfile(activate_this):
-        raise Exception("Invalid Python Virtual Environment `%s'. Please be sure that the "
-                        "`%s' virtual environment exists before continuing." % (venv, venv))
-except AttributeError as e:
-    raise Exception(r"Could not read the attributes of your conf\virtualenv.py module. Please be "
-                    "sure that the `path` and `name' attributes are defined and valid.")
-except ImportError as e:
-    raise Exception(r"Could not import `conf\virtualenv.py module. Please rename "
-                    r"`conf\virtualenv.py.example' to `conf\virtualenv.py' and set the `path' and "
-                    "`name' attributes for your configuration.")
+        raise Exception(
+            f"Invalid Python Virtual Environment `{venv}`. Please be sure that "
+            f"the `{venv}` virtual environment exists before continuing."
+        )
+except AttributeError:
+    raise Exception(
+        "Could not read the attributes of your `conf/virtualenv.py` module. Please "
+        "be sure that the `path` and `name' attributes are defined and valid."
+    )
+except ImportError:
+    raise Exception(
+        "Could not import `conf/virtualenv.py` module. Please rename "
+        "`conf/virtualenv.py.example` to `conf/virtualenv.py` and set the `path` and "
+        "`name` attributes for your configuration."
+    )
 
 # Add the site-packages of the chosen virtualenv to work with
 site.addsitedir(new_site)

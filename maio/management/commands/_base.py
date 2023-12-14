@@ -4,17 +4,20 @@ File: base.py
 Module: ``maio.management.commands._base``
 '''
 
+from __future__ import annotations
+from typing import Any
+
 from pprint import pformat
 
-from django.core.management.base import BaseCommand
-from django.core.management.base import CommandError
+from django.core.management.base import BaseCommand #, CommandError
+
 
 class MaioBaseCommand(BaseCommand):
     args = '<None>'
     help = 'Extend MaioBaseCommand into a Command class to create a command for use in manage.py'
     can_import_settings = True
 
-    def out(self, *args, ending='\n', flush=True, **kwargs):
+    def out(self, *args: Any, ending: str = '\n', flush: bool = True, **kwargs: Any) -> None:
         first_arg = True
         for arg in args:
             if first_arg:

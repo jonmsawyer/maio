@@ -1,64 +1,85 @@
 '''
 File: File.py
+
 Module: ``maio.models.File``
 '''
 
-# pylint:
+from __future__ import annotations
 
 import uuid
 
-from django.db import models
-from django.db.models import Q
 
+from django.conf import settings
+from django.db.models import (
+    Model, UUIDField, CharField, PositiveIntegerField, FloatField, DateTimeField, ForeignKey,
+    FileField, ImageField, DO_NOTHING,
+)
+from django.db.models.base import ModelBase
+
+from conf import MaioConf
 from .maiofields import FixedCharField
+from .MaioType import MaioType
 
 
-#: Quick way of saying "NULL" for Django models
-NULL = {'null': True, 'blank': True}
+maio_conf = MaioConf(settings.MAIO_SETTINGS)
+
+class FileMeta(ModelBase):
+    '''Metaclass for File model.'''
+    name = 'File'
+    verbose_name = 'Files'
+    app_label = 'maio'
+    db_table_comment = 'Files are saved to the hard drive, network, or cloud.'
+    get_latest_by = ['-date_modified']
+    # order_with_respect_to = ['']
+    ordering = ['-date_modified']
 
 
-class File(models.Model):
-    '''File object. Represents a file stored in filestore/media.'''
-    
+class File(Model, metaclass=FileMeta):
+    '''File model. Represents a file stored in filestore/media.'''
+
     #: UUID unique ID.
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
-    
+    id = UUIDField('UUID', primary_key=True, default=uuid.uuid4, editable=False)
+
+    #: Maio's type.
+    maio_type = ForeignKey(to=MaioType, on_delete=DO_NOTHING)
+
     #: The md5sum hash of the File, should be unique.
-    md5sum = FixedCharField(max_length=32, unique=True)
-    
+    md5sum = FixedCharField('MD5SUM', max_length=32, unique=True, editable=False)
+
     #: The base name for the File.
-    original_name = models.CharField(max_length=1024)
-    
+    original_name = CharField('Original Name', max_length=1024, editable=False)
+
     #: The File extension, if known.
-    original_extension = models.CharField(max_length=8, null=True, blank=True)
-    
+    original_extension = CharField('Original Extension', max_length=8, null=True, blank=True, editable=False)
+
     #: The File's mime type.
-    mime_type = models.CharField(max_length=64)
-    
+    mime_type = CharField('MIME Type', max_length=64, editable=False)
+
     #: The size, in bytes, of the File.
-    size = models.PositiveIntegerField(default=0)
-    
+    size = PositiveIntegerField('Size (Bytes)', default=0, editable=False)
+
     #: File modified date, as a Unix time stamp.
-    mtime = models.FloatField(default=0.0)
-    
-    #: The thumbnail path stored in ./filestore/thumbnails.
-    tn_path = models.CharField(max_length=1024)
-    
-    #: The File path stored in ./filestore/media/images.
-    file_path = models.CharField(max_length=1024)
-    
+    mtime = FloatField('Modified Time', default=0.0, editable=False)
+
+    #: The thumbnail path stored in ./filestore/thumbnails/.
+    thumbnail = ImageField('Thumbnail File', max_length=1024, upload_to=maio_conf.get_thumbnail_path(), null=True, blank=True, editable=False)
+
+    #: The File path stored in ./filestore/media/
+    content_file = FileField('Content File', max_length=1024, upload_to=maio_conf.get_upload_path(), null=True, blank=True)
+
+    #: The META file path fored in ./filestore/media/
+    meta_file = FileField('Meta File', max_length=1024, upload_to=maio_conf.get_meta_path(), null=True, blank=True, editable=False)
+
     #: The date time when this File was added to Maio.
-    date_added = models.DateTimeField(auto_now_add=True)
-    
+    date_added = DateTimeField('Date Added', auto_now_add=True)
+
     #: The date time when this File was modified by Maio.
-    date_modified = models.DateTimeField()
-    
-    class Meta:
-        ordering = ['-date_modified']
-    
-    def __str__(self):
-        return '({}) {}.{} - {} - {} bytes'.format(str(self.id)[0:6],
-                                   self.original_name,
-                                   self.original_extension,
-                                   self.mime_type,
-                                   self.size)
+    date_modified = DateTimeField('Date Modified', auto_now=True)
+
+    def __str__(self) -> str:
+        id = str(self.id)[0:6]
+        name = self.original_name
+        ext = self.original_extension
+        mime = self.mime_type
+        size = self.size
+        return f"({id}) {name}.{ext} - {mime} - {size} bytes"

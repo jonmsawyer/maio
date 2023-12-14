@@ -1,0 +1,31 @@
+{
+    "emeraldwalk.runonsave": {
+    	"commands": [
+            {
+                "match": "\\.py$",
+                "isAsync": true,
+                "cmd": "\"${env.MAIO_HTTP_SERVER}\" -n \"${env.MAIO_HTTP_SERVICE}\" -k restart"
+            },
+            {
+                "match": "\\.html$",
+                "isAsync": true,
+                "cmd": "\"${env.MAIO_HTTP_SERVER}\" -n \"${env.MAIO_HTTP_SERVICE}\" -k restart"
+            },
+            {
+                "match": "\\.conf$",
+                "isAsync": true,
+                "cmd": "\"${env.MAIO_HTTP_SERVER}\" -n \"${env.MAIO_HTTP_SERVICE}\" -k restart"
+            },
+            {
+                "match": "\\.js$",
+                "isAsync": false,
+                "cmd": "activate.bat && py manage.py collectstatic --noinput"
+            },
+            {
+                "match": "\\.css$",
+                "isAsync": false,
+                "cmd": "activate.bat && py manage.py collectstatic --noinput"
+            }
+        ]
+    },
+}

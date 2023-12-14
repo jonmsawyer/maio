@@ -1,17 +1,21 @@
 '''
-:file: dashboard.py
-:module: ``maio.views.dashboard``
+File: dashboard.py
+
+Module: ``maio.views.dashboard``
 '''
 
-# pylint:
+from __future__ import annotations
+from typing import Any
 
 import logging
 import time
 from datetime import datetime
 
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.core.paginator import Page, Paginator
+from django.db.models import QuerySet
 
 from maio.models import Media
 
@@ -20,7 +24,7 @@ logger.debug('============================================')
 logger.debug('Logger start: {}'.format(datetime.now()))
 logger.debug('============================================')
 
-def get_pagination(request, items, per_page):
+def get_pagination(request: HttpRequest, items: QuerySet[Any], per_page: int | str) -> Page:
     spread = 6
     paginator = Paginator(items, per_page)
     page = request.GET.get('page')
@@ -30,11 +34,11 @@ def get_pagination(request, items, per_page):
         page_range_first = 0
     page_range_last = pages.number + spread
     page_range = list(paginator.page_range)[page_range_first:page_range_last]
-    pages.paginator.custom_page_range = page_range
+    pages.paginator.custom_page_range = page_range # type: ignore[reportGeneralTypeIssues]
     return pages
 
 @login_required
-def dashboard(request):
+def dashboard(request: HttpRequest) -> HttpResponse:
     cd = {}
     width = 260
     images_list = Media.get_all_images(request)

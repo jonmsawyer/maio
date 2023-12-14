@@ -1,3 +1,11 @@
+'''
+File: apps.py
+
+Module: ``maio.apps``
+'''
+
+from __future__ import annotations
+
 from django.apps import AppConfig
 
 
