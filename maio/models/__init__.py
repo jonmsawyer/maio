@@ -8,13 +8,13 @@ from django.conf import settings
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 
-
 from .File import File
 from .Caption import Caption
 from .Media import Media
 from .Playlist import Playlist
 from .Tag import Tag
 from .MaioMapType import MaioMapType, MaioMapTypeChoices
+# from .MaioMimeType import MaioMimeType
 from .MaioMap import MaioMap
 from .MaioUser import MaioUser
 from .MaioType import MaioType, MaioTypeChoices
@@ -30,6 +30,7 @@ __all__: list[str] = [
     'Playlist',
     'Tag',
     'MaioMapType', 'MaioMapTypeChoices',
+    # 'MaioMimeType',
     'MaioMap',
     'MaioUser',
     'MaioType', 'MaioTypeChoices',

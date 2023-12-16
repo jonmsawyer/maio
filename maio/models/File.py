@@ -6,8 +6,11 @@ Module: ``maio.models.File``
 
 from __future__ import annotations
 
+# import os
 import uuid
+import hashlib
 
+import magic # for mime types
 
 from django.conf import settings
 from django.db.models import (
@@ -15,6 +18,8 @@ from django.db.models import (
     FileField, ImageField, DO_NOTHING,
 )
 from django.db.models.base import ModelBase
+from django.utils.datastructures import MultiValueDictKeyError
+
 
 from conf import MaioConf
 from .maiofields import FixedCharField
@@ -22,6 +27,11 @@ from .MaioType import MaioType
 
 
 maio_conf = MaioConf(settings.MAIO_SETTINGS)
+
+
+class MimeTypeNotSetError(Exception):
+    '''Raise this error when the `mime_type` field is not set.'''
+
 
 class FileMeta(ModelBase):
     '''Metaclass for File model.'''
@@ -83,3 +93,61 @@ class File(Model, metaclass=FileMeta):
         mime = self.mime_type
         size = self.size
         return f"({id}) {name}.{ext} - {mime} - {size} bytes"
+
+    @staticmethod
+    def handle_uploaded_file(request: HttpRequest, field: str) -> File | bool:
+        '''Handle the uploaded file as given by `request.FILES`.'''
+        try:
+            content_file = request.FILES[field]
+            maio_file = File(content_file=content_file)
+        except MultiValueDictKeyError:
+            return False
+
+        _deets = f'''
+            Content File
+            ------------
+            Name: {maio_file.content_file.name}
+            Size: {maio_file.content_file.size}
+            Content Type: {content_file.content_type}
+            Content Type Extra: {content_file.content_type_extra}
+            Charset: {content_file.charset}
+            Upload To: {File.content_file.field.upload_to}
+        '''
+        # raise Exception(_deets)
+
+        maio_file.save_file(request)
+        maio_file.set_data(request, content_file)
+        return maio_file
+
+    def save_file(self):
+        '''Save the file referenced by `self.content_file`.'''
+        with open(self.content_file, 'wb+') as destination:
+            for chunk in self.content_file.chunks():
+                destination.write(chunk)
+
+    def set_data(self, request: HttpRequest, content_file):
+        '''Set the data attributes of this object based on the uploaded file and input data.'''
+        self.md5sum = self.calculate_md5sum()
+        self.original_name = ''.join(self.content_file.name.split('.')[:-1])
+        self.original_extension = ''.join(self.content_file.name.split('.')[1:])
+        self.mime_type = self.calculate_mimetype()
+        self.maio_type = self.calculate_maio_type()
+
+    def calculate_md5sum(self) -> str:
+        '''Return the md5sum of the file represented by this object.'''
+        return hashlib.md5(open(self.content_file, 'rb').read()).hexdigest
+
+    def calculate_mimetype(self):
+        '''Return the mime type of the file represented by this object.'''
+        mime = magic.Magic(mime=True)
+        return mime.from_file(self.content_file.path)
+
+    def calculate_maio_type(self):
+        '''Return the MaioType of the file represented by this object.'''
+        if not self.mime_type:
+            raise MimeTypeNotSetError(
+                'The `mime_type` must be set in order to calculate the `MaioType`.'
+            )
+
+        return 
+        # return MaioType(maio_type=MaioTypeChoices.IMAGE)

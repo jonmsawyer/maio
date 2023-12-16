@@ -22,6 +22,7 @@
           </a>
           {% if request.user.is_authenticated %}
             <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="{% url 'dashboard' %}">Dashboard</a></li>
               <li><a class="dropdown-item" href="{% url 'upload_media' %}">Upload Media</a></li>
               <li><hr class="dropdown-divider"></li>
               <li><a class="dropdown-item" href="{% url 'edit_profile' %}">Edit Profile</a></li>
