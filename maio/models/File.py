@@ -149,5 +149,4 @@ class File(Model, metaclass=FileMeta):
                 'The `mime_type` must be set in order to calculate the `MaioType`.'
             )
 
-        return 
         # return MaioType(maio_type=MaioTypeChoices.IMAGE)
