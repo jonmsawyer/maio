@@ -2,6 +2,8 @@
 
 Version: development, super-pre-alpha, not-even-ready-for-testing
 
+## Warning: Maio is under heavy development, the follow instructions may no longer apply.
+
 ## Installing Maio
 
 So far, Maio has only been developed and installed on Linux. Official Windows and Mac support will
