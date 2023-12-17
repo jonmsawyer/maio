@@ -11,9 +11,9 @@
 # Internet media types should be registered as described in RFC 4288.
 # The registry is at <http://www.iana.org/assignments/media-types/>.
 #
-# Data dumped by Maio on: 2023-12-17 00:58:10.807794+00:00
+# Data dumped by Maio on: 2023-12-17 01:37:28.886713+00:00
 #
-# MIME type (lowercased)                                                                Maio Type    Extensions
+# MIME type (lowercased)                                                                Maio Type   Extensions
 # ==================================================================================    ========    =====================================================
 application/1d-interleaved-parityfec                                                    document    
 application/3gpdash-qoe-report+xml                                                      document    

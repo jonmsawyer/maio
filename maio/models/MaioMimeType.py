@@ -125,7 +125,7 @@ class MaioMimeType(Model, metaclass=MaioMimeTypeMeta):
                 longest_extensions = len(mime_type.extensions)
 
         header = ('MIME type (lowercased)', 'Maio Type', 'Extensions')
-        buf += f"# {header[0]:<{longest_mime_type-2}}    {header[1]:<{longest_maio_type}}    {header[2]}\n"
+        buf += f"# {header[0]:<{longest_mime_type-2}}    {header[1]:<{longest_maio_type}}   {header[2]}\n"
         buf += "# " + "="*(longest_mime_type-2) + "    " + "="*longest_maio_type + "    " + "="*longest_extensions + "\n"
 
         for mime_type, maio_type, extensions in mimetypes:
@@ -134,4 +134,4 @@ class MaioMimeType(Model, metaclass=MaioMimeTypeMeta):
         with open(os.path.join(settings.BASE_DIR, 'data', 'mime.types'), 'w') as fh:
             fh.write(buf)
 
-        print("MIME type data has been dumped from the database.")
+        print("MIME type data has been dumped from the database to `./data/mime.types`.")
