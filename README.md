@@ -2,7 +2,7 @@
 
 Version: development, super-pre-alpha, not-even-ready-for-testing
 
-## Warning: Maio is under heavy development, the follow instructions may no longer apply.
+## Warning: Maio is under heavy development, the following instructions may no longer apply.
 
 ## Installing Maio
 
