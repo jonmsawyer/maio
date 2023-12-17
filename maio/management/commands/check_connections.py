@@ -1,7 +1,7 @@
 '''
 File: check_connections.py
 
-Module: ``acsapi.management.commands.check_connections``
+Module: ``maio.management.commands.check_connections``
 
 Custom manage.py command. Check the connection status of all database defined in
 `settings.DATABASES`.

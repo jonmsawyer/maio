@@ -14,7 +14,7 @@ from .Media import Media
 from .Playlist import Playlist
 from .Tag import Tag
 from .MaioMapType import MaioMapType, MaioMapTypeChoices
-# from .MaioMimeType import MaioMimeType
+from .MaioMimeType import MaioMimeType
 from .MaioMap import MaioMap
 from .MaioUser import MaioUser
 from .MaioType import MaioType, MaioTypeChoices
@@ -30,7 +30,7 @@ __all__: list[str] = [
     'Playlist',
     'Tag',
     'MaioMapType', 'MaioMapTypeChoices',
-    # 'MaioMimeType',
+    'MaioMimeType',
     'MaioMap',
     'MaioUser',
     'MaioType', 'MaioTypeChoices',
