@@ -9,3 +9,12 @@
 .highlight_media {
     background-color: rgb(244, 103, 88);
 }
+
+.maio-media-icon {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    z-index: 1;
+    background-color: white;
+    border-radius: 2px;
+}

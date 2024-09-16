@@ -153,7 +153,7 @@ class Media(Model, metaclass=MediaMeta):
         else:
             ext = ''
         size = self.file.size
-        return f"({id}) [{maio_type}] {name}{ext} - {size} bytes"
+        return f"({id}) [{maio_type}] {name}{ext} - {size} Bytes"
 
     @staticmethod
     def get_all_images(request: HttpRequest) -> QuerySet[Media]:
@@ -165,7 +165,7 @@ class Media(Model, metaclass=MediaMeta):
             is_active=True,
             is_hidden=False,
             is_deleted=False
-        )
+        ).order_by('-date_added')
 
     @staticmethod
     def get_all_media(request: HttpRequest) -> QuerySet[Media]:
@@ -177,7 +177,7 @@ class Media(Model, metaclass=MediaMeta):
             is_active=True,
             is_hidden=False,
             is_deleted=False
-        )
+        ).order_by('-date_added')
 
     @staticmethod
     def create_from_maio_file(

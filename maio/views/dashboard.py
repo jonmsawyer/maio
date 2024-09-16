@@ -65,5 +65,5 @@ def dashboard(request: HttpRequest) -> HttpResponse:
     cd['images'] = images
     cd['pages'] = images # for pagination
     cd['per_page'] = per_page
-    cd['delete_media_url'] = reverse('delete_media'),
+    cd['delete_media_url'] = reverse('delete_media')
     return render(request, 'maio/dashboard.html', cd)
