@@ -126,4 +126,12 @@ class MaioConf():
 
     def get_ffpmeg_bin_path(self) -> str  | None:
         '''get_ffmpeg_bin_path'''
-        return self.config.get('ffmpeg', {}).get('bin')
+        return self.config.get('ffmpeg', {}).get('ffmpeg_exe')
+
+    def get_ffprobe_bin_path(self) -> str  | None:
+        '''get_ffplay_bin_path'''
+        return self.config.get('ffmpeg', {}).get('ffprobe_exe')
+
+    def get_ffplay_bin_path(self) -> str  | None:
+        '''get_ffplay_bin_path'''
+        return self.config.get('ffmpeg', {}).get('ffplay_exe')

@@ -306,7 +306,7 @@ class File(Model, metaclass=FileMeta):
                 "-vframes", "1",
                 tn_path,
             ]
-            # raise Exception(f"FFmpeg cmd: `{' '.join(ffmpeg_cmd)}`")
+            # raise Exception(f"FFmpeg cmd: `{ffmpeg_cmd}`")
             try:
                 _output = subprocess.run(ffmpeg_cmd, capture_output=True)
                 image = Image.open(tn_path)

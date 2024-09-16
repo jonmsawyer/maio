@@ -6,7 +6,9 @@ Module: ``maio.models.Media``
 
 from __future__ import annotations
 
+import os
 import uuid
+import subprocess
 
 from django.conf import settings
 from django.http import HttpRequest
@@ -19,6 +21,7 @@ from django.db.models.base import ModelBase
 from django.contrib.auth.models import User
 
 from conf import MaioConf
+from maio import filestore as fs
 
 # from maio import filestore as fs
 
@@ -196,7 +199,22 @@ class Media(Model, metaclass=MediaMeta):
             tn_extension = extension
         if maio_file.mime_type.get_maio_type_choice() == MaioTypeChoices.VIDEO:
             # TODO: Process video height and width
-            pass
+            video_path = os.path.join(fs.mk_md5_dir_media(maio_file.md5sum), maio_file.get_filename())
+            ffprobe_cmd = [
+                maio_conf.get_ffprobe_bin_path(),
+                "-v", "error",
+                "-select_streams", "v",
+                "-show_entries", "stream=width,height",
+                "-of", "csv=p=0:s=x",
+                video_path,
+            ]
+            try:
+                output = subprocess.run(ffprobe_cmd, capture_output=True)
+                output = str(output.stdout, encoding='UTF-8')
+                width = output.split('x')[0]
+                height = output.split('x')[1]
+            except subprocess.CalledProcessError:
+                raise
 
         maio_file.process_thumbnail()
 
