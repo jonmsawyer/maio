@@ -10,10 +10,12 @@ from django.contrib.auth.models import User, Group, Permission
 
 from maio.models import (
     File, Caption, Media, Playlist, Tag, MaioMap, MaioUser, MaioType, MaioMapType,
-    Love, Like, Rating, MaioMimeType,
+    Love, Like, Rating, MaioMimeType, FileStat, Log, MetaFile, Thumbnail, UserSetting,
 )
 
 from .MaioAdminSite import MaioAdminSite
+
+# Maio Admins
 from .FileAdmin import FileAdmin
 from .CaptionAdmin import CaptionAdmin
 from .MediaAdmin import MediaAdmin
@@ -27,6 +29,13 @@ from .MaioMapTypeAdmin import MaioMapTypeAdmin
 from .LoveAdmin import LoveAdmin
 from .LikeAdmin import LikeAdmin
 from .RatingAdmin import RatingAdmin
+from .FileStatAdmin import FileStatAdmin
+from .LogAdmin import LogAdmin
+from .MetaFileAdmin import MetaFileAdmin
+from .ThumbnailAdmin import ThumbnailAdmin
+from .UserSettingAdmin import UserSettingAdmin
+
+# auth Admins
 from .UserAdmin import UserAdmin
 from .GroupAdmin import GroupAdmin
 from .PermissionAdmin import PermissionAdmin
@@ -49,6 +58,11 @@ __all__: list[str] = [
     'LoveAdmin',
     'LikeAdmin',
     'RatingAdmin',
+    'FileStatAdmin',
+    'LogAdmin',
+    'MetaFileAdmin',
+    'ThumbnailAdmin',
+    'UserSettingAdmin',
 
     # auth Admins
     'UserAdmin',
@@ -72,6 +86,11 @@ admin_site.register(MaioMapType, MaioMapTypeAdmin)
 admin_site.register(Love, LoveAdmin)
 admin_site.register(Like, LikeAdmin)
 admin_site.register(Rating, RatingAdmin)
+admin_site.register(FileStat, FileStatAdmin)
+admin_site.register(Log, LogAdmin)
+admin_site.register(MetaFile, MetaFileAdmin)
+admin_site.register(Thumbnail, ThumbnailAdmin)
+admin_site.register(UserSetting, UserSettingAdmin)
 
 # auth Admins
 admin_site.register(User, UserAdmin)

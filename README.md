@@ -141,3 +141,7 @@ $ ./manage.py runserver 8080
 ### Run Maio
 
 In your browser, go to http://maio.hostname.local:8080/ and enjoy!
+
+# Notes
+
+Maio requires `FFmpeg`. If you are running windows, use scoop: `scoop install ffmpeg`.

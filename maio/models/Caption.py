@@ -15,7 +15,8 @@ from django.db.models import (
 from django.db.models.base import ModelBase
 
 from .Media import Media
-from .MaioMapType import MaioMapType, MaioMapTypeChoices
+from .MaioMapType import MaioMapType
+from django.utils.translation import gettext_lazy as _T
 
 
 class CaptionMeta(ModelBase):
@@ -30,19 +31,15 @@ class CaptionMeta(ModelBase):
 
 class Caption(Model, metaclass=CaptionMeta):
     '''Caption model.'''
-    id = UUIDField('UUID', primary_key=True, default=uuid.uuid4, editable=False)
+    id = UUIDField(_T('UUID'), primary_key=True, default=uuid.uuid4, editable=False)
     media = ForeignKey(Media, on_delete=CASCADE)
-    author = CharField('Author', max_length=1024, null=True, blank=True)
-    url = URLField('URL', max_length=1024, null=True, blank=True)
-    date_added = DateTimeField('Date Added', auto_now_add=True)
-    date_modified = DateTimeField('Date Modified', auto_now=True)
-    caption_date = DateTimeField('Caption Date', null=True, blank=True)
-    caption_type = ForeignKey(
-        to=MaioMapType,
-        on_delete=DO_NOTHING,
-        default=MaioMapType.default,
-    )
-    caption = TextField('Caption')
+    author = CharField(_T('Author'), max_length=1024, null=True, blank=True)
+    url = URLField(_T('URL'), max_length=1024, null=True, blank=True)
+    date_added = DateTimeField(_T('Date Added'), auto_now_add=True)
+    date_modified = DateTimeField(_T('Date Modified'), auto_now=True)
+    caption_date = DateTimeField(_T('Caption Date'), null=True, blank=True)
+    caption_type = ForeignKey(to=MaioMapType, on_delete=DO_NOTHING, default=MaioMapType.default) # type: ignore
+    caption = TextField(_T('Caption'))
 
     def __str__(self):
         return f"{self.media.name} - {self.caption_date} - {self.caption[0:20]}"

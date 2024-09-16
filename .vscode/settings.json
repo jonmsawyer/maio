@@ -4,17 +4,17 @@
             {
                 "match": "\\.py$",
                 "isAsync": true,
-                "cmd": "\"${env.MAIO_HTTP_SERVER}\" -n \"${env.MAIO_HTTP_SERVICE}\" -k restart"
+                "cmd": "\"${env.MAIO_HTTP_SERVER}\" -k restart -n \"${env.MAIO_HTTP_SERVICE}\""
             },
             {
                 "match": "\\.html$",
                 "isAsync": true,
-                "cmd": "\"${env.MAIO_HTTP_SERVER}\" -n \"${env.MAIO_HTTP_SERVICE}\" -k restart"
+                "cmd": "\"${env.MAIO_HTTP_SERVER}\" -k restart -n \"${env.MAIO_HTTP_SERVICE}\""
             },
             {
                 "match": "\\.conf$",
                 "isAsync": true,
-                "cmd": "\"${env.MAIO_HTTP_SERVER}\" -n \"${env.MAIO_HTTP_SERVICE}\" -k restart"
+                "cmd": "\"${env.MAIO_HTTP_SERVER}\" -k restart -n \"${env.MAIO_HTTP_SERVICE}\""
             },
             {
                 "match": "\\.js$",

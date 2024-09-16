@@ -29,9 +29,9 @@ class Playlist(Model, metaclass=PlaylistMeta):
     media: ManyToManyField[Media, Playlist] = ManyToManyField(Media)
     name = CharField(max_length=1024)
     tn_path = CharField(max_length=1024)
-    date_added = DateTimeField(auto_now_add=True)
-    date_modified = DateTimeField(auto_now=True)
     default_order = PositiveSmallIntegerField(default=0) # 0 random, 1 descending, 2 ascending
     seconds_between = FloatField(default=5.0)
     caption_type = ForeignKey(to=MaioMapType, on_delete=DO_NOTHING, default=MaioMapType.default)
     caption = TextField(null=True, blank=True)
+    date_added = DateTimeField(auto_now_add=True)
+    date_modified = DateTimeField(auto_now=True)

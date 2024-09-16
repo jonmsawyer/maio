@@ -4,29 +4,27 @@
 {% load static %}
 
 {% if image and width %}
-<div class="card m-2 p-0" style="width: {{width}}px;">
+<div class="card m-2 p-0" style="width: {{width}}px;" id="card_{{ image.id }}">
   <!-- top of card, image -->
   <div style="height: {{width}}px;
               overflow: hidden;">
-    <a href="{% static image.file.file_path %}"
+    <a href="{{image.get_static_media_uri}}"
     ><img class="card-img-top"
-          src="{% static image.file.tn_path %}"
+          src="{{image.get_static_thumbnail_uri}}"
           alt="{{ image.name }}.{{ image.extension }}"
-          style="{% if image.width > image.height %}
+          style="{% if image.tn_width > image.tn_height %}
                    height: {{width}}px; width: auto;
-                 {% else %}
-                   width: {{width}}px; height: auto;
-                 {% endif %}
-                 {% if image.width > image.height %}
                    margin-left: {{image.margin_left}}px;
                  {% else %}
                    margin-top: {{image.margin_top}}px;
+                   width: {{width}}px; height: auto;
                  {% endif %}"
     >
     </a>
   </div>
   <!-- /image -->
 
+  {% if user_setting.display_thumbnails_only is False %}
   <div class="card-body p-1"> <!-- title -->
     <h5 class="card-title">
       {{ image.name }}.{{ image.extension }}
@@ -56,10 +54,19 @@
   </div>  <!-- /title -->
 
   <!-- rating -->
-  <div class="card-body p-0 border-bottom clearfix pb-1" style="font-size: 14pt;">
-    <span class="oi oi-heart float-right mr-2" title="Love this image" aria-hidden="true"></span>
-    <span class="oi oi-thumb-up float-right mr-2" title="Like this image" aria-hidden="true"></span>
-    <span class="oi oi-star float-left ml-2" title="star" aria-hidden="true"></span>
+  <div class="card-body p-0 border-bottom clearfix pb-1" style="font-size: 14pt; padding: 0 5px;">
+    <span class="bi bi-heart" title="Love this image" aria-hidden="true" style="margin: 0 6px;"></span>
+    <span class="bi bi-hand-thumbs-up" title="Like this image" aria-hidden="true" style="margin: 0 6px;"></span>
+    <span class="bi bi-star float-end" title="Give this image 5 Stars" aria-hidden="true" style="margin: 0 6px 0 0;"></span>
+    <span class="bi bi-star float-end" title="Give this image 4 Stars" aria-hidden="true"></span>
+    <span class="bi bi-star float-end" title="Give this image 3 Stars" aria-hidden="true"></span>
+    <span class="bi bi-star float-end" title="Give this image 2 Stars" aria-hidden="true"></span>
+    <span class="bi bi-star float-end" title="Give this image 1 Star" aria-hidden="true" style="margin: 0 0 0 6px;"></span>
+  </div>
+  <div class="card-body p-0 border-bottom clearfix pb-1" style="font-size: 14pt; padding: 0 5px;">
+    <span class="bi bi-share" title="Share this media with another Maio User." style="margin: 0 0 0 6px;"></span>
+    <span class="bi bi-download float-end" title="Download this media" aria-hidden="true" style="margin: 0 6px;"></span>
+    <span class="bi bi-eye-slash float-end" title="Private (visible only to you)" aria-hidden="true" style="margin: 0 6px;"></span>
   </div>
   <!-- /rating -->
 
@@ -69,24 +76,61 @@
     {% for tag in image.tags.all %}
       <span class="badge badge-secondary">#{{ tag.name }}</span>
     {% empty %}
-      No tags
+      None
     {% endfor %}
   </div>
   <!-- /tags -->
 
-  {% if image.source %}
   <!-- source -->
   <div class="card-body p-1 border-bottom" style="font-size: 10pt;">
     Source: {{ image.source }}
   </div>
   <!-- /source -->
-  {% endif %}
 
   <!-- date modified and dimensions -->
   <div class="card-body p-1 clearfix" style="font-size: 10pt;">
-    <span class="float-left">{{ image.date_modified }}</span>
-    <span class="float-right">{{ image.width }}x{{ image.height }}</span>
+    <span>{{ image.date_modified }}</span>
+    <span>{{ image.width }}x{{ image.height }}</span>
+    <div class="btn-group dropup float-end">
+      <span class="bi bi-three-dots-vertical float-end dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"></span>
+      <ul class="dropdown-menu" style="cursor: pointer;">
+        <!-- Dropdown menu links -->
+        <li class="media_options"
+            data-bs-toggle="modal"
+            data-bs-target="#modal_{{ image.id }}"
+            onclick="highlight_media('{{ image.id }}');">
+          Delete
+        </li>
+      </ul>
+    </div>
   </div>
   <!-- /date modified and dimensions -->
+  {% endif %}
+</div>
+
+<div class="modal fade" id="modal_{{ image.id }}" tabindex="-1" onclick="unhighlight_media('{{ image.id }}');">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Delete Media?</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="unhighlight_media('{{ image.id }}');"></button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you wish to delete {{ image.name }}.{{ image.extension }}?</p>
+        {% if request.user.is_superuser %}
+        <div>
+          <input type="checkbox" id="delete_all_{{ image.id }}">
+          <label for="delete_all_{{ image.id }}">Permanently delete this Media and the underlying filestore.</label>
+        </div>
+        {% endif %}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="unhighlight_media('{{ image.id }}');">No, Cancel</button>
+        <button type="button" class="btn btn-danger" onclick="delete_media('{{ image.id }}');">
+          Yes, Delete
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
 {% endif %}

@@ -16,12 +16,12 @@ from django.contrib.auth import authenticate
 from django.contrib.auth import login
 
 from maio.forms import LoginForm
-
+from maio.lib import pre_populate_context_dict
 
 def home(
     request: HttpRequest
 ) -> HttpResponseRedirect | HttpResponsePermanentRedirect | HttpResponse:
-    cd = {}
+    cd = pre_populate_context_dict(request, {})
     if request.method == 'POST':
         form = LoginForm(request.POST)
         if form.is_valid():

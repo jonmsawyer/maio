@@ -6,6 +6,28 @@
 {% block content %}
   <div class="container"> <!-- container -->
     <h1>Upload Media</h1>
+    {% if media %}
+    <h4 class="alert alert-success">Upload successful.</h4>
+    <div class="alert alert-info">
+      <div class="row">
+        <div class="col-lg">
+          <img src="{{media.get_static_thumbnail_uri}}" alt="{{media.name}}">
+        </div>
+        <div class="col-lg">
+          <div>File ID: {{media.file.id}}</div>
+          <div>Media ID: {{media.id}}</div>
+          <div>Name: {{media.name}}</div>
+          <div>Extension: {{media.extension}}</div>
+          <div>Date Added: {{media.date_added}}</div>
+          <div>Date Modified: {{media.date_modified}}</div>
+          <div>Width: {{media.width}}</div>
+          <div>Height: {{media.height}}</div>
+          <div>Thumbnail Width: {{media.tn_width}}</div>
+          <div>Thumbnail Height: {{media.tn_height}}</div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
     <form method="post" enctype="multipart/form-data">
       {% csrf_token %}
       <h3>File Form</h3>

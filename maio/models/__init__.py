@@ -8,6 +8,7 @@ from django.conf import settings
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 
+from .Log import Log
 from .File import File
 from .Caption import Caption
 from .Media import Media
@@ -21,9 +22,13 @@ from .MaioType import MaioType, MaioTypeChoices
 from .Love import Love
 from .Like import Like
 from .Rating import Rating
-
+from .Thumbnail import Thumbnail
+from .MetaFile import MetaFile
+from .FileStat import FileStat
+from .UserSetting import UserSetting
 
 __all__: list[str] = [
+    'Log',
     'File',
     'Caption',
     'Media',
@@ -37,6 +42,10 @@ __all__: list[str] = [
     'Love',
     'Like',
     'Rating',
+    'Thumbnail',
+    'MetaFile',
+    'FileStat',
+    'UserSetting',
 ]
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
@@ -45,4 +54,5 @@ def create_maio_user(sender, instance=None, created=False, **kwargs) -> None: # 
     Hook into the `User` model's post-save signal and create a `MaioUser` associated with it.
     '''
     if created:
-        MaioUser.objects.create(user=instance)
+        maio_user = MaioUser.objects.create(user=instance)
+        _user_setting = UserSetting.objects.create(user=maio_user)

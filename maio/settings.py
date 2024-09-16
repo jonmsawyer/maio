@@ -2,11 +2,14 @@
 Django settings for Maio project.
 
 For more information on this file, see
-https://docs.djangoproject.com/en/4.2/topics/settings/
+https://docs.djangoproject.com/en/5.1/topics/settings/
 
 For the full list of settings and their values, see
-https://docs.djangoproject.com/en/4.2/ref/settings/
+https://docs.djangoproject.com/en/5.1/ref/settings/
 """
+
+from __future__ import annotations
+from typing import Any
 
 import os
 import re
@@ -45,11 +48,14 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.contrib.admindocs.middleware.XViewMiddleware',
+    # Maio Middleware
+    'maio.middleware.FileStatMiddleware',
+    'maio.middleware.UserSettingMiddleware',
 ]
 
 ROOT_URLCONF = 'maio.urls'
 
-TEMPLATES = [
+TEMPLATES: list[dict[str, Any]] = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [],
@@ -68,7 +74,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'maio.wsgi.application'
 
-LOGGING = {
+LOGGING: dict[str, Any] = {
     'version': 1,
     'disable_existing_loggers': False,
     'handlers': {
@@ -99,7 +105,7 @@ LOGGING = {
 
 
 # Password validation
-# https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
+# https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -117,7 +123,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 # Internationalization
-# https://docs.djangoproject.com/en/4.2/topics/i18n/
+# https://docs.djangoproject.com/en/5.1/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
 
@@ -132,14 +138,14 @@ APPEND_SLASH = True
 LOGIN_URL = '/'
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.2/howto/static-files/
+# https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
 
 MEDIA_URL = 'uploads/'
 
 # Default primary key field type
-# https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
+# https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -147,12 +153,17 @@ FIXTURE_DIRS = [
     os.path.join(BASE_DIR, '.fixtures'),
 ]
 
-FILESTORE_ROOT = os.path.join(BASE_DIR, 'filestore')
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.db.DatabaseCache",
+        "LOCATION": "django_cache",
+    }
+}
 
 # Maio's site settings loader
 # Import conf.site_settings and add references to its attributes.
 # THIS WILL OVERRIDE SETTINGS LISTED ABOVE
-settings_re = re.compile('[A-Z_-]')
+settings_re = re.compile('[A-Z0-9_]')
 for key, value in site_settings.__dict__.items():
     if settings_re.search(key):
         globals().update({key: value})

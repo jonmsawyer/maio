@@ -8,13 +8,11 @@ from __future__ import annotations
 
 import os
 import uuid
-from pprint import pprint
+# from pprint import pprint
 
 from django.conf import settings
 from django.utils import timezone
-from django.db.models import (
-    Model, UUIDField, CharField, ForeignKey, DO_NOTHING,
-)
+from django.db.models import Model, UUIDField, CharField, ForeignKey, DO_NOTHING
 from django.db.models.base import ModelBase
 
 from .MaioType import MaioType, MaioTypeChoices
@@ -135,3 +133,7 @@ class MaioMimeType(Model, metaclass=MaioMimeTypeMeta):
             fh.write(buf)
 
         print("MIME type data has been dumped from the database to `./data/mime.types`.")
+
+    def get_maio_type_choice(self):
+        '''Get the MaioTypeChoices variant of this mime type.'''
+        return self.maio_type.get_choice()

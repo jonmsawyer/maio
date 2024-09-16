@@ -58,66 +58,72 @@ class MaioConf():
 
     def get_thumbnail_path(self) -> str:
         '''get_thumbnail_path'''
-        media_path = self.get_media_path()
+        filestore_path = self.get_filestore_path()
         thumbnail_path = (
             self.config
-                .get('maio_types', {})
                 .get('thumbnail', {})
                 .get('directory', '')
         )
-        return os.path.join(media_path, thumbnail_path)
+        return os.path.join(filestore_path, thumbnail_path)
 
     def get_images_path(self) -> str:
         '''get_images_path'''
-        media_path = self.get_media_path()
+        filestore_path = self.get_filestore_path()
         images_path = (
             self.config
-                .get('maio_types', {})
                 .get('image', {})
                 .get('directory', '')
         )
-        return os.path.join(media_path, images_path)
+        return os.path.join(filestore_path, images_path)
 
     def get_audio_path(self) -> str:
         '''get_audio_path'''
-        media_path = self.get_media_path()
+        filestore_path = self.get_filestore_path()
         audio_path = (
             self.config
-                .get('maio_types', {})
                 .get('audio', {})
                 .get('directory', '')
         )
-        return os.path.join(media_path, audio_path)
+        return os.path.join(filestore_path, audio_path)
 
     def get_video_path(self) -> str:
         '''get_video_path'''
-        media_path = self.get_media_path()
+        filestore_path = self.get_filestore_path()
         video_path = (
             self.config
-                .get('maio_types', {})
                 .get('video', {})
                 .get('directory', '')
         )
-        return os.path.join(media_path, video_path)
+        return os.path.join(filestore_path, video_path)
 
     def get_document_path(self) -> str:
         '''get_document_path'''
-        media_path = self.get_media_path()
+        filestore_path = self.get_filestore_path()
         document_path = (
             self.config
-                .get('maio_types', {})
                 .get('document', {})
                 .get('directory', '')
         )
-        return os.path.join(media_path, document_path)
+        return os.path.join(filestore_path, document_path)
 
     def get_other_path(self) -> str:
         '''get_other_path'''
-        media_path = self.get_media_path()
+        filestore_path = self.get_filestore_path()
         other_path = (
             self.config
-                .get('maio_types', {})
                 .get('other', {})
                 .get('directory', '')
         )
-        return os.path.join(media_path, other_path)
+        return os.path.join(filestore_path, other_path)
+
+    def get_static_media_uri(self) -> str | None:
+        '''get_media_uri'''
+        return self.config.get('media', {}).get('static_uri')
+
+    def get_static_thumbnail_uri(self) -> str | None:
+        '''get_media_uri'''
+        return self.config.get('thumbnail', {}).get('static_uri')
+
+    def get_ffpmeg_bin_path(self) -> str  | None:
+        '''get_ffmpeg_bin_path'''
+        return self.config.get('ffmpeg', {}).get('bin')

@@ -2,82 +2,74 @@
 File: lib.py
 
 Module: ``maio.lib``
+
+Maio Core library functions.
 '''
 
-# pylint:
+from __future__ import annotations
+from typing import Any, Optional
 
-from collections import OrderedDict
+import re
+
+from django.http import HttpRequest
 
 
-MIMETYPE_EXTENSION: dict[str, OrderedDict[str, tuple[str, ...]]] = {
-    'image': OrderedDict([
-        # GIF
-        ('image/gif', ('.gif',)),
-        ('image/gi_', ('.gif',)),
+def pre_populate_context_dict(
+    request: HttpRequest,
+    cd: Optional[dict[Any, Any]] = None,
+) -> dict[Any, Any]:
+    '''Pre-populate the context dictionary with common attributes.'''
+    if cd is None:
+        cd = {}
+    cd = dict(cd)
+    cd['file_stat'] = getattr(request, 'file_stat')
+    cd['user_setting'] = getattr(request, 'user_setting')
+    return cd
 
-        # JPG
-        ('image/jpeg', ('.jpg', '.jpeg')),
-        ('image/pjpeg', ('.pjpg', '.pjpeg')),
-        ('image/jpg', ('.jpg', '.jpeg')),
-        ('image/jp_', ('.jpg', '.jpeg')),
-        ('application/jpg', ('.jpg', '.jpeg')),
-        ('application/x-jpg', ('.jpg', '.jpeg')),
-        ('image/pipeg', ('.jpg', '.jpeg')),
-        ('image/vnd.swiftview-jpeg', ('.jpg', '.jpeg')),
 
-        # JPEG 2000
-        ('image/jp2', ('.jp2', '.j2k', '.jpf')),
-        ('image/jpx', ('.jpx',)),
-        ('image/jpm', ('.jpm',)),
+def sizeof_fmt(num: int | float, suffix: str = "B") -> str:
+    '''
+    Returns a size of bytes with a human readable suffix.
 
-        # PNG
-        ('image/png', ('.png',)),
+    Supports::
 
-        # TIFF
-        ('image/tiff', ('.tiff', '.tif')),
-        ('image/x-tiff', ('.tiff', '.tif')),
-        ('image/tif', ('.tif', '.tiff')),
-        ('image/x-tif', ('.tif', '.tiff')),
-        ('application/tif', ('.tif', '.tiff')),
-        ('application/x-tif', ('.tif', '.tiff')),
-        ('application/tiff', ('.tiff', '.tif')),
-        ('application/x-tiff', ('.tiff', '.tif')),
+        * all currently known binary prefixes
+        * negative and positive numbers
+        * numbers larger than 1000 Yobibytes
+        * arbitrary units (maybe you like to count in Gibibits!)
 
-        # BMP
-        ('image/bmp', ('.bmp',)),
-        ('image/x-windows-bmp', ('.bmp',)),
+    Thanks to::
 
-        # PCX
-        ('image/vnd.zbrush.pcx', ('.pcx',)),
-        ('image/x-pcx', ('.pcx',)),
-        ('application/pcx', ('.pcx',)),
-        ('application/x-pcx', ('.pcx',)),
-        ('image/pcx', ('.pcx',)),
-        ('image/x-pc-paintbrush', ('.pcx',)),
-        ('image/x-pcx', ('.pcx',)),
-        ('zz-application/zz-winassoc-pcx', ('.pcx',)),
+        https://stackoverflow.com/a/1094933
+    '''
+    for unit in ("", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi"):
+        if abs(num) < 1024.0:
+            return f"{num:3.1f} {unit}{suffix}"
+        num /= 1024.0
+    return f"{num:.1f} Yi{suffix}"
 
-        # PPM
-        ('image/x-portable-pixmap', ('.ppm', '.pbm', '.pgm', '.pnm')),
-        ('image/x-portable-bitmap', ('.pbm', '.ppm', '.pgm', '.pnm')),
-        ('image/x-portable-graymap', ('.pgm', '.ppm', '.pbm', '.pnm')),
-        ('image/x-portable-anymap', ('.pnm', '.ppm', '.pbm', '.pgm')),
-        ('application/ppm', ('.ppm', '.pbm', '.pgm', '.pnm')),
-        ('application/x-ppm', ('.ppm', '.pbm', '.pgm', '.pnm')),
-        ('image/x-p', ('.ppm', '.pbm', '.pgm', '.pnm')),
-        ('image/x-ppm', ('.ppm', '.pbm', '.pgm', '.pnm')),
 
-        # WEBP
-        ('image/webp', ('.webp',)),
+def validate_filename(filename: str) -> bool:
+    '''
+    Validate that the filename contains valid characters on Windows.
 
-        # PPM
-        ('image/x-portable-bitmap', ('.ppm', '.pbm', '.pgm', '.pnm')),
-        ('image/x-portable-graymap', ('.ppm', '.pbm', '.pgm', '.pnm')),
-        ('image/x-portable-pixmap', ('.ppm', '.pbm', '.pgm', '.pnm')),
-        ('image/x-portable-anymap', ('.ppm', '.pbm', '.pgm', '.pnm')),
+    According to: https://learn.microsoft.com/en-us/windows/win32/fileio/naming-a-file
 
-        #XBM
-        ('image/x-xbitmap', ('.xbm',)),
-        ('image/xbm', ('.xbm',)),
-    ]),
-}
+    The following reserved characters are not allowed::
+
+        * < (less than)
+        * > (greater than)
+        * : (colon)
+        * " (double quote)
+        * / (forward slash)
+        * \\ (backslash)
+        * | (vertical bar or pipe)
+        * ? (question mark)
+        * * (asterisk)
+        * Integer value zero, sometimes referred to as the ASCII NUL character.
+    '''
+    invalid_chars_re = re.compile(r'[<>:"/\|?*\0]+')
+    matches = invalid_chars_re.search(filename)
+    if matches:
+        return False
+    return True

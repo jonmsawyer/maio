@@ -13,7 +13,7 @@ from django.db.models import (
     Model, UUIDField, CharField, TextChoices,
 )
 from django.db.models.base import ModelBase
-from django.db import IntegrityError
+# from django.db import IntegrityError
 from django.utils.translation import gettext_lazy as _T
 
 
@@ -54,3 +54,15 @@ class MaioType(Model, metaclass=MaioTypeMeta):
         MaioType.objects.get_or_create(maio_type=MaioTypeChoices.DOCUMENT)
         maio_type, _created = MaioType.objects.get_or_create(maio_type=MaioTypeChoices.OTHER)
         return maio_type.id
+
+    def get_choice(self) -> MaioTypeChoices:
+        '''Get the Maio Type Choice for this MaioType.'''
+        if self.maio_type == 'image':
+            return MaioTypeChoices.IMAGE
+        elif self.maio_type == 'audio':
+            return MaioTypeChoices.AUDIO
+        elif self.maio_type == 'video':
+            return MaioTypeChoices.VIDEO
+        elif self.maio_type == 'document':
+            return MaioTypeChoices.DOCUMENT
+        return MaioTypeChoices.OTHER

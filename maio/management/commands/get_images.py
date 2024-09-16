@@ -13,7 +13,6 @@ import hashlib
 # from pprint import pprint
 # from getpass import getpass
 from datetime import datetime
-from collections import OrderedDict
 
 import magic
 from PIL import Image
@@ -163,11 +162,11 @@ class Command(MaioBaseCommand):
 
         def mk_md5_dir(md5: str, root: str) -> str | None:
             '''
-            Make MD5 directory. Makes 3 directories under ``root``, where the first 2 characters
-            in ``md5`` make up the first directory, the next 2 characters make up the second
-            directory, and the next 2 characters make up the third directory.
+            Make MD5 directory. Makes 3 directories under `root`, where the first 2 characters
+            in `md5` make up the first directory, the next 2 characters make up the second
+            directory, and the next 2 characters make up the third directory, each of them nested.
 
-            :returns: (str) The path to final directory structure.
+            :returns: (str) The path to the created directory.
             '''
             if len(md5) == 32:
                 part1 = md5[0:2]

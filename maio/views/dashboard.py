@@ -16,7 +16,9 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Page, Paginator
 from django.db.models import QuerySet
+from django.urls import reverse
 
+from maio.lib import pre_populate_context_dict
 from maio.models import Media
 
 logger = logging.getLogger('maio.DEBUG')
@@ -39,9 +41,9 @@ def get_pagination(request: HttpRequest, items: QuerySet[Any], per_page: int | s
 
 @login_required
 def dashboard(request: HttpRequest) -> HttpResponse:
-    cd = {}
+    cd = pre_populate_context_dict(request, {})
     width = 260
-    images_list = Media.get_all_images(request)
+    images_list = Media.get_all_media(request)
     try:
         per_page = int(request.GET.get('per_page', 28))
     except:
@@ -63,4 +65,5 @@ def dashboard(request: HttpRequest) -> HttpResponse:
     cd['images'] = images
     cd['pages'] = images # for pagination
     cd['per_page'] = per_page
+    cd['delete_media_url'] = reverse('delete_media'),
     return render(request, 'maio/dashboard.html', cd)

@@ -1,0 +1,11 @@
+.media_options {
+    padding-left: 10px;
+}
+
+.media_options:hover {
+    background-color: gray;
+}
+
+.highlight_media {
+    background-color: rgb(244, 103, 88);
+}
