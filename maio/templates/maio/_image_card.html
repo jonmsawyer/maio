@@ -19,19 +19,25 @@
     {% else %}
       <i class="bi bi-file-binary maio-media-icon"></i>
     {% endif %}
-    <a href="{{medium.get_static_media_uri}}"
-    ><img class="card-img-top"
-          src="{{medium.get_static_thumbnail_uri}}"
-          alt="{{ medium.name }}.{{ medium.extension }}"
-          style="{% if medium.tn_width > medium.tn_height %}
-                   height: {{width}}px; width: auto;
-                   margin-left: {{medium.margin_left}}px;
-                 {% else %}
-                   margin-top: {{medium.margin_top}}px;
-                   width: {{width}}px; height: auto;
-                 {% endif %}"
+    <!-- <a class="maio-media-options"
+       data-bs-toggle="modal"
+       data-bs-target="#modal_maio_viewer_{{ medium.id }}"
+    > -->
+    <img class="card-img-top"
+         data-bs-toggle="modal"
+         data-bs-target="#modal_maio_viewer_{{ medium.id }}"
+         src="{{medium.get_static_thumbnail_uri }}"
+         alt="{{ medium.name }}.{{ medium.extension }}"
+         style="{% if medium.tn_width > medium.tn_height %}
+                  height: {{ width }}px; width: auto;
+                  margin-left: {{ medium.margin_left }}px;
+                {% else %}
+                  margin-top: {{ medium.margin_top }}px;
+                  width: {{ width }}px; height: auto;
+                {% endif %}
+                cursor: pointer;"
     >
-    </a>
+    <!-- </a> -->
   </div>
   <!-- /image -->
 
@@ -106,11 +112,19 @@
     <!-- /tags -->
     <div class="btn-group dropup float-end maio-card-options">
       <span class="bi bi-three-dots-vertical float-end dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"></span>
-      <ul class="dropdown-menu" style="cursor: pointer;">
+      <ul class="dropdown-menu" style="cursor: pointer; padding: 0; width: 13em;">
         <!-- Dropdown menu links -->
-        <li class="media_options"
+        <li class="maio-media-options"
             data-bs-toggle="modal"
-            data-bs-target="#modal_{{ medium.id }}">
+            data-bs-target="#modal_maio_viewer_{{ medium.id }}"
+        >
+          View Media in Maio Viewer
+        </li>
+        <li class="maio-media-options"><a href="{{ medium.get_static_media_uri }}" target="_new">View Raw Media</a></li>
+        <li class="maio-media-options"
+            data-bs-toggle="modal"
+            data-bs-target="#modal_delete_media_{{ medium.id }}"
+        >
           Delete
         </li>
       </ul>
@@ -120,18 +134,42 @@
 
   <script>
     $(function(){
-      $("#modal_{{ medium.id }}").on('show.bs.modal', function(){
+      $("#modal_delete_media_{{ medium.id }}").on('show.bs.modal', function() {
         highlight_media('{{ medium.id }}');
       });
-      $("#modal_{{ medium.id }}").on('hidden.bs.modal', function(){
+      $("#modal_delete_media_{{ medium.id }}").on('hidden.bs.modal', function() {
         unhighlight_media('{{ medium.id }}');
       });
+      $("#modal_maio_viewer_{{ medium.id }}").on('show.bs.modal', function() {
+        var el = null;
+        {% if medium.file.mime_type.maio_type.maio_type == 'video' %}
+          el = document.getElementById("video_{{ medium.id }}");
+        {% elif medium.file.mime_type.maio_type.maio_type == 'audio' %}
+          el = document.getElementById("audio_{{ medium.id }}");
+        {% endif %}
+        console.log('Show Modal. Play Media. El:', el);
+        if (el != null) {
+          el.play();
+        }
+      });
+      $("#modal_maio_viewer_{{ medium.id }}").on('hidden.bs.modal', function() {
+        var el = null;
+        {% if medium.file.mime_type.maio_type.maio_type == 'video' %}
+          el = document.getElementById("video_{{ medium.id }}");
+        {% elif medium.file.mime_type.maio_type.maio_type == 'audio' %}
+          el = document.getElementById("audio_{{ medium.id }}");
+        {% endif %}
+        console.log('Hide Modal. Stop Media. El:', el);
+        if (el != null) {
+          el.pause();
+        }
     });
+  });
   </script>
   {% endif %}
 </div>
 
-<div class="modal fade" id="modal_{{ medium.id }}" tabindex="-1">
+<div class="modal fade" id="modal_delete_media_{{ medium.id }}" tabindex="-1">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
@@ -150,8 +188,52 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No, Cancel</button>
         <button type="button" class="btn btn-danger" onclick="delete_media('{{ medium.id }}');">
-          Yes, Delete
+          Yes, Delete <i class="bi bi-x-square"></i>
         </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="modal_maio_viewer_{{ medium.id }}" tabindex="-1">
+  <div class="modal-dialog modal-fullscreen-xl-down modal-xl modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Maio Viewer</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        {% if medium.file.mime_type.maio_type.maio_type == 'image' %}
+          <div class="maio-viewer-container">
+            <img class="maio-viewer{% if medium.file.mime_type.mime_type == 'image/gif' %}-gif{% endif %}" src="{{ medium.get_static_media_uri }}"
+                 style="{% if medium.height > image_height %}height: {{ image_height }}px;{% endif %}"
+            >
+          </div>
+        {% elif medium.file.mime_type.maio_type.maio_type == 'video' %}
+          <figure class="maio-viewer">
+            <figcaption><b>{{ medium.name }}.{{ medium.extension }}</b></figcaption>
+            <video controls class="maio-viewer" id="video_{{ medium.id }}">
+              <source src="{{ medium.get_static_media_uri }}"/>
+            </video>
+          </figure>
+        {% elif medium.file.mime_type.maio_type.maio_type == 'audio' %}
+          <figure class="maio-viewer">
+            <figcaption>{{ medium.name }}.{{ medium.extension }}</b></figcaption>
+            <audio controls class="maio-viewer" id="audio_{{ medium.id }}">
+              <source src="{{ medium.get_static_media_uri }}">
+            </audio>
+          </figure>
+        {% elif medium.file.mime_type.maio_type.maio_type == 'document' %}
+          No viewer available for <b>{{ medium.name }}.{{ medium.extension }}</b>.
+          Try <a href="{{ medium.get_static_media_uri }}" download>downloading the file</a> instead.
+        {% else %}
+          No viewer available for <b>{{ medium.name }}..{{ medium.extension }}</b><br>
+          Try <a href="{{ medium.get_static_media_uri }}" download>downloading the file</a> instead.
+        {% endif %}
+        </div>
+      <div class="modal-footer">
+        <a class="btn btn-primary" href="{{ medium.get_static_media_uri }}" download>Download <i class="bi bi-download"></i></a>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close <i class="bi bi-x-lg"></i></button>
       </div>
     </div>
   </div>

@@ -1,9 +1,21 @@
-.media_options {
+.maio-media-options {
     padding-left: 10px;
 }
 
-.media_options:hover {
-    background-color: gray;
+.maio-media-options a {
+    text-decoration: none;
+    color: rgb(33, 37, 41);
+    width: 100%;
+}
+
+.maio-media-options:hover {
+    background-color: rgb(13, 110, 253);
+    color: white;
+}
+
+.maio-media-options:hover a {
+    text-decoration: none;
+    color: white;
 }
 
 .maio-highlight-media {
@@ -38,3 +50,28 @@
 .maio-text-white:hover {
     color: white;
 }
+
+div.maio-viewer-container {
+    display: flex;
+    justify-content: center;
+}
+
+.maio-viewer {
+    width: 100%;
+    position: relative;
+}
+
+img.maio-viewer {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    display: block;
+    margin-right: 8px;
+}
+
+img.maio-viewer-gif {
+    width: auto;
+}
+audio.maio-viewer {}
+
+video.maio-viewer {}

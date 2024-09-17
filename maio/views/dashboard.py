@@ -74,6 +74,7 @@ def dashboard(request: HttpRequest) -> HttpResponse:
             medium.margin_top = margin
             medium.margin_left = 0
     cd['width'] = width
+    cd['image_height'] = 800
     cd['media_type'] = media_type
     cd['media'] = media
     cd['num_media'] = media_list.count()
