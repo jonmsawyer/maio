@@ -73,8 +73,17 @@ def dashboard(request: HttpRequest) -> HttpResponse:
             margin = int(width - y) // 2
             medium.margin_top = margin
             medium.margin_left = 0
+
+    # Set up query_dict
+    qd = request.GET.copy()
+    qd['media_type'] = media_type
+    qd['per_page'] = per_page
+    # /query_dict
+
+    cd['query_dict'] = qd
     cd['width'] = width
     cd['image_height'] = 800
+    cd['image_width'] = 1100
     cd['media_type'] = media_type
     cd['media'] = media
     cd['num_media'] = media_list.count()

@@ -5,7 +5,7 @@
 {% load maio_extras %}
 
 {% if medium and width %}
-<div class="card m-2 p-0" style="width: {{width}}px;" id="card_{{ medium.id }}">
+<div class="card m-2 p-0 border border-dark" style="width: {{width}}px;" id="card_{{ medium.id }}">
   <!-- top of card, image -->
   <div style="height: {{width}}px; overflow: hidden; border-radius: 5px;">
     {% if medium.file.mime_type.maio_type.maio_type == 'image' %}
@@ -71,7 +71,7 @@
   </div>  <!-- /title -->
 
   <!-- rating -->
-  <div class="card-body p-0 border-bottom clearfix pb-1" style="font-size: 14pt; padding: 0 5px;">
+  <div class="card-body p-0 border-bottom clearfix pb-1  border border-dark-subtle" style="font-size: 14pt; padding: 0 5px;">
     <span class="bi bi-heart" title="Love this image" aria-hidden="true" style="margin: 0 6px;"></span>
     <span class="bi bi-hand-thumbs-up" title="Like this image" aria-hidden="true" style="margin: 0 6px;"></span>
     <span class="bi bi-star float-end" title="Give this image 5 Stars" aria-hidden="true" style="margin: 0 6px 0 0;"></span>
@@ -80,7 +80,7 @@
     <span class="bi bi-star float-end" title="Give this image 2 Stars" aria-hidden="true"></span>
     <span class="bi bi-star float-end" title="Give this image 1 Star" aria-hidden="true" style="margin: 0 0 0 6px;"></span>
   </div>
-  <div class="card-body p-0 border-bottom clearfix pb-1" style="font-size: 14pt; padding: 0 5px;">
+  <div class="card-body p-0 border-bottom clearfix pb-1 border border-dark-subtle" style="font-size: 14pt; padding: 0 5px;">
     <span class="bi bi-share" title="Share this media with another Maio User." style="margin: 0 0 0 6px;"></span>
     <span class="bi bi-download float-end" title="Download this media" aria-hidden="true" style="margin: 0 6px;"></span>
     <span class="bi bi-eye-slash float-end" title="Private (visible only to you)" aria-hidden="true" style="margin: 0 6px;"></span>
@@ -88,7 +88,7 @@
   <!-- /rating -->
 
   <!-- date modified and dimensions -->
-  <div class="card-body p-1 clearfix" style="font-size: 10pt;">
+  <div class="card-body p-1 clearfix border border-dark-subtle" style="font-size: 10pt;">
     <span>{{ medium.date_modified }}</span>
     <br><span>Size: {{ medium.file.size|maio_filesize_human }}</span>
     {% if medium.file.mime_type.maio_type.maio_type == 'image' %}
@@ -206,7 +206,10 @@
         {% if medium.file.mime_type.maio_type.maio_type == 'image' %}
           <div class="maio-viewer-container">
             <img class="maio-viewer{% if medium.file.mime_type.mime_type == 'image/gif' %}-gif{% endif %}" src="{{ medium.get_static_media_uri }}"
-                 style="{% if medium.height > image_height %}height: {{ image_height }}px;{% endif %}"
+                 style="
+                  {% if medium.height > image_height %}height: {{ image_height }}px;{% endif %};
+                  {% comment %} {% if medium.width < image_width %}width: auto;{% endif %} {% endcomment %}
+                 "
             >
           </div>
         {% elif medium.file.mime_type.maio_type.maio_type == 'video' %}
