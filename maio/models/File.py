@@ -12,6 +12,7 @@ import uuid
 import hashlib
 import json
 import subprocess
+from unidecode import unidecode
 
 from django.db import IntegrityError
 
@@ -78,8 +79,11 @@ class File(Model, metaclass=FileMeta):
     #: The base name for the File.
     original_name = CharField(_T('Original Name'), max_length=1024, editable=False)
 
-    #: The File extension, if known.
+    #: The File extension.
     original_extension = CharField(_T('Original Extension'), max_length=8, editable=False, null=True, blank=True)
+
+    #: Thumbnail extension.
+    original_extension = CharField(_T('Thumbnail Extension'), max_length=8, null=True, blank=True)
 
     #: The File's mime type.
     mime_type = ForeignKey(to=MaioMimeType, on_delete=DO_NOTHING, editable=False)
@@ -118,21 +122,14 @@ class File(Model, metaclass=FileMeta):
     @staticmethod
     def handle_uploaded_file(
         request: HttpRequest,
-        field: str,
+        content_file: UploadedFile,
     ) -> tuple[File, UploadedFile, bool]:
         '''Handle the uploaded file as given by `request.FILES`.'''
         logger = Log.new(request, 'File')
         try:
-            content_file = request.FILES.get(field)
+            # content_file = request.FILES.get(field)
             maio_file = File(content_file=content_file)
         except MultiValueDictKeyError as e:
-            logger.exception(str(e))
-            raise e
-
-        # maio_file.content_file.name = File.normalize_filename(maio_file.content_file.name)
-
-        if content_file is None:
-            e = ContentFileNotSetError('Content File is not set.')
             logger.exception(str(e))
             raise e
 
@@ -175,7 +172,8 @@ class File(Model, metaclass=FileMeta):
 
     def save_upload_file(self) -> None:
         '''Save the file referenced by `self.content_file`.'''
-        path = os.path.join(File.content_file.field.upload_to, self.content_file.name)
+        self.content_file.name = unidecode(self.content_file.name)
+        path: str = str(os.path.join(File.content_file.field.upload_to, self.content_file.name))
         with open(path, 'wb+') as destination:
             for chunk in self.content_file.chunks():
                 destination.write(chunk)
@@ -189,31 +187,29 @@ class File(Model, metaclass=FileMeta):
         if not self.original_extension:
             ext = 'bin'
             try:
-                extensions = MaioMimeType.objects.get(mime_type=self.mime_type).extensions
+                extensions = str(MaioMimeType.objects.get(mime_type=self.mime_type).extensions)
                 extensions = extensions.split()
                 if extensions:
                     ext = extensions[0]
             except MaioMimeType.DoesNotExist:
                 raise
             self.original_extension = ext
+        return f"{self.original_name}.{self.original_extension}"
 
     def set_data(self) -> bool:
         '''Set the data attributes of this object based on the uploaded file and input data.'''
         if not self.content_file:
             raise ContentFileNotSetError('`content_file` is not set.')
         now = timezone.now()
-        self.size = self.content_file.size
+        self.size = int(self.content_file.size)
         self.mtime = now.timestamp()
         self.modified_time = now
         try:
             maio_file = File.objects.get(md5sum=self.md5sum, mime_type=self.mime_type)
-            created = False
+            self = maio_file
         except File.DoesNotExist:
             self.save()
-            created = True
-        if not created:
-            self = maio_file
-        return created
+        return True
 
     def calculate_md5sum(self) -> str:
         '''Return the md5sum of the file represented by this object.'''
@@ -224,9 +220,9 @@ class File(Model, metaclass=FileMeta):
 
     def calculate_mime_type(self) -> MaioMimeType:
         '''Return the mime type of the file represented by this object.'''
-        mime = magic.Magic(mime=True)
-        path = os.path.join(File.content_file.field.upload_to, self.content_file.name)
-        mimetype = str(mime.from_file(path))
+        mime: magic.Magic = magic.Magic(mime=True)
+        path: str = str(os.path.join(File.content_file.field.upload_to, self.content_file.name))
+        mimetype: str = str(mime.from_file(path))
         maio_mime_type, _created = MaioMimeType.objects.get_or_create(mime_type=mimetype)
         self.mime_type = maio_mime_type
         return self.mime_type
@@ -239,19 +235,19 @@ class File(Model, metaclass=FileMeta):
             )
         return self.mime_type.maio_type
 
-    def load_image(self) -> Image.Image:
+    def load_image(self) -> tuple[Image.Image, str]:
         '''Load the image located at `self.content_file`.'''
-        path = os.path.join(fs.mk_md5_dir_media(self.md5sum), self.get_filename())
-        image = Image.open(path)
+        path: str = str(os.path.join(fs.mk_md5_dir_media(self.md5sum), self.get_filename()))
+        image: Image.Image = Image.open(path)
         image.load()
         return image.copy(), path
 
     def process_media(self) -> bool:
         '''Process the media for this file.'''
-        path = os.path.join(File.content_file.field.upload_to, self.content_file.name)
+        path: str = str(os.path.join(File.content_file.field.upload_to, self.content_file.name))
         with open(path, 'rb') as fh:
             buf = fh.read()
-        root = fs.mk_md5_dir_media(self.md5sum)
+        root: str = fs.mk_md5_dir_media(self.md5sum)
         if root:
             file_path = os.path.join(root, self.get_filename())
             with open(file_path, 'wb') as fh:
@@ -261,16 +257,22 @@ class File(Model, metaclass=FileMeta):
             return True
         return False
 
-    def process_thumbnail(self) -> bool | str:
+    def process_thumbnail(self) -> tuple[bool | str, bool]:
         '''Process the thumbnail for this file.'''
         maio_type_choice = self.mime_type.maio_type.get_choice()
         root = fs.mk_md5_dir_thumbnail(self.md5sum)
+        tn_path = ''
+        tn_extension = 'jpg'
         is_processed = False
         if maio_type_choice == MaioTypeChoices.IMAGE:
             tn_path = os.path.join(root, self.get_filename())
+            tn_path_name = '.'.join(tn_path.split('.')[:-1])
+            tn_path = f"{tn_path_name}.{tn_extension}"
+
             try:
                 # Thanks to: https://stackoverflow.com/a/6218425
-                image, image_path = self.load_image()
+                image, _image_path = self.load_image()
+                orientation = None
                 for orientation in ExifTags.TAGS.keys():
                     if ExifTags.TAGS[orientation] == 'Orientation':
                         break
@@ -292,7 +294,10 @@ class File(Model, metaclass=FileMeta):
             # raise Exception(_deets)
 
             image.thumbnail((300, 300), Image.Resampling.LANCZOS)
-            image.save(tn_path)
+            try:
+                image.save(tn_path)
+            except OSError:
+                image.convert('RGB').save(tn_path)
             is_processed = True
 
         if maio_type_choice == MaioTypeChoices.VIDEO:
@@ -315,9 +320,20 @@ class File(Model, metaclass=FileMeta):
             except subprocess.CalledProcessError:
                 raise
 
+        if maio_type_choice == MaioTypeChoices.AUDIO:
+            audio_tn_path = maio_conf.get_audio_thumbnail_path()
+            audio_tn_ext = audio_tn_path.split('.')[-1]
+            tn_path = os.path.join(root, self.get_filename())
+            tn_path_name = '.'.join(tn_path.split('.')[:-1])
+            tn_path = f"{tn_path_name}.{audio_tn_ext}"
+            image = Image.open(audio_tn_path)
+            image.load()
+            image.save(tn_path)
+            is_processed = True
+
         if is_processed:
             try:
-                self.thumbnail, _created = Thumbnail.objects.get_or_create(
+                self.thumbnail, is_created = Thumbnail.objects.get_or_create(
                     file=self,
                     md5sum=self.md5sum,
                     content_file=tn_path,
@@ -327,11 +343,14 @@ class File(Model, metaclass=FileMeta):
                 )
             except IntegrityError:
                 self.thumbnail = Thumbnail.objects.get(md5sum=self.md5sum)
+                is_created = False
             finally:
                 image.close()
-            return tn_path
+            return tn_path, is_created
+        else:
+            raise Exception(f"Mime Type: {self.mime_type}")
 
-        return False
+        return self.get_thumbnail_path(), False
 
     def process_meta(self) -> bool:
         '''Process the Metadata for this object.'''
@@ -375,3 +394,13 @@ class File(Model, metaclass=FileMeta):
         if self.original_extension:
             return f"{self.md5sum}.{self.original_extension}"
         return self.md5sum
+
+    def get_media_path(self) -> str:
+        '''Return the filesystem file path.'''
+        return self.content_file.path
+
+    def get_thumbnail_path(self) -> str:
+        '''Return the filesystem thumbnail path.'''
+        root = fs.mk_md5_dir_thumbnail(self.md5sum)
+        path = os.path.join(root, self.get_filename())
+        return path

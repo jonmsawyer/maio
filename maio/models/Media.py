@@ -10,6 +10,8 @@ import os
 import uuid
 import subprocess
 
+from PIL import Image
+
 from django.conf import settings
 from django.http import HttpRequest
 from django.core.files.uploadedfile import UploadedFile
@@ -96,8 +98,8 @@ class Media(Model, metaclass=MediaMeta):
     #: The thumbnail height
     tn_height = PositiveIntegerField('Thumbnail Height (Pixels)', null=True, blank=True)
 
-    #: The length (in milliseconds for Audio or Video, null for Image and Document)
-    length = FloatField('Length (Milliseconsd)', null=True, blank=True)
+    #: The length (in seconds for Audio or Video, null for Image and Document)
+    length = FloatField('Length (Seconds)', null=True, blank=True)
 
     #: The author of this Media, if there is one.
     author = CharField('Author', max_length=1024, null=True, blank=True)
@@ -156,6 +158,18 @@ class Media(Model, metaclass=MediaMeta):
         return f"({id}) [{maio_type}] {name}{ext} - {size} Bytes"
 
     @staticmethod
+    def get_all_media(request: HttpRequest) -> QuerySet[Media]:
+        return Media.objects.filter(
+            owner=request.user,
+            # file__mime_type__in=MaioMimeType.objects.filter(
+            #     maio_type__in=MaioType.objects.filter(maio_type=MaioTypeChoices.IMAGE)
+            # ),
+            is_active=True,
+            is_hidden=False,
+            is_deleted=False
+        ).order_by('-date_added')
+
+    @staticmethod
     def get_all_images(request: HttpRequest) -> QuerySet[Media]:
         return Media.objects.filter(
             owner=request.user,
@@ -168,12 +182,49 @@ class Media(Model, metaclass=MediaMeta):
         ).order_by('-date_added')
 
     @staticmethod
-    def get_all_media(request: HttpRequest) -> QuerySet[Media]:
+    def get_all_audio(request: HttpRequest) -> QuerySet[Media]:
         return Media.objects.filter(
             owner=request.user,
-            # file__mime_type__in=MaioMimeType.objects.filter(
-            #     maio_type__in=MaioType.objects.filter(maio_type=MaioTypeChoices.IMAGE)
-            # ),
+            file__mime_type__in=MaioMimeType.objects.filter(
+                maio_type__in=MaioType.objects.filter(maio_type=MaioTypeChoices.AUDIO)
+            ),
+            is_active=True,
+            is_hidden=False,
+            is_deleted=False
+        ).order_by('-date_added')
+
+    @staticmethod
+    def get_all_videos(request: HttpRequest) -> QuerySet[Media]:
+        return Media.objects.filter(
+            owner=request.user,
+            file__mime_type__in=MaioMimeType.objects.filter(
+                maio_type__in=MaioType.objects.filter(maio_type=MaioTypeChoices.VIDEO)
+            ),
+            is_active=True,
+            is_hidden=False,
+            is_deleted=False
+        ).order_by('-date_added')
+
+    @staticmethod
+    def get_all_documents(request: HttpRequest) -> QuerySet[Media]:
+        return Media.objects.filter(
+            owner=request.user,
+            file__mime_type__in=MaioMimeType.objects.filter(
+                maio_type__in=MaioType.objects.filter(maio_type=MaioTypeChoices.DOCUMENT)
+            ),
+            is_active=True,
+            is_hidden=False,
+            is_deleted=False
+        ).order_by('-date_added')
+
+
+    @staticmethod
+    def get_all_other_file(request: HttpRequest) -> QuerySet[Media]:
+        return Media.objects.filter(
+            owner=request.user,
+            file__mime_type__in=MaioMimeType.objects.filter(
+                maio_type__in=MaioType.objects.filter(maio_type=MaioTypeChoices.OTHER)
+            ),
             is_active=True,
             is_hidden=False,
             is_deleted=False
@@ -190,15 +241,15 @@ class Media(Model, metaclass=MediaMeta):
         extension = ''.join(content_file.name.split('.')[-1])
         width = None
         height = None
+        length = None
+        tn_path = ''
         tn_extension = 'jpg'
         if maio_file.mime_type.get_maio_type_choice() == MaioTypeChoices.IMAGE:
             image, _image_path = maio_file.load_image()
             width = image.width
             height = image.height
             image.close()
-            tn_extension = extension
         if maio_file.mime_type.get_maio_type_choice() == MaioTypeChoices.VIDEO:
-            # TODO: Process video height and width
             video_path = os.path.join(fs.mk_md5_dir_media(maio_file.md5sum), maio_file.get_filename())
             ffprobe_cmd = [
                 maio_conf.get_ffprobe_bin_path(),
@@ -210,13 +261,45 @@ class Media(Model, metaclass=MediaMeta):
             ]
             try:
                 output = subprocess.run(ffprobe_cmd, capture_output=True)
-                output = str(output.stdout, encoding='UTF-8')
+                output = str(output.stdout, encoding='UTF-8').strip()
                 width = output.split('x')[0]
                 height = output.split('x')[1]
             except subprocess.CalledProcessError:
                 raise
+            ffprobe_cmd = [
+                maio_conf.get_ffprobe_bin_path(),
+                "-show_entries", "format=duration",
+                "-v", "quiet",
+                "-of", "csv=p=0",
+                "-i", video_path,
+            ]
+            try:
+                output = subprocess.run(ffprobe_cmd, capture_output=True)
+                output = str(output.stdout, encoding='UTF-8')
+                length = float(output.strip())
+            except subprocess.CalledProcessError:
+                raise
+        if maio_file.mime_type.get_maio_type_choice() == MaioTypeChoices.AUDIO:
+            tn_extension = 'png'
+            audio_path = os.path.join(fs.mk_md5_dir_media(maio_file.md5sum), maio_file.get_filename())
+            ffprobe_cmd = [
+                maio_conf.get_ffprobe_bin_path(),
+                "-show_entries", "format=duration",
+                "-v", "quiet",
+                "-of", "csv=p=0",
+                "-i", audio_path,
+            ]
+            try:
+                output = subprocess.run(ffprobe_cmd, capture_output=True)
+                output = str(output.stdout, encoding='UTF-8')
+                length = float(output.strip())
+            except subprocess.CalledProcessError:
+                raise
 
-        maio_file.process_thumbnail()
+        tn_path, _is_created = maio_file.process_thumbnail()
+        # raise Exception(f"tn_path: {tn_path}\nis_created: {_is_created}")
+        tn_image = Image.open(tn_path)
+        tn_image.load()
 
         # _deets = f'''
         #     Name: {name}
@@ -228,7 +311,7 @@ class Media(Model, metaclass=MediaMeta):
         # '''
         # raise Exception(_deets)
 
-        return Media.objects.create(
+        media = Media.objects.create(
             file=maio_file,
             owner=request.user,
             name=name,
@@ -236,9 +319,13 @@ class Media(Model, metaclass=MediaMeta):
             tn_extension=tn_extension,
             width=width,
             height=height,
-            tn_width=maio_file.thumbnail.width,
-            tn_height=maio_file.thumbnail.height,
+            length=length,
+            tn_width=tn_image.width,
+            tn_height=tn_image.height,
         )
+
+        tn_image.close()
+        return media
 
     def get_static_media_uri(self) -> str | None:
         '''Get the static URL of this resource.'''

@@ -6,8 +6,8 @@
     background-color: gray;
 }
 
-.highlight_media {
-    background-color: rgb(244, 103, 88);
+.maio-highlight-media {
+    background-color: rgb(243, 218, 60);
 }
 
 .maio-media-icon {
@@ -17,4 +17,24 @@
     z-index: 1;
     background-color: white;
     border-radius: 2px;
+}
+
+.maio-file-name {
+    word-wrap: break-word;
+    text-decoration: underline;
+}
+
+.maio-card-options {
+    position: absolute;
+    right: 4px;
+    bottom: 2px;
+    z-index: 1;
+}
+
+.maio-text-white {
+    color: white;
+}
+
+.maio-text-white:hover {
+    color: white;
 }

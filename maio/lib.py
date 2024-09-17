@@ -49,6 +49,29 @@ def sizeof_fmt(num: int | float, suffix: str = "B") -> str:
     return f"{num:.1f} Yi{suffix}"
 
 
+def sizeof_duration_fmt(num: int | float) -> str:
+    '''
+    Returns a length of time with a human readable suffix.
+
+    Supports::
+
+        * all currently known binary prefixes
+        * negative and positive numbers
+        * numbers larger than 1000 Yobibytes
+        * arbitrary units (maybe you like to count in Gibibits!)
+
+    Thanks to::
+
+        https://stackoverflow.com/a/1094933
+    '''
+    unit = "s"
+    for unit in ("s", "m", "h"):
+        if abs(num) < 60.0:
+            return f"{num:3.1f}{unit}"
+        num /= 60.0
+    return f"{num:.1f}{unit}"
+
+
 def validate_filename(filename: str) -> bool:
     '''
     Validate that the filename contains valid characters on Windows.

@@ -71,6 +71,7 @@ class MaioConf():
         filestore_path = self.get_filestore_path()
         images_path = (
             self.config
+                .get('maio_types', {})
                 .get('image', {})
                 .get('directory', '')
         )
@@ -81,10 +82,20 @@ class MaioConf():
         filestore_path = self.get_filestore_path()
         audio_path = (
             self.config
+                .get('maio_types', {})
                 .get('audio', {})
                 .get('directory', '')
         )
         return os.path.join(filestore_path, audio_path)
+
+    def get_audio_thumbnail_path(self) -> str:
+        '''get_audio_thumbnail path.'''
+        return (
+            self.config
+                .get('maio_types', {})
+                .get('audio', {})
+                .get('thumbnail_path', '')
+        )
 
     def get_video_path(self) -> str:
         '''get_video_path'''

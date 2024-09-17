@@ -2,31 +2,32 @@
 {# requires a Media instance named 'image' and an integer named 'width' context variables #}
 
 {% load static %}
+{% load maio_extras %}
 
-{% if image and width %}
-<div class="card m-2 p-0" style="width: {{width}}px;" id="card_{{ image.id }}">
+{% if medium and width %}
+<div class="card m-2 p-0" style="width: {{width}}px;" id="card_{{ medium.id }}">
   <!-- top of card, image -->
   <div style="height: {{width}}px; overflow: hidden; border-radius: 5px;">
-    {% if image.file.mime_type.maio_type.maio_type == 'image' %}
+    {% if medium.file.mime_type.maio_type.maio_type == 'image' %}
       <i class="bi bi-file-earmark-image maio-media-icon"></i>
-    {% elif image.file.mime_type.maio_type.maio_type == 'video' %}
+    {% elif medium.file.mime_type.maio_type.maio_type == 'video' %}
       <i class="bi bi-camera-video maio-media-icon"></i>
-    {% elif image.file.mime_type.maio_type.maio_type == 'audio' %}
+    {% elif medium.file.mime_type.maio_type.maio_type == 'audio' %}
       <i class="bi bi-file-music maio-media-icon"></i>
-    {% elif image.file.mime_type.maio_type.maio_type == 'document' %}
+    {% elif medium.file.mime_type.maio_type.maio_type == 'document' %}
       <i class="bi bi-file-earmark-word maio-media-icon"></i>
     {% else %}
       <i class="bi bi-file-binary maio-media-icon"></i>
     {% endif %}
-    <a href="{{image.get_static_media_uri}}"
+    <a href="{{medium.get_static_media_uri}}"
     ><img class="card-img-top"
-          src="{{image.get_static_thumbnail_uri}}"
-          alt="{{ image.name }}.{{ image.extension }}"
-          style="{% if image.tn_width > image.tn_height %}
+          src="{{medium.get_static_thumbnail_uri}}"
+          alt="{{ medium.name }}.{{ medium.extension }}"
+          style="{% if medium.tn_width > medium.tn_height %}
                    height: {{width}}px; width: auto;
-                   margin-left: {{image.margin_left}}px;
+                   margin-left: {{medium.margin_left}}px;
                  {% else %}
-                   margin-top: {{image.margin_top}}px;
+                   margin-top: {{medium.margin_top}}px;
                    width: {{width}}px; height: auto;
                  {% endif %}"
     >
@@ -37,28 +38,28 @@
   {% if user_setting.display_thumbnails_only is False %}
   <div class="card-body p-1"> <!-- title -->
     <h5 class="card-title">
-      {{ image.name }}.{{ image.extension }}
+      {{ medium.name }}.{{ medium.extension }}
     </h5>
-    {% if image.author %}
+    {% if medium.author %}
     <!-- author -->
     <div class="card-text" style="font-size: 10pt;">
       Author:
-      {% if image.url %}
-        <a href="{{ image.url }}">
+      {% if medium.url %}
+        <a href="{{ medium.url }}">
       {% endif %}
 
-      {{ image.author }}
+      {{ medium.author }}
 
-      {% if image.url %}
+      {% if medium.url %}
         </a>
       {% endif %}
     </div> <!-- /author -->
     {% endif %}
 
-    {% if image.copyright %}
+    {% if medium.copyright %}
     <!-- copyright -->
     <div class="card-text" style="font-size: 10pt;">
-      Copyright: {{ image.copyright }}
+      Copyright: {{ medium.copyright }}
     </div> <!-- /copyright -->
     {% endif %}
   </div>  <!-- /title -->
@@ -80,63 +81,75 @@
   </div>
   <!-- /rating -->
 
-  <!-- tags -->
-  <div class="card-body p-1 border-bottom" style="font-size: 10pt;">
-    Tags:
-    {% for tag in image.tags.all %}
-      <span class="badge badge-secondary">#{{ tag.name }}</span>
-    {% empty %}
-      None
-    {% endfor %}
-  </div>
-  <!-- /tags -->
-
-  <!-- source -->
-  <div class="card-body p-1 border-bottom" style="font-size: 10pt;">
-    Source: {{ image.source }}
-  </div>
-  <!-- /source -->
-
   <!-- date modified and dimensions -->
   <div class="card-body p-1 clearfix" style="font-size: 10pt;">
-    <span>{{ image.date_modified }}</span>
-    <span>{{ image.width }}x{{ image.height }}</span>
-    <div class="btn-group dropup float-end">
+    <span>{{ medium.date_modified }}</span>
+    <br><span>Size: {{ medium.file.size|maio_filesize_human }}</span>
+    {% if medium.file.mime_type.maio_type.maio_type == 'image' %}
+      <br><span>Dimensions: {{ medium.width }}x{{ medium.height }}</span>
+    {% elif medium.file.mime_type.maio_type.maio_type == 'video' %}
+      <br><span>Dimensions: {{ medium.width }}x{{ medium.height }}</span>
+      <br><span>Length: {{medium.length|maio_duration_human}}</span>
+    {% elif medium.file.mime_type.maio_type.maio_type == 'audio' %}
+      <br><span>Length: {{ medium.length|maio_duration_human }}</span>
+    {% else %}
+      <br><span>No extra properties shown.</span>
+    {% endif %}
+    <br><span>Source: {{ medium.source }}</span>
+    <br><span>Tags:
+      {% for tag in medium.tags.all %}
+        <span class="badge badge-secondary">#{{ tag.name }}</span>
+      {% empty %}
+        None
+      {% endfor %}
+    </span>
+    <!-- /tags -->
+    <div class="btn-group dropup float-end maio-card-options">
       <span class="bi bi-three-dots-vertical float-end dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"></span>
       <ul class="dropdown-menu" style="cursor: pointer;">
         <!-- Dropdown menu links -->
         <li class="media_options"
             data-bs-toggle="modal"
-            data-bs-target="#modal_{{ image.id }}"
-            onclick="highlight_media('{{ image.id }}');">
+            data-bs-target="#modal_{{ medium.id }}">
           Delete
         </li>
       </ul>
     </div>
   </div>
   <!-- /date modified and dimensions -->
+
+  <script>
+    $(function(){
+      $("#modal_{{ medium.id }}").on('show.bs.modal', function(){
+        highlight_media('{{ medium.id }}');
+      });
+      $("#modal_{{ medium.id }}").on('hidden.bs.modal', function(){
+        unhighlight_media('{{ medium.id }}');
+      });
+    });
+  </script>
   {% endif %}
 </div>
 
-<div class="modal fade" id="modal_{{ image.id }}" tabindex="-1" onclick="unhighlight_media('{{ image.id }}');">
+<div class="modal fade" id="modal_{{ medium.id }}" tabindex="-1">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Delete Media?</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="unhighlight_media('{{ image.id }}');"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <p>Are you sure you wish to delete {{ image.name }}.{{ image.extension }}?</p>
+        <p>Are you sure you wish to delete <span class="maio-file-name">{{ medium.name }}.{{ medium.extension }}?</span></p>
         {% if request.user.is_superuser %}
         <div>
-          <input type="checkbox" id="delete_all_{{ image.id }}">
-          <label for="delete_all_{{ image.id }}">Permanently delete this Media and the underlying filestore.</label>
+          <input type="checkbox" id="delete_all_{{ medium.id }}">
+          <label for="delete_all_{{ medium.id }}">Permanently delete this Media and the underlying filestore.</label>
         </div>
         {% endif %}
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="unhighlight_media('{{ image.id }}');">No, Cancel</button>
-        <button type="button" class="btn btn-danger" onclick="delete_media('{{ image.id }}');">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No, Cancel</button>
+        <button type="button" class="btn btn-danger" onclick="delete_media('{{ medium.id }}');">
           Yes, Delete
         </button>
       </div>
