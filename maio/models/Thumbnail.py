@@ -50,7 +50,13 @@ class Thumbnail(Model, metaclass=ThumbnailMeta):
     md5sum = CharField('MD5 Sum', max_length=32, unique=True, editable=False)
 
     #: The File path stored in ./filestore/media/
-    content_file = FileField('Content File', max_length=1024, upload_to=maio_conf.get_thumbnail_path())
+    content_file = FileField('Content File', max_length=1024, upload_to=maio_conf.get_thumbnail_directory())
+
+    #: The thumbnail extension.
+    extension = CharField('Extension', max_length=8, default='jpg')
+
+    #: The URI of the thumbnail relative to `settings.STATIC_URL`
+    uri = CharField('URI', max_length=1024, default=maio_conf.get_static_media_uri())
 
     #: Width
     width = PositiveIntegerField('Width')
@@ -69,7 +75,7 @@ class Thumbnail(Model, metaclass=ThumbnailMeta):
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
-        self.content_file.field.upload_to = maio_conf.get_thumbnail_path()
+        self.content_file.field.upload_to = maio_conf.get_thumbnail_directory()
 
     def __str__(self) -> str:
         id = str(self.id)[0:6]

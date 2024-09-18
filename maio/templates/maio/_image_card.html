@@ -43,7 +43,7 @@
 
   {% if user_setting.display_thumbnails_only is False %}
   <div class="card-body p-1"> <!-- title -->
-    <h5 class="card-title">
+    <h5 class="card-title maio-card-title" title="{{ medium.name }}.{{ medium.extension }}">
       {{ medium.name }}.{{ medium.extension }}
     </h5>
     {% if medium.author %}
@@ -187,7 +187,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No, Cancel</button>
-        <button type="button" class="btn btn-danger" onclick="delete_media('{{ medium.id }}');">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" onclick="delete_media('{{ medium.id }}');">
           Yes, Delete <i class="bi bi-x-square"></i>
         </button>
       </div>

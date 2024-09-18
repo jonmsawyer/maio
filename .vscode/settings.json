@@ -25,6 +25,16 @@
                 "match": "\\.css$",
                 "isAsync": false,
                 "cmd": "activate.bat && py manage.py collectstatic --noinput"
+            },
+            {
+                "match": "\\.json$",
+                "isAsync": false,
+                "cmd": "activate.bat && py manage.py collectstatic --noinput"
+            },
+            {
+                "match": "\\.md$",
+                "isAsync": false,
+                "cmd": "activate.bat && py manage.py collectstatic --noinput"
             }
         ]
     },

@@ -75,3 +75,9 @@ img.maio-viewer-gif {
 audio.maio-viewer {}
 
 video.maio-viewer {}
+
+.maio-card-title {
+    max-height: 3.6em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

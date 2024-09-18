@@ -77,13 +77,13 @@ class File(Model, metaclass=FileMeta):
     md5sum = CharField(_T('MD5 Sum'), max_length=32, unique=True, editable=False)
 
     #: The base name for the File.
-    original_name = CharField(_T('Original Name'), max_length=1024, editable=False)
+    original_name = CharField(_T('Original Name'), max_length=1024)
 
     #: The File extension.
-    original_extension = CharField(_T('Original Extension'), max_length=8, editable=False, null=True, blank=True)
+    original_extension = CharField(_T('Original Extension'), max_length=8, null=True, blank=True)
 
     #: Thumbnail extension.
-    original_extension = CharField(_T('Thumbnail Extension'), max_length=8, null=True, blank=True)
+    thumbnail_extension = CharField(_T('Thumbnail Extension'), max_length=8, null=True, blank=True)
 
     #: The File's mime type.
     mime_type = ForeignKey(to=MaioMimeType, on_delete=DO_NOTHING, editable=False)
@@ -98,7 +98,7 @@ class File(Model, metaclass=FileMeta):
     modified_time = DateTimeField(_T('Modified Time'), auto_now_add=True)
 
     #: The File path stored in ./filestore/media/
-    content_file = FileField(_T('Content File'), max_length=1024, upload_to=maio_conf.get_upload_path())
+    content_file = FileField(_T('Content File'), max_length=1024, upload_to=maio_conf.get_upload_directory())
 
     #: The date time when this File was added to Maio.
     date_added = DateTimeField(_T('Date Added'), auto_now_add=True)
@@ -263,13 +263,17 @@ class File(Model, metaclass=FileMeta):
         root = fs.mk_md5_dir_thumbnail(self.md5sum)
         tn_path = ''
         tn_extension = 'jpg'
+        tn_uri = maio_conf.get_static_media_uri()
         is_processed = False
+
         if maio_type_choice == MaioTypeChoices.IMAGE:
             tn_path = os.path.join(root, self.get_filename())
+            tn_extension = tn_path.split('.')[-1]
             tn_path_name = '.'.join(tn_path.split('.')[:-1])
             tn_path = f"{tn_path_name}.{tn_extension}"
 
             try:
+                # Process JPEG thumbnails.
                 # Thanks to: https://stackoverflow.com/a/6218425
                 image, _image_path = self.load_image()
                 orientation = None
@@ -279,30 +283,26 @@ class File(Model, metaclass=FileMeta):
                 exif = dict(image.getexif().items())
                 if orientation in exif:
                     if exif[orientation] == 3:
-                        image=image.rotate(180, expand=True)
+                        image = image.rotate(180, expand=True)
                     elif exif[orientation] == 6:
-                        image=image.rotate(270, expand=True)
+                        image = image.rotate(270, expand=True)
                     elif exif[orientation] == 8:
-                        image=image.rotate(90, expand=True)
+                        image = image.rotate(90, expand=True)
             except Exception:
                 raise
 
-            # _deets = f'''
-            #     File Path: {file_path}
-            #     Image Path: {image_path}
-            # '''
-            # raise Exception(_deets)
-
             image.thumbnail((300, 300), Image.Resampling.LANCZOS)
+
             try:
                 image.save(tn_path)
             except OSError:
                 image.convert('RGB').save(tn_path)
+
             is_processed = True
 
         if maio_type_choice == MaioTypeChoices.VIDEO:
             tn_path = '.'.join(os.path.join(root, self.get_filename()).split('.')[:-1])
-            tn_path = f"{tn_path}.jpg"
+            tn_path = f"{tn_path}.{tn_extension}"
             ffmpeg_cmd: list[str] = [
                 maio_conf.get_ffpmeg_bin_path(),
                 "-ss", "00:00:01.00",
@@ -326,17 +326,92 @@ class File(Model, metaclass=FileMeta):
             tn_path = os.path.join(root, self.get_filename())
             tn_path_name = '.'.join(tn_path.split('.')[:-1])
             tn_path = f"{tn_path_name}.{audio_tn_ext}"
+
             image = Image.open(audio_tn_path)
             image.load()
-            image.save(tn_path)
+
+            try:
+                image.save(tn_path)
+            except OSError:
+                image.convert('RGB').save(tn_path)
+
+            is_processed = True
+
+        if maio_type_choice == MaioTypeChoices.DOCUMENT:
+            document_tn_path = maio_conf.get_document_thumbnail_path()
+            # PDF / Adobe PDF
+            if (
+                self.original_extension in maio_conf.get_document_pdf_extensions() or
+                self.mime_type.mime_type in maio_conf.get_document_pdf_mime_types()
+            ):
+                document_tn_path = maio_conf.get_document_pdf_thumbnail_path()
+            # MS Word / OpenDocument Word Processing Document
+            if (
+                self.original_extension in maio_conf.get_document_msword_extensions() or
+                self.mime_type.mime_type in maio_conf.get_document_msword_mime_types()
+            ):
+                document_tn_path = maio_conf.get_document_msword_thumbnail_path()
+            # MS Excel / OpenDocument Spreadsheet
+            if (
+                self.original_extension in maio_conf.get_document_msexcel_extensions() or
+                self.mime_type.mime_type in maio_conf.get_document_msexcel_mime_types()
+            ):
+                document_tn_path = maio_conf.get_document_msexcel_thumbnail_path()
+            # MS PowerPoint / OpenDocument Presentation
+            if (
+                self.original_extension in maio_conf.get_document_mspowerpoint_extensions() or
+                self.mime_type.mime_type in maio_conf.get_document_mspowerpoint_mime_types()
+            ):
+                document_tn_path = maio_conf.get_document_mspowerpoint_thumbnail_path()
+            # MS Access / OpenDocument Database
+            if (
+                self.original_extension in maio_conf.get_document_msaccess_extensions() or
+                self.mime_type.mime_type in maio_conf.get_document_msaccess_mime_types()
+            ):
+                document_tn_path = maio_conf.get_document_msaccess_thumbnail_path()
+            # XML
+            if (
+                self.original_extension in maio_conf.get_document_xml_extensions() or
+                self.mime_type.mime_type in maio_conf.get_document_xml_mime_types()
+            ):
+                document_tn_path = maio_conf.get_document_xml_thumbnail_path()
+            # Text
+            if (
+                self.original_extension in maio_conf.get_document_text_extensions() or
+                self.mime_type.mime_type in maio_conf.get_document_text_mime_types()
+            ):
+                document_tn_path = maio_conf.get_document_text_thumbnail_path()
+
+            tn_extension = document_tn_path.split('.')[-1]
+            tn_path = os.path.join(root, self.get_filename())
+            tn_path_name = '.'.join(tn_path.split('.')[:-1])
+            tn_path = f"{tn_path_name}.{tn_extension}"
+
+            # _deets = f'''
+            #     tn_extension: {tn_extension}
+            #     tn_path: {tn_path}
+            # '''
+            # raise Exception(_deets)
+
+            image = Image.open(document_tn_path)
+            image.load()
+
+            try:
+                image.save(tn_path)
+            except OSError:
+                image.convert('RGB').save(tn_path)
+
             is_processed = True
 
         if is_processed:
+            self.thumbnail_extension = tn_extension
             try:
                 self.thumbnail, is_created = Thumbnail.objects.get_or_create(
                     file=self,
                     md5sum=self.md5sum,
                     content_file=tn_path,
+                    extension=tn_extension,
+                    uri=tn_uri,
                     width=image.width,
                     height=image.height,
                     size=os.stat(tn_path).st_size,

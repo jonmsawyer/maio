@@ -167,7 +167,8 @@ class Media(Model, metaclass=MediaMeta):
             is_active=True,
             is_hidden=False,
             is_deleted=False
-        ).order_by('-date_added')
+        # ).order_by('-date_added')
+        ).order_by('name')
 
     @staticmethod
     def get_all_images(request: HttpRequest) -> QuerySet[Media]:
@@ -179,7 +180,7 @@ class Media(Model, metaclass=MediaMeta):
             is_active=True,
             is_hidden=False,
             is_deleted=False
-        ).order_by('-date_added')
+        ).order_by('name')
 
     @staticmethod
     def get_all_audio(request: HttpRequest) -> QuerySet[Media]:
@@ -191,7 +192,7 @@ class Media(Model, metaclass=MediaMeta):
             is_active=True,
             is_hidden=False,
             is_deleted=False
-        ).order_by('-date_added')
+        ).order_by('name')
 
     @staticmethod
     def get_all_videos(request: HttpRequest) -> QuerySet[Media]:
@@ -203,7 +204,7 @@ class Media(Model, metaclass=MediaMeta):
             is_active=True,
             is_hidden=False,
             is_deleted=False
-        ).order_by('-date_added')
+        ).order_by('name')
 
     @staticmethod
     def get_all_documents(request: HttpRequest) -> QuerySet[Media]:
@@ -215,7 +216,7 @@ class Media(Model, metaclass=MediaMeta):
             is_active=True,
             is_hidden=False,
             is_deleted=False
-        ).order_by('-date_added')
+        ).order_by('name')
 
 
     @staticmethod
@@ -228,7 +229,7 @@ class Media(Model, metaclass=MediaMeta):
             is_active=True,
             is_hidden=False,
             is_deleted=False
-        ).order_by('-date_added')
+        ).order_by('name')
 
     @staticmethod
     def create_from_maio_file(
@@ -243,7 +244,7 @@ class Media(Model, metaclass=MediaMeta):
         height = None
         length = None
         tn_path = ''
-        tn_extension = 'jpg'
+        tn_extension = maio_file.thumbnail_extension if maio_file.thumbnail_extension else 'jpg'
         if maio_file.mime_type.get_maio_type_choice() == MaioTypeChoices.IMAGE:
             image, _image_path = maio_file.load_image()
             width = image.width
@@ -280,7 +281,6 @@ class Media(Model, metaclass=MediaMeta):
             except subprocess.CalledProcessError:
                 raise
         if maio_file.mime_type.get_maio_type_choice() == MaioTypeChoices.AUDIO:
-            tn_extension = 'png'
             audio_path = os.path.join(fs.mk_md5_dir_media(maio_file.md5sum), maio_file.get_filename())
             ffprobe_cmd = [
                 maio_conf.get_ffprobe_bin_path(),
@@ -297,19 +297,8 @@ class Media(Model, metaclass=MediaMeta):
                 raise
 
         tn_path, _is_created = maio_file.process_thumbnail()
-        # raise Exception(f"tn_path: {tn_path}\nis_created: {_is_created}")
         tn_image = Image.open(tn_path)
         tn_image.load()
-
-        # _deets = f'''
-        #     Name: {name}
-        #     Extension: {extension}
-        #     Width: {width}
-        #     Height: {height}
-        #     Maio File: {maio_file}
-        #     Content File: {content_file}
-        # '''
-        # raise Exception(_deets)
 
         media = Media.objects.create(
             file=maio_file,
