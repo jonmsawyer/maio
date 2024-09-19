@@ -1,0 +1,19 @@
+{# medium icon file #}
+{# requires a Media instance named 'image' and an integer named 'width' context variables #}
+
+{% load static %}
+{% load maio_extras %}
+
+{% if medium and width %}
+    {% if medium.file.mime_type.maio_type.maio_type == 'image' %}
+        <i class="bi bi-file-earmark-image maio-media-icon"></i>
+    {% elif medium.file.mime_type.maio_type.maio_type == 'video' %}
+        <i class="bi bi-camera-video maio-media-icon"></i>
+    {% elif medium.file.mime_type.maio_type.maio_type == 'audio' %}
+        <i class="bi bi-file-music maio-media-icon"></i>
+    {% elif medium.file.mime_type.maio_type.maio_type == 'document' %}
+        <i class="bi bi-file-earmark-word maio-media-icon"></i>
+    {% else %}
+        <i class="bi bi-file-binary maio-media-icon"></i>
+    {% endif %}
+{% endif %}

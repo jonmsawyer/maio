@@ -98,7 +98,7 @@ class File(Model, metaclass=FileMeta):
     modified_time = DateTimeField(_T('Modified Time'), auto_now_add=True)
 
     #: The File path stored in ./filestore/media/
-    content_file = FileField(_T('Content File'), max_length=1024, upload_to=maio_conf.get_upload_directory())
+    content_file = FileField(_T('Content File'), max_length=1024, upload_to=maio_conf.get_chain('upload', 'directory'))
 
     #: The date time when this File was added to Maio.
     date_added = DateTimeField(_T('Date Added'), auto_now_add=True)
@@ -322,10 +322,10 @@ class File(Model, metaclass=FileMeta):
 
         if maio_type_choice == MaioTypeChoices.AUDIO:
             audio_tn_path = maio_conf.get_audio_thumbnail_path()
-            audio_tn_ext = audio_tn_path.split('.')[-1]
+            tn_extension = audio_tn_path.split('.')[-1]
             tn_path = os.path.join(root, self.get_filename())
             tn_path_name = '.'.join(tn_path.split('.')[:-1])
-            tn_path = f"{tn_path_name}.{audio_tn_ext}"
+            tn_path = f"{tn_path_name}.{tn_extension}"
 
             image = Image.open(audio_tn_path)
             image.load()

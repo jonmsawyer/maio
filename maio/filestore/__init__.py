@@ -49,19 +49,19 @@ def mk_md5_dir(md5: str, root: str | None = None, length: int = 2) -> str:
 
 def mk_md5_dir_media(md5: str, length: int = 2) -> str:
     '''Make MD5 directory under Media.'''
-    return mk_md5_dir(md5, maio_conf.get_media_directory(), length)
+    return mk_md5_dir(md5, maio_conf.get_chain('media', 'directory'), length)
 
 def mk_md5_dir_upload(md5: str, length: int = 2) -> str:
     '''Make MD5 directory under Upload.'''
-    return mk_md5_dir(md5, maio_conf.get_upload_directory(), length)
+    return mk_md5_dir(md5, maio_conf.get_chain('upload', 'directory'), length)
 
 def mk_md5_dir_meta(md5: str, length: int = 2) -> str:
     '''Make MD5 directory under Meta.'''
-    return mk_md5_dir(md5, maio_conf.get_meta_directory(), length)
+    return mk_md5_dir(md5, maio_conf.get_chain('meta', 'directory'), length)
 
 def mk_md5_dir_thumbnail(md5: str, length: int = 2) -> str:
     '''Make MD5 directory under Thumbnail.'''
-    return mk_md5_dir(md5, maio_conf.get_thumbnail_directory(), length)
+    return mk_md5_dir(md5, maio_conf.get_chain('thumbnail', 'directory'), length)
 
 def mk_md5_dir_images(md5: str, length: int = 2) -> str:
     '''Make MD5 directory under Images.'''

@@ -21,7 +21,7 @@
               {% if request.user.is_superuser %}
               <li><hr class="dropdown-divider"></li>
               <li><a class="dropdown-item" href="{% url 'admin:index' %}">Django Admin</a></li>
-              <li><a class="dropdown-item" href="{% url 'maio_admin' %}">Maio Admin</a></li>
+              <li><a class="dropdown-item" href="{% url 'maio_admin:home' %}">Maio Admin</a></li>
               {% endif %}
 
               <li><hr class="dropdown-divider"></li>

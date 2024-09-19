@@ -8,8 +8,28 @@
   <div class="jumbotron">
     <div class="container" style="">
       <h1 class="display-3" style="margin-top: 0em;">Maio Admin</h1>
-      <div style="clear: both;"></div>
-      <p>Admin stuff here.</p>
+      <div class="card">
+        <h4 class="card-title">User Admin</h4>
+        <div class="card-body">
+          <div class="card-text">
+            <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
+              <div class="btn-group" role="group">
+                <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                  User Dashboard
+                </button>
+                <ul class="dropdown-menu">
+                  {% for user in user_list %}
+                    <li><a class="dropdown-item" href="{% url 'maio_admin:user_dashboard' user.username %}">[{{ user.id }}] {{ user.username }}</a></li>
+                  {% endfor %}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
+  <div class="container">
+    Admin stats here.
   </div>
 {% endblock content %}

@@ -10,5 +10,6 @@ from django.contrib.admin import AdminSite
 
 
 class MaioAdminSite(AdminSite):
-    site_header = 'Maio Administration'
+    '''Maio Admin Site'''
     site_title = 'Maio Administration'
+    site_header = 'Maio Administration'

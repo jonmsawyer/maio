@@ -1,0 +1,37 @@
+{# medium icon file #}
+{# requires a Media instance named 'image' and an integer named 'width' context variables #}
+
+{% load static %}
+{% load maio_extras %}
+
+{% if medium and width %}
+  <!-- title -->
+  <div class="card-body p-1">
+    <h5 class="card-title maio-card-title" title="{{ medium.name }}.{{ medium.extension }}">
+        {{ medium.name }}.{{ medium.extension }}
+    </h5>
+
+    {% if medium.author %}
+    <!-- author -->
+    <div class="card-text" style="font-size: 10pt;">
+        Author:
+        {% if medium.url %}
+            <a href="{{ medium.url }}">
+        {% endif %}
+
+        {{ medium.author }}
+
+        {% if medium.url %}
+            </a>
+        {% endif %}
+    </div> <!-- /author -->
+    {% endif %}
+
+    {% if medium.copyright %}
+    <!-- copyright -->
+    <div class="card-text" style="font-size: 10pt;">
+        Copyright: {{ medium.copyright }}
+    </div> <!-- /copyright -->
+    {% endif %}
+  </div> <!-- /title -->
+{% endif %}

@@ -1,4 +1,4 @@
-{# image card #}
+{# image card, simple #}
 {# requires a Media instance named 'image' and an integer named 'width' context variables #}
 
 {% load static %}
@@ -7,9 +7,6 @@
 {% if medium and width %}
 <div class="card m-2 p-0 border border-dark" style="width: {{width}}px;" id="card_{{ medium.id }}">
   {% include 'maio/_image.html' %}
-  {% include 'maio/_title.html' %}
-  {% include 'maio/_rating.html' %}
-  {% include 'maio/_properties.html' %}
 </div>
 
 {% include 'maio/_modal_delete_media.html' %}

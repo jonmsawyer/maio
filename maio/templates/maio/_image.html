@@ -1,0 +1,27 @@
+{# medium icon file #}
+{# requires a Media instance named 'image' and an integer named 'width' context variables #}
+
+{% load static %}
+{% load maio_extras %}
+
+{% if medium and width %}
+  <!-- image -->
+  <div style="height: {{width}}px; overflow: hidden; border-radius: 5px;">
+    {% include 'maio/_medium_icon.html' %}
+    <img class="card-img-top"
+         data-bs-toggle="modal"
+         data-bs-target="#modal_maio_viewer_{{ medium.id }}"
+         src="{{medium.get_static_thumbnail_uri }}"
+         alt="{{ medium.name }}.{{ medium.extension }}"
+         style="{% if medium.tn_width > medium.tn_height %}
+                  height: {{ width }}px; width: auto;
+                  margin-left: {{ medium.margin_left }}px;
+                {% else %}
+                  margin-top: {{ medium.margin_top }}px;
+                  width: {{ width }}px; height: auto;
+                {% endif %}
+                cursor: pointer;"
+    >
+  </div>
+  <!-- /image -->
+{% endif %}

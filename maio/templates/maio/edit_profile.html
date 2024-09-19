@@ -3,8 +3,50 @@
 
 {% block title %}Edit Profile{% endblock title %}
 
+{% block stylesheets %}
+    <link href="{% static 'maio/css/edit_profile.css' %}" rel="stylesheet">
+{% endblock stylesheets %}
+
 {% block content %}
   <div class="container"> <!-- container -->
-    <h1>Edit Profile</h1>
+    <h1>Edit Profile ({{request.user.username}})</h1>
+    <div class="bg-default" style="margin-top: 2em;">
+      <a href="{% url 'edit_profile' %}" class="btn btn-primary btn-sm" class="maio-reload">
+        Reload Profile
+      </a>
+      <h4>Profile</h4>
+      <div class="maio-panel maio-edit-profile">
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="user_profile">
+          <div class="maio-form">
+            {{ user_profile_form.as_div }}
+          </div>
+          <div class="maio-submit">
+            <input type="submit" class="btn btn-primary maio-submit-input" value="Save Profile">
+          </div>
+          <div class="alert alert-{% if user_profile_saved %}success{% else %}warning{% endif %} maio-saved">
+            User Profile has {% if user_profile_saved %}been{% else %}not been{% endif %} saved.
+          </div>
+        </form>
+      </div>
+
+      <h4 style="margin-top: 2em;">User Settings</h4>
+      <div class="maio-panel maio-edit-settings">
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="user_setting">
+          <div class="maio-form">
+            {{ user_settings_form.as_div }}
+          </div>
+          <div class="maio-submit">
+            <input type="submit" class="btn btn-primary maio-submit-input" value="Save User Settings">
+          </div>
+          <div class="alert alert-{% if user_settings_saved %}success{% else %}warning{% endif %} maio-saved">
+            User Settings have {% if user_settings_saved %}been{% else %}not been{% endif %} saved.
+          </div>
+        </form>
+      </div>
+    </div>
   </div> <!-- /container -->
 {% endblock content %}

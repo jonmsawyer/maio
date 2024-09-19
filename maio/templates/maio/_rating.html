@@ -1,0 +1,24 @@
+{# rating file #}
+{# requires a Media instance named 'image' and an integer named 'width' context variables #}
+
+{% load static %}
+{% load maio_extras %}
+
+{% if medium and width %}
+  <!-- rating -->
+  <div class="card-body p-0 border-bottom clearfix pb-1  border border-dark-subtle" style="font-size: 14pt; padding: 0 5px;">
+    <span class="bi bi-heart" title="Love this image" aria-hidden="true" style="margin: 0 6px;"></span>
+    <span class="bi bi-hand-thumbs-up" title="Like this image" aria-hidden="true" style="margin: 0 6px;"></span>
+    <span class="bi bi-star float-end" title="Give this image 5 Stars" aria-hidden="true" style="margin: 0 6px 0 0;"></span>
+    <span class="bi bi-star float-end" title="Give this image 4 Stars" aria-hidden="true"></span>
+    <span class="bi bi-star float-end" title="Give this image 3 Stars" aria-hidden="true"></span>
+    <span class="bi bi-star float-end" title="Give this image 2 Stars" aria-hidden="true"></span>
+    <span class="bi bi-star float-end" title="Give this image 1 Star" aria-hidden="true" style="margin: 0 0 0 6px;"></span>
+  </div>
+  <div class="card-body p-0 border-bottom clearfix pb-1 border border-dark-subtle" style="font-size: 14pt; padding: 0 5px;">
+    <span class="bi bi-share" title="Share this media with another Maio User." style="margin: 0 0 0 6px;"></span>
+    <span class="bi bi-download float-end" title="Download this media" aria-hidden="true" style="margin: 0 6px;"></span>
+    <span class="bi bi-eye-slash float-end" title="Private (visible only to you)" aria-hidden="true" style="margin: 0 6px;"></span>
+  </div>
+  <!-- /rating -->
+{% endif %}

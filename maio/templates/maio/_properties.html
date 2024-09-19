@@ -1,0 +1,69 @@
+{# rating file #}
+{# requires a Media instance named 'image' and an integer named 'width' context variables #}
+
+{% load static %}
+{% load maio_extras %}
+
+{% if medium and width %}
+  <!-- media properties -->
+  <div class="card-body p-1 clearfix border border-dark-subtle">
+    {% if user_setting.default_dashboard_view == 'default' %}
+      <span>{{ medium.date_modified }}</span>
+      <div>Size: {{ medium.file.size|maio_filesize_human }}</div>
+      {% if medium.file.mime_type.maio_type.maio_type == 'image' %}
+        <div>Dimensions: {{ medium.width }}x{{ medium.height }}</div>
+      {% elif medium.file.mime_type.maio_type.maio_type == 'video' %}
+        <div>Dimensions: {{ medium.width }}x{{ medium.height }}</div>
+        <div>Length: {{medium.length|maio_duration_human}}</div>
+      {% elif medium.file.mime_type.maio_type.maio_type == 'audio' %}
+        <div>Length: {{ medium.length|maio_duration_human }}</div>
+      {% else %}
+        <div>No extra properties shown.</div>
+      {% endif %}
+    {% else %}
+      <div>
+        {% if medium.file.mime_type.maio_type.maio_type == 'image' %}
+          {{ medium.width }}x{{ medium.height }}
+        {% elif medium.file.mime_type.maio_type.maio_type == 'video' %}
+          {{ medium.width }}x{{ medium.height }} | {{medium.length|maio_duration_human}}
+        {% elif medium.file.mime_type.maio_type.maio_type == 'audio' %}
+          {{ medium.length|maio_duration_human }}
+        {% elif medium.file.mime_type.maio_type.maio_type == 'document' %}
+          {{ medium.file.size|maio_filesize_human }}
+        {% endif %}
+      </div>
+    {% endif %}
+
+    {% if user_setting.default_dashboard_view == 'default' %}
+    <div>Source: {{ medium.source }}</div>
+    <div>
+      Tags:
+      {% for tag in medium.tags.all %}
+        <span class="badge badge-secondary">#{{ tag.name }}</span>
+      {% empty %}
+        None
+      {% endfor %}
+    </div>
+    <div class="btn-group dropup float-end maio-card-options">
+      <span class="bi bi-three-dots-vertical float-end dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"></span>
+      <ul class="dropdown-menu" style="cursor: pointer; padding: 0; width: 13em;">
+        <!-- Dropdown menu links -->
+        <li class="maio-media-options"
+            data-bs-toggle="modal"
+            data-bs-target="#modal_maio_viewer_{{ medium.id }}"
+        >
+          View Media in Maio Viewer
+        </li>
+        <li class="maio-media-options"><a href="{{ medium.get_static_media_uri }}" target="_new">View Raw Media</a></li>
+        <li class="maio-media-options"
+            data-bs-toggle="modal"
+            data-bs-target="#modal_delete_media_{{ medium.id }}"
+        >
+          Delete
+        </li>
+      </ul>
+    </div>
+    {% endif %}
+  </div>
+  <!-- /properties -->
+{% endif %}

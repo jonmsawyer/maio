@@ -1,0 +1,21 @@
+{# rating file #}
+{# requires a Media instance named 'image' and an integer named 'width' context variables #}
+
+{% load static %}
+{% load maio_extras %}
+
+{% if medium and width %}
+  <!-- properties, simple -->
+  <div class="card-body p-1 clearfix border border-dark-subtle">
+    <div>
+      {% if medium.file.mime_type.maio_type.maio_type == 'image' %}
+        {{ medium.width }}x{{ medium.height }}
+      {% elif medium.file.mime_type.maio_type.maio_type == 'video' %}
+        {{ medium.width }}x{{ medium.height }} | {{medium.length|maio_duration_human}}
+      {% elif medium.file.mime_type.maio_type.maio_type == 'audio' %}
+        {{ medium.length|maio_duration_human }}
+      {% endif %}
+    </div>
+  </div>
+  <!-- /properties, simple -->
+{% endif %}

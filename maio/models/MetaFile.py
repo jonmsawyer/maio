@@ -58,7 +58,7 @@ class MetaFile(Model, metaclass=MetaFileMeta):
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
-        self.content_file.field.upload_to = maio_conf.get_meta_directory()
+        self.content_file.field.upload_to = maio_conf.get_chain('meta', 'directory')
 
     def __str__(self) -> str:
         id = str(self.id)[0:6]

@@ -5,6 +5,7 @@ Module: ``maio.models.Media``
 '''
 
 from __future__ import annotations
+from typing import Optional
 
 import os
 import uuid
@@ -158,78 +159,113 @@ class Media(Model, metaclass=MediaMeta):
         return f"({id}) [{maio_type}] {name}{ext} - {size} Bytes"
 
     @staticmethod
-    def get_all_media(request: HttpRequest) -> QuerySet[Media]:
+    def get_all_by_media_type(
+        request: HttpRequest,
+        media_type: str,
+        with_user: Optional[User] = None,
+    ) -> QuerySet[Media]:
+        '''get_all_media_by_media_type'''
+        if media_type == 'image':
+            return Media.get_all_images(request, with_user)
+        elif media_type == 'audio':
+            return Media.get_all_audio(request, with_user)
+        elif media_type == 'video':
+            return Media.get_all_videos(request, with_user)
+        elif media_type == 'document':
+            return Media.get_all_documents(request, with_user)
+        else:
+            return Media.get_all_media(request, with_user)
+
+    @staticmethod
+    def get_all_media(request: HttpRequest, with_user: Optional[User]) -> QuerySet[Media]:
+        user = request.user
+        if request.user.is_superuser and with_user:
+            user = with_user
         return Media.objects.filter(
-            owner=request.user,
+            owner=user,
             # file__mime_type__in=MaioMimeType.objects.filter(
             #     maio_type__in=MaioType.objects.filter(maio_type=MaioTypeChoices.IMAGE)
             # ),
             is_active=True,
             is_hidden=False,
             is_deleted=False
-        # ).order_by('-date_added')
-        ).order_by('name')
+        ).order_by(request.user_setting.default_dashboard_sort)
 
     @staticmethod
-    def get_all_images(request: HttpRequest) -> QuerySet[Media]:
+    def get_all_images(request: HttpRequest, with_user: Optional[User]) -> QuerySet[Media]:
+        user = request.user
+        if request.user.is_superuser and with_user:
+            user = with_user
         return Media.objects.filter(
-            owner=request.user,
+            owner=user,
             file__mime_type__in=MaioMimeType.objects.filter(
                 maio_type__in=MaioType.objects.filter(maio_type=MaioTypeChoices.IMAGE)
             ),
             is_active=True,
             is_hidden=False,
             is_deleted=False
-        ).order_by('name')
+        ).order_by(request.user_setting.default_dashboard_sort)
 
     @staticmethod
-    def get_all_audio(request: HttpRequest) -> QuerySet[Media]:
+    def get_all_audio(request: HttpRequest, with_user: Optional[User]) -> QuerySet[Media]:
+        user = request.user
+        if request.user.is_superuser and with_user:
+            user = with_user
         return Media.objects.filter(
-            owner=request.user,
+            owner=user,
             file__mime_type__in=MaioMimeType.objects.filter(
                 maio_type__in=MaioType.objects.filter(maio_type=MaioTypeChoices.AUDIO)
             ),
             is_active=True,
             is_hidden=False,
             is_deleted=False
-        ).order_by('name')
+        ).order_by(request.user_setting.default_dashboard_sort)
 
     @staticmethod
-    def get_all_videos(request: HttpRequest) -> QuerySet[Media]:
+    def get_all_videos(request: HttpRequest, with_user: Optional[User]) -> QuerySet[Media]:
+        user = request.user
+        if request.user.is_superuser and with_user:
+            user = with_user
         return Media.objects.filter(
-            owner=request.user,
+            owner=user,
             file__mime_type__in=MaioMimeType.objects.filter(
                 maio_type__in=MaioType.objects.filter(maio_type=MaioTypeChoices.VIDEO)
             ),
             is_active=True,
             is_hidden=False,
             is_deleted=False
-        ).order_by('name')
+        ).order_by(request.user_setting.default_dashboard_sort)
 
     @staticmethod
-    def get_all_documents(request: HttpRequest) -> QuerySet[Media]:
+    def get_all_documents(request: HttpRequest, with_user: Optional[User]) -> QuerySet[Media]:
+        user = request.user
+        if request.user.is_superuser and with_user:
+            user = with_user
         return Media.objects.filter(
-            owner=request.user,
+            owner=user,
             file__mime_type__in=MaioMimeType.objects.filter(
                 maio_type__in=MaioType.objects.filter(maio_type=MaioTypeChoices.DOCUMENT)
             ),
             is_active=True,
             is_hidden=False,
             is_deleted=False
-        ).order_by('name')
+        ).order_by(request.user_setting.default_dashboard_sort)
 
 
     @staticmethod
-    def get_all_other_file(request: HttpRequest) -> QuerySet[Media]:
+    def get_all_other_file(request: HttpRequest, with_user: Optional[User]) -> QuerySet[Media]:
+        user = request.user
+        if request.user.is_superuser and with_user:
+            user = with_user
         return Media.objects.filter(
-            owner=request.user,
+            owner=user,
             file__mime_type__in=MaioMimeType.objects.filter(
                 maio_type__in=MaioType.objects.filter(maio_type=MaioTypeChoices.OTHER)
             ),
             is_active=True,
             is_hidden=False,
             is_deleted=False
-        ).order_by('name')
+        ).order_by(request.user_setting.default_dashboard_sort)
 
     @staticmethod
     def create_from_maio_file(

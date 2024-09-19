@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'maio.apps.MaioAppConfig',
+    'maioadmin.apps.MaioAdminAppConfig',
 ]
 
 MIDDLEWARE = [
@@ -166,6 +167,11 @@ CACHES = {
     }
 }
 
+DATA_UPLOAD_MAX_MEMORY_SIZE = 4294967296 # 4 GB
+
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 1010
+
+DATA_UPLOAD_MAX_NUMBER_FILES = 1000
 
 # Maio specific settings
 MAIO_SETTINGS: dict[str, dict[str, Any]] = {
@@ -174,7 +180,7 @@ MAIO_SETTINGS: dict[str, dict[str, Any]] = {
     },
     'media': {
         'directory': os.path.join(MEDIA_ROOT, 'media'),
-        'static_uri': f'/{STATIC_URL}/media/',
+        'static_uri': f'/{STATIC_URL}media/',
     },
     'upload': {
         'directory': os.path.join(MEDIA_ROOT, 'uploads'),
@@ -184,7 +190,7 @@ MAIO_SETTINGS: dict[str, dict[str, Any]] = {
     },
     'thumbnail': {
         'directory': os.path.join(MEDIA_ROOT, 'thumbnails'),
-        'static_uri': f'/{STATIC_URL}/thumbnails/',
+        'static_uri': f'/{STATIC_URL}thumbnails/',
     },
     'ffmpeg': {
         'ffmpeg_exe': 'C:\\Users\\jonms\\scoop\\shims\\ffmpeg.exe',
@@ -822,10 +828,6 @@ MAIO_SETTINGS: dict[str, dict[str, Any]] = {
         },
     },
 }
-
-DATA_UPLOAD_MAX_MEMORY_SIZE = 4294967296 # 4 GB
-DATA_UPLOAD_MAX_NUMBER_FIELDS = 1010
-DATA_UPLOAD_MAX_NUMBER_FILES = 1000
 
 # Maio's site settings loader
 # Import conf.site_settings and add references to its attributes.

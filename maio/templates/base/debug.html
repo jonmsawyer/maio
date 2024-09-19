@@ -1,0 +1,13 @@
+{# image card, simple #}
+{# requires a Media instance named 'image' and an integer named 'width' context variables #}
+
+{% load static %}
+{% load maio_extras %}
+
+<div class="container maio-debug">
+  <hr>
+  <h4>Debug</h4>
+  <pre>User: {{ request.user }}
+Query Dict: {{ query_dict.urlencode }}
+User Setting: {{ user_setting.default_dashboard_view }}</pre>
+  </div>

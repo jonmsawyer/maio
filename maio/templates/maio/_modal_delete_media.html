@@ -1,0 +1,45 @@
+{# modal delete media file #}
+{# requires a Media instance named 'image' and an integer named 'width' context variables #}
+
+{% load static %}
+{% load maio_extras %}
+
+{% if medium and width %}
+  <!-- modal delete media -->
+  <script>
+    $(function() {
+      $("#modal_delete_media_{{ medium.id }}").on('show.bs.modal', function() {
+        highlight_media('{{ medium.id }}');
+      });
+      $("#modal_delete_media_{{ medium.id }}").on('hidden.bs.modal', function() {
+        unhighlight_media('{{ medium.id }}');
+      });
+    });
+  </script>
+  <div class="modal fade" id="modal_delete_media_{{ medium.id }}" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Delete Media?</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you wish to delete <span class="maio-file-name">{{ medium.name }}.{{ medium.extension }}?</span></p>
+          {% if request.user.is_superuser %}
+          <div>
+            <input type="checkbox" id="delete_all_{{ medium.id }}">
+            <label for="delete_all_{{ medium.id }}">Permanently delete this Media and the underlying filestore.</label>
+          </div>
+          {% endif %}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No, Cancel</button>
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal" onclick="delete_media('{{ medium.id }}');">
+            Yes, Delete <i class="bi bi-x-square"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- /modal delete media -->
+  {% endif %}

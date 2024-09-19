@@ -12,11 +12,12 @@ from django.shortcuts import redirect
 from django.http import (
     HttpRequest, HttpResponse, HttpResponseRedirect, HttpResponsePermanentRedirect,
 )
-from django.contrib.auth import authenticate
-from django.contrib.auth import login
+from django.contrib.auth import login, authenticate
+from django.contrib.auth.models import User
 
 from maio.forms import LoginForm
 from maio.lib import pre_populate_context_dict
+
 
 def home(
     request: HttpRequest
@@ -27,6 +28,12 @@ def home(
         if form.is_valid():
             username = form.cleaned_data.get('username', '')
             password = form.cleaned_data.get('password', '')
+            try:
+                findUser = User._default_manager.get(username__iexact=username)
+            except User.DoesNotExist:
+                findUser = None
+            if findUser is not None:
+                username = findUser.username
             user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
@@ -37,3 +44,4 @@ def home(
         form = LoginForm()
     cd['form'] = form
     return render(request, 'maio/home.html', cd)
+

@@ -1,0 +1,113 @@
+.maio-panel {
+    border: 1px black solid;
+    border-radius: 5px;
+    padding: 0.5em 1em 1em 1.5em;
+    position: relative;
+}
+
+.maio-panel.maio-edit-profile input,
+.maio-panel.maio-edit-settings input,
+.maio-panel.maio-edit-settings select {
+    display: block;
+    margin-left: 1em;
+    width: 30em;
+}
+
+.maio-panel.maio-edit-settings input[type=checkbox] {
+    display: inline;
+    width: auto;
+}
+
+.maio-panel form > div {
+    padding-top: 0;
+}
+
+.maio-submit {
+    position: absolute;
+    bottom: 1.5em;
+    right: 1em;
+}
+
+.maio-submit-input {
+    width: auto !important;
+    margin: 0 !important;
+}
+
+.maio-saved {
+    margin-top: 1em;
+    max-width: 400px;
+    margin-bottom: 0;
+    padding: 0.5em 1em !important;
+}
+
+.maio-reload {
+    float: right;
+    display: block;
+}
+
+div.maio-form {
+    position: relative;
+}
+
+body > main > div.container > div > a {
+    float: right;
+    display: block;
+}
+
+body > main > div.container > div > div.maio-panel.maio-edit-profile > form > div.maio-form > div,
+body > main > div.container > div > div.maio-panel.maio-edit-settings > form > div.maio-form > div {
+    margin-top: 5px;
+}
+
+div.helptext {
+    margin-left: 1em;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+    border: 1px rgb(29, 99, 156) solid;
+    background-color: rgb(150, 190, 223);
+    border-radius: 5px;
+    padding: 5px 5px 5px 10px;
+}
+
+ul.errorlist {
+    border: 1px solid rgb(185, 48, 48);
+    border-radius: 5px;
+    padding: 5px 5px 5px 10px;
+    margin-left: 1em;
+    margin-top: 0.5em;
+    background-color: rgb(212, 158, 158);
+}
+
+ul.errorlist li {
+    margin-left: 1.5em;
+}
+
+div label {
+    font-weight: bold;
+}
+
+#id_password {
+    margin-left: 1em;
+}
+
+#id_password > p:nth-child(2) {
+    margin-bottom: 0;
+}
+
+#id_password > p:nth-child(1) {
+    display: none;
+    margin-bottom: 0;
+}
+
+#id_password > p:nth-child(2) > a {
+    visibility: hidden;
+}
+#id_password > p:nth-child(2) > a:after {
+    content:'Change Password';
+    visibility: visible;
+    display: block;
+    position: absolute;
+    padding: 5px;
+    bottom: 0;
+    text-decoration: underline;
+}

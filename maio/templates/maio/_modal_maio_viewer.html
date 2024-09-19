@@ -1,0 +1,84 @@
+{# modal delete media file #}
+{# requires a Media instance named 'image' and an integer named 'width' context variables #}
+
+{% load static %}
+{% load maio_extras %}
+
+{% if medium and width %}
+  <!-- modal maio viewer -->
+  <script>
+    $(function() {
+      $("#modal_maio_viewer_{{ medium.id }}").on('show.bs.modal', function() {
+        var el = null;
+        {% if medium.file.mime_type.maio_type.maio_type == 'video' %}
+          el = document.getElementById("video_{{ medium.id }}");
+        {% elif medium.file.mime_type.maio_type.maio_type == 'audio' %}
+          el = document.getElementById("audio_{{ medium.id }}");
+        {% endif %}
+        console.log('Show Modal. Play Media. El:', el);
+        if (el != null) {
+          el.play();
+        }
+      });
+      $("#modal_maio_viewer_{{ medium.id }}").on('hidden.bs.modal', function() {
+        var el = null;
+        {% if medium.file.mime_type.maio_type.maio_type == 'video' %}
+          el = document.getElementById("video_{{ medium.id }}");
+        {% elif medium.file.mime_type.maio_type.maio_type == 'audio' %}
+          el = document.getElementById("audio_{{ medium.id }}");
+        {% endif %}
+        console.log('Hide Modal. Stop Media. El:', el);
+        if (el != null) {
+          el.pause();
+        }
+      });
+    });
+  </script>
+  <div class="modal fade" id="modal_maio_viewer_{{ medium.id }}" tabindex="-1">
+    <div class="modal-dialog modal-fullscreen-xl-down modal-xl modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Maio Viewer</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          {% if medium.file.mime_type.maio_type.maio_type == 'image' %}
+            <div class="maio-viewer-container">
+              <img class="img-fluid maio-viewer{% if medium.file.mime_type.mime_type == 'image/gif' %}-gif{% endif %}" src="{{ medium.get_static_media_uri }}"
+                   style="
+                    {% if medium.height > image_height %}height: {{ image_height }}px;{% endif %};
+                    {% comment %} {% if medium.width < image_width %}width: auto;{% endif %} {% endcomment %}
+                   "
+              >
+            </div>
+          {% elif medium.file.mime_type.maio_type.maio_type == 'video' %}
+            <figure class="maio-viewer">
+              <figcaption><b>{{ medium.name }}.{{ medium.extension }}</b></figcaption>
+              <video controls class="maio-viewer" id="video_{{ medium.id }}">
+                <source src="{{ medium.get_static_media_uri }}"/>
+              </video>
+            </figure>
+          {% elif medium.file.mime_type.maio_type.maio_type == 'audio' %}
+            <figure class="maio-viewer">
+              <figcaption>{{ medium.name }}.{{ medium.extension }}</b></figcaption>
+              <audio controls class="maio-viewer" id="audio_{{ medium.id }}">
+                <source src="{{ medium.get_static_media_uri }}">
+              </audio>
+            </figure>
+          {% elif medium.file.mime_type.maio_type.maio_type == 'document' %}
+            No viewer available for <b>{{ medium.name }}.{{ medium.extension }}</b>.
+            Try <a href="{{ medium.get_static_media_uri }}" download>downloading the file</a> instead.
+          {% else %}
+            No viewer available for <b>{{ medium.name }}..{{ medium.extension }}</b><br>
+            Try <a href="{{ medium.get_static_media_uri }}" download>downloading the file</a> instead.
+          {% endif %}
+          </div>
+        <div class="modal-footer">
+          <a class="btn btn-primary" href="{{ medium.get_static_media_uri }}" download>Download <i class="bi bi-download"></i></a>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close <i class="bi bi-x-lg"></i></button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- /modal maio viewer -->
+  {% endif %}

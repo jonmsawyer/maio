@@ -10,6 +10,7 @@ from .logout import logout
 from .edit_profile import edit_profile
 from .upload_media import UploadMediaView
 from .search import search
+from .password_change import PasswordChangeView, PasswordChangeDoneView
 from . import maio_admin
 
 __all__: list[str] = [
@@ -19,6 +20,8 @@ __all__: list[str] = [
     'edit_profile',
     'UploadMediaView',
     'search',
+    'PasswordChangeView',
+    'PasswordChangeDoneView',
     # Maio Admin
     'maio_admin',
 ]

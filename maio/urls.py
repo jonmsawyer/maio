@@ -18,19 +18,21 @@ from maio.admin import admin_site
 
 
 urlpatterns: list[Any] = [
+    # Admin
+    path('maio_admin/', include('maioadmin.urls', namespace='maio_admin')),
     path('admin/doc/', include('django.contrib.admindocs.urls')),
+    path('password/', login_required(views.PasswordChangeView.as_view()), name='password'),
+    path('password_change_done/', login_required(views.PasswordChangeDoneView.as_view()), name='password_change_done'),
     path('admin/', admin_site.urls),
-    #path('portal/', include(portal.urls, namespace='portal')),
+
+    # Maio Views
     path('dashboard/', views.dashboard, name='dashboard'),
     path('logout/', views.logout, name='logout'),
     path('upload_media/', login_required(views.UploadMediaView.as_view()), name='upload_media'),
-    path('edit_profile/', views.edit_profile, name='edit_profile'),
-    path('search/', views.search, name='search'),
-
-    # Maio Admin
-    path('maio_admin/', views.maio_admin.home, name='maio_admin'),
+    path('edit_profile/', login_required(views.edit_profile), name='edit_profile'),
+    path('search/', login_required(views.search), name='search'),
 
     # AJAX
-    path('ajax/delete_media/', ajax.delete_media, name='delete_media'),
+    path('ajax/delete_media/', login_required(ajax.delete_media), name='delete_media'),
     path('', views.home, name='home'),
 ]
