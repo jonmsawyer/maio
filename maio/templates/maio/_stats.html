@@ -6,8 +6,8 @@
       Images
     </h2>
     <p>
-      Number of images: {{file_stat.num_images}}<br />
-      Size of images: {{file_stat.get_file_sizes_human.0}}
+      Count: {{ file_stat.num_images }}<br />
+      Size: {{ file_stat.get_file_sizes_human.0 }}
     </p>
   </div>
   <div class="col-md-2">
@@ -15,8 +15,8 @@
       Audio
     </h2>
     <p>
-      There are {{file_stat.num_audio}} audio files in Maio.<br />
-      Size of audio: {{file_stat.get_file_sizes_human.1}}
+      Count: {{ file_stat.num_audio }}<br />
+      Size: {{ file_stat.get_file_sizes_human.1 }}
     </p>
   </div>
   <div class="col-md-2">
@@ -24,22 +24,22 @@
       Video
     </h2>
     <p>
-      There are {{file_stat.num_videos}} videos in Maio.<br />
-      Size of videos: {{file_stat.get_file_sizes_human.2}}
+      Count: {{ file_stat.num_videos }}<br />
+      Size: {{ file_stat.get_file_sizes_human.2 }}
    </p>
   </div>
   <div class="col-md-2">
     <h2>Documents</h2>
     <p>
-      There are {{file_stat.num_documents}} documents in Maio.<br />
-      Size of documents: {{file_stat.get_file_sizes_human.3}}
+      Count: {{ file_stat.num_documents }}<br />
+      Size: {{ file_stat.get_file_sizes_human.3 }}
     </p>
   </div>
   <div class="col-md-2">
     <h2>Other</h2>
     <p>
-      There are {{file_stat.num_others}} other files in Maio.<br />
-      Size of other files: {{file_stat.get_file_sizes_human.4}}
+      Count: {{ file_stat.num_others }}<br />
+      Size: {{ file_stat.get_file_sizes_human.4 }}
     </p>
   </div>
 </div> <!-- /stats -->

@@ -66,7 +66,7 @@ class Command(MaioBaseCommand):
         num_documents = len(documents)
         documents_bytes = 0
         for document in documents:
-            document_bytes += int(document.size) # type: ignore
+            documents_bytes += int(document.size) # type: ignore
 
         print(f"Documents: {num_documents} totaling {documents_bytes} bytes.")
 
