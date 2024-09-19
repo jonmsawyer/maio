@@ -62,13 +62,17 @@ class MaioMapTypeChoices(TextChoices):
 
 class MaioMapTypeMeta(ModelBase):
     '''Metaclass for MaioType model.'''
-    name = 'Maio Map Type'
-    verbose_name = 'Maio Map Types'
-    app_label = 'maio'
-    db_table_comment = 'General Maio Map Types.'
-    # get_latest_by = ['-date_modified']
-    # order_with_respect_to = ['']
-    ordering = ['maio_map_type']
+    class Meta:
+        verbose_name = 'Maio Map Type'
+        verbose_name_plural = 'Maio Map Types'
+        app_label = 'maio'
+        db_table_comment = 'General Maio Map Types.'
+        get_latest_by = ['-date_modified']
+        # order_with_respect_to = ['']
+        ordering = ['maio_map_type']
+        # indexes = [
+        #     Index(fields=('sort', 'name', 'is_default', 'date_added', '-date_modified'))
+        # ]
 
 
 class MaioMapType(Model, metaclass=MaioMapTypeMeta):

@@ -17,7 +17,17 @@ from .Media import Media
 
 class LoveMeta(ModelBase):
     '''Metaclass for Love model.'''
-    ordering = ['-date_added']
+    class Meta:
+        verbose_name = 'Love'
+        verbose_name_plural = 'Loves'
+        app_label = 'maio'
+        db_table_comment = 'Contains the Loves for Media.'
+        get_latest_by = ['-date_modified']
+        # order_with_respect_to = ['user', 'date_added']
+        ordering = ['-date_modified']
+        # indexes = [
+        #     Index(fields=('sort', 'name', 'is_default', 'date_added', '-date_modified'))
+        # ]
 
 
 class Love(Model, metaclass=LoveMeta):

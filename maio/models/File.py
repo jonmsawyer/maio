@@ -53,18 +53,19 @@ class ContentFileNotSetError(Exception):
 
 class FileMeta(ModelBase):
     '''Metaclass for File model.'''
-    name = 'File'
-    verbose_name = 'Files'
-    app_label = 'maio'
-    db_table_comment = 'Files are saved to the hard drive, network, or cloud.'
-    get_latest_by = ['-date_modified']
-    # order_with_respect_to = ['']
-    ordering = ['-date_modified']
-    indexes = [
-        Index(fields=(
-            'original_name', 'size', 'mtime', '-modified_time', 'date_added', '-date_modified'
-        ))
-    ]
+    class Meta:
+        verbose_name = 'File'
+        verbose_name_plural = 'Files'
+        app_label = 'maio'
+        db_table_comment = 'Files are saved to the hard drive, network, or cloud.'
+        get_latest_by = ['-date_modified']
+        # order_with_respect_to = ['']
+        ordering = ['-date_modified']
+        indexes = [
+            Index(fields=(
+                'original_name', 'size', 'mtime', '-modified_time', 'date_added', '-date_modified'
+            ))
+        ]
 
 
 class File(Model, metaclass=FileMeta):

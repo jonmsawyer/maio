@@ -28,13 +28,17 @@ class MaioTypeChoices(TextChoices):
 
 class MaioTypeMeta(ModelBase):
     '''Metaclass for MaioType model.'''
-    name = 'Maio Type'
-    verbose_name = 'Maio Types'
-    app_label = 'maio'
-    db_table_comment = 'General Maio Types.'
-    # get_latest_by = ['-date_modified']
-    # order_with_respect_to = ['']
-    ordering = ['maio_type']
+    class Meta:
+        verbose_name = 'Maio Type'
+        verbose_name_plural = 'Maio Types'
+        app_label = 'maio'
+        db_table_comment = 'General Maio Types.'
+        # get_latest_by = ['-date_modified']
+        # order_with_respect_to = ['']
+        ordering = ['maio_type']
+        # indexes = [
+        #     Index(fields=('sort', 'name', 'is_default', 'date_added', '-date_modified'))
+        # ]
 
 
 class MaioType(Model, metaclass=MaioTypeMeta):

@@ -18,7 +18,8 @@ from django.http import HttpRequest
 from django.core.files.uploadedfile import UploadedFile
 from django.db.models import (
     Model, UUIDField, ForeignKey, ManyToManyField, CharField, FloatField, PositiveIntegerField,
-    DateTimeField, BooleanField, URLField, TextField, QuerySet, CASCADE, DO_NOTHING,
+    DateTimeField, BooleanField, URLField, TextField, QuerySet,
+    CASCADE, DO_NOTHING,
 )
 from django.db.models.base import ModelBase
 from django.contrib.auth.models import User
@@ -33,6 +34,7 @@ from .Tag import Tag
 from .MaioType import MaioType, MaioTypeChoices
 from .MaioMapType import MaioMapType
 from .MaioMimeType import MaioMimeType
+from .Category import Category
 
 
 maio_conf = MaioConf(config=settings.MAIO_SETTINGS)
@@ -45,12 +47,16 @@ class StaticThumbnailURINotSetError(Exception):
 
 class MediaMeta(ModelBase):
     '''Metaclass for Media model.'''
-    name = 'Media'
-    verbose_name = 'Media'
-    app_label = 'maio'
-    db_table_comment = 'More than one Media may map onto one File.'
-    get_latest_by = ['file', '-date_modified']
-    order_with_respect_to = ['file', '-date_modified']
+    class Meta:
+        verbose_name = 'Media'
+        verbose_name_plural = 'Media'
+        app_label = 'maio'
+        db_table_comment = 'More than one Media may map onto one File.'
+        get_latest_by = ['file', '-date_modified']
+        # order_with_respect_to = ['file', '-date_modified']
+        # indexes = [
+        #     Index(fields=('sort', 'name', 'is_default', 'date_added', '-date_modified'))
+        # ]
 
 
 class Media(Model, metaclass=MediaMeta):
@@ -68,6 +74,9 @@ class Media(Model, metaclass=MediaMeta):
 
     #: Owner of the File
     owner = ForeignKey(to=User, on_delete=DO_NOTHING)
+
+    #: Category
+    category = ForeignKey(to=Category, on_delete=DO_NOTHING, null=True, blank=True)
 
     #: The media's tags
     tags: ManyToManyField[Tag, Media] = ManyToManyField(Tag)

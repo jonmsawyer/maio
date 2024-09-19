@@ -35,13 +35,17 @@ class LogLevelChoices(TextChoices):
 
 class LogMeta(ModelBase):
     '''Metaclass for Log model.'''
-    name = 'Log'
-    verbose_name = 'Logs'
-    app_label = 'maio'
-    db_table_comment = 'Logs contain logging information, errors, warnings, etc.'
-    get_latest_by = ['user', '-date_added']
-    order_with_respect_to = ['user', 'date_added']
-    # ordering = ['media', 'Log_date']
+    class Meta:
+        verbose_name = 'Log'
+        verbose_name_plural = 'Logs'
+        app_label = 'maio'
+        db_table_comment = 'Logs contain logging information, errors, warnings, etc.'
+        # get_latest_by = ['user', '-date_added']
+        # order_with_respect_to = ['user']
+        # ordering = ['media', 'Log_date']
+        # indexes = [
+        #     Index(fields=('sort', 'name', 'is_default', 'date_added', '-date_modified'))
+        # ]
 
 
 class Log(Model, metaclass=LogMeta):

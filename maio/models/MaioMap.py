@@ -23,13 +23,17 @@ from .MaioMapType import MaioMapType
 
 class MaioMapMeta(ModelBase):
     '''Metaclass for Map model.'''
-    name = 'Maio User'
-    verbose_name = 'Maio Users'
-    app_label = 'maio'
-    db_table_comment = 'Maio users are also Django users.'
-    get_latest_by = ['user', '-upd_dttm']
-    order_with_respect_to = ['user', 'key']
-    # ordering = ['user', 'key']
+    class Meta:
+        verbose_name = 'Maio User'
+        verbose_name_plural = 'Maio Users'
+        app_label = 'maio'
+        db_table_comment = 'Maio users are also Django users.'
+        get_latest_by = ['-upd_dttm']
+        # order_with_respect_to = ['user', 'key']
+        ordering = ['-upd_dttm']
+        # indexes = [
+        #     Index(fields=('sort', 'name', 'is_default', 'date_added', '-date_modified'))
+        # ]
 
 
 class MaioMap(Model, metaclass=MaioMapMeta):

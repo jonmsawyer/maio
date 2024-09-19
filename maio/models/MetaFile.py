@@ -23,16 +23,17 @@ maio_conf = MaioConf(config=settings.MAIO_SETTINGS)
 
 class MetaFileMeta(ModelBase):
     '''Metaclass for File model.'''
-    name = 'MetaFile'
-    verbose_name = 'MetaFiles'
-    app_label = 'maio'
-    db_table_comment = 'MetaFiles are saved to the hard drive, network, or cloud.'
-    get_latest_by = ['-date_modified']
-    # order_with_respect_to = ['']
-    ordering = ['-date_modified']
-    indexes = [
-        Index(fields=('content_file', 'date_added', '-date_modified')),
-    ]
+    class Meta:
+        verbose_name = 'MetaFile'
+        verbose_name_plural = 'MetaFiles'
+        app_label = 'maio'
+        db_table_comment = 'MetaFiles are saved to the hard drive, network, or cloud.'
+        get_latest_by = ['-date_modified']
+        # order_with_respect_to = ['']
+        ordering = ['-date_modified']
+        indexes = [
+            Index(fields=('content_file', 'date_added', '-date_modified')),
+        ]
 
 
 class MetaFile(Model, metaclass=MetaFileMeta):

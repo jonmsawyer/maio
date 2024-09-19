@@ -15,7 +15,7 @@ from django.db.models import (
 )
 from django.db.models.base import ModelBase
 from django.utils.translation import gettext_lazy as _T
-from django.utils.safestring import mark_safe
+# from django.utils.safestring import mark_safe
 
 from .MaioUser import MaioUser
 from .MaioMapType import MaioMapTypeChoices # MaioMapType
@@ -85,13 +85,17 @@ USER_SETTINGS: dict[str, Any] = {
 
 class UserSettingMeta(ModelBase):
     '''Metaclass for Caption model.'''
-    name = 'User Setting'
-    verbose_name = 'User Settings'
-    app_label = 'maio'
-    db_table_comment = 'User system-wide settings.'
-    get_latest_by = ['-date_modified']
-    order_with_respect_to = ['user', '-date_modified']
-    ordering = ['-date_modified']
+    class Meta:
+        verbose_name = 'User Setting'
+        verbose_name_plural = 'User Settings'
+        app_label = 'maio'
+        db_table_comment = 'User system-wide settings.'
+        get_latest_by = ['-date_modified']
+        # order_with_respect_to = ['user', '-date_modified']
+        ordering = ['-date_modified']
+        # indexes = [
+        #     Index(fields=('sort', 'name', 'is_default', 'date_added', '-date_modified'))
+        # ]
 
 
 class UserSetting(Model, metaclass=UserSettingMeta):

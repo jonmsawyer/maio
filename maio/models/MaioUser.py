@@ -20,13 +20,17 @@ from django.contrib.auth.models import User
 
 class MaioUserMeta(ModelBase):
     '''Metaclass for MaioUser model.'''
-    name = 'Maio User'
-    verbose_name = 'Maio Users'
-    app_label = 'maio'
-    db_table_comment = 'Maio users are also Django users.'
-    get_latest_by = ['-user.last_login']
-    order_with_respect_to = ['user.last_login']
-    # ordering = ['user.last_login']
+    class Meta:
+        verbose_name = 'Maio User'
+        verbose_name_plural = 'Maio Users'
+        app_label = 'maio'
+        db_table_comment = 'Maio users are also Django users.'
+        # get_latest_by = ['-user__last_login']
+        # order_with_respect_to = ['user']
+        # ordering = ['user.last_login']
+        # indexes = [
+        #     Index(fields=('sort', 'name', 'is_default', 'date_added', '-date_modified'))
+        # ]
 
 
 class MaioUser(Model, metaclass=MaioUserMeta):

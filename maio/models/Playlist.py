@@ -20,7 +20,17 @@ from .MaioMapType import MaioMapType
 
 class PlaylistMeta(ModelBase):
     '''Metaclass for Playlist model.'''
-    ordering = ['-date_modified']
+    class Meta:
+        verbose_name = 'Playlist'
+        verbose_name_plural = 'Playlists'
+        app_label = 'maio'
+        db_table_comment = 'Contains the Playlists for Media.'
+        get_latest_by = ['-date_modified']
+        # order_with_respect_to = ['user', 'date_added']
+        ordering = ['-date_modified']
+        # indexes = [
+        #     Index(fields=('sort', 'name', 'is_default', 'date_added', '-date_modified'))
+        # ]
 
 
 class Playlist(Model, metaclass=PlaylistMeta):

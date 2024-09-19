@@ -19,7 +19,17 @@ from .Media import Media
 
 class RatingMeta(ModelBase):
     '''Metaclass for Rating model.'''
-    ordering = ['-date_added']
+    class Meta:
+        verbose_name = 'Rating'
+        verbose_name_plural = 'Ratings'
+        app_label = 'maio'
+        db_table_comment = 'Contains the Playlists for Media.'
+        get_latest_by = ['-date_modified']
+        # order_with_respect_to = ['user', 'date_added']
+        ordering = ['-date_modified']
+        # indexes = [
+        #     Index(fields=('sort', 'name', 'is_default', 'date_added', '-date_modified'))
+        # ]
 
 
 class Rating(Model, metaclass=RatingMeta):

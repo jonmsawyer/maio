@@ -21,13 +21,17 @@ from django.utils.translation import gettext_lazy as _T
 
 class CaptionMeta(ModelBase):
     '''Metaclass for Caption model.'''
-    name = 'Caption'
-    verbose_name = 'Captions'
-    app_label = 'maio'
-    db_table_comment = 'Captions are attached to Media.'
-    get_latest_by = ['media', '-caption_date']
-    order_with_respect_to = ['media', 'caption_date']
-    # ordering = ['media', 'caption_date']
+    class Meta:
+        verbose_name = 'Caption'
+        verbose_name_plural = 'Captions'
+        app_label = 'maio'
+        db_table_comment = 'Captions are attached to Media.'
+        get_latest_by = ['media', '-caption_date']
+        # order_with_respect_to = ['media', 'caption_date']
+        ordering = ['-caption_date']
+        # indexes = [
+        #     Index(fields=('sort', 'name', 'is_default', 'date_added', '-date_modified'))
+        # ]
 
 class Caption(Model, metaclass=CaptionMeta):
     '''Caption model.'''

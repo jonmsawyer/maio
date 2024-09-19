@@ -20,13 +20,17 @@ from .MaioType import MaioType, MaioTypeChoices
 
 class MaioMimeTypeMeta(ModelBase):
     '''Metaclass for MaioType model.'''
-    name = 'Maio Mime Type'
-    verbose_name = 'Maio Mime Types'
-    app_label = 'maio'
-    db_table_comment = 'General Maio Mime Types.'
-    # get_latest_by = ['-date_modified']
-    order_with_respect_to = ['maio_type']
-    # ordering = ['mime_type']
+    class Meta:
+        verbose_name = 'Maio Mime Type'
+        verbose_name_plural = 'Maio Mime Types'
+        app_label = 'maio'
+        db_table_comment = 'General Maio Mime Types.'
+        # get_latest_by = ['-date_modified']
+        # order_with_respect_to = ['maio_type']
+        # ordering = ['mime_type']
+        # indexes = [
+        #     Index(fields=('sort', 'name', 'is_default', 'date_added', '-date_modified'))
+        # ]
 
 
 class MaioMimeType(Model, metaclass=MaioMimeTypeMeta):

@@ -14,7 +14,17 @@ from django.db.models.base import ModelBase
 
 class TagMeta(ModelBase):
     '''Metaclass for Tag model.'''
-    ordering = ['name']
+    class Meta:
+        verbose_name = 'Tag'
+        verbose_name_plural = 'Tags'
+        app_label = 'maio'
+        db_table_comment = 'Contains the Tags for Media.'
+        get_latest_by = ['-date_modified']
+        # order_with_respect_to = ['user', 'date_added']
+        ordering = ['name']
+        # indexes = [
+        #     Index(fields=('sort', 'name', 'is_default', 'date_added', '-date_modified'))
+        # ]
 
 
 class Tag(Model, metaclass=TagMeta):
