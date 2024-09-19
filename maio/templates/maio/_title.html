@@ -7,8 +7,15 @@
 {% if medium and width %}
   <!-- title -->
   <div class="card-body p-1">
-    <h5 class="card-title maio-card-title" title="{{ medium.name }}.{{ medium.extension }}">
-        {{ medium.name }}.{{ medium.extension }}
+    <h5 class="card-title maio-card-title {% if user_setting.default_dashboard_view == 'simple' %}maio-simple{% endif %}"
+        title="{{ medium.name }}.{{ medium.extension }}"
+    >
+        <span id="media_name_{{ medium.id }}">{{ medium.name }}.{{ medium.extension }}</span>
+        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
     </h5>
 
     {% if medium.author %}

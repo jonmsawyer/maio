@@ -38,9 +38,14 @@
 
 .maio-card-options {
     position: absolute;
-    right: 4px;
-    bottom: 2px;
+    right: 0;
+    bottom: 0;
     z-index: 1;
+    background-color: white;
+    border-radius: 5px 0;
+    padding: 2px;
+    border-top: 1px solid rgb(33, 37, 41);
+    border-left: 1px solid rgb(33, 37, 41);
 }
 
 .maio-text-white {
@@ -80,4 +85,8 @@ video.maio-viewer {}
     max-height: 3.6em;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.maio-card-title.maio-simple {
+    max-height: 1.4em;
 }

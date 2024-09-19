@@ -44,25 +44,6 @@
         None
       {% endfor %}
     </div>
-    <div class="btn-group dropup float-end maio-card-options">
-      <span class="bi bi-three-dots-vertical float-end dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"></span>
-      <ul class="dropdown-menu" style="cursor: pointer; padding: 0; width: 13em;">
-        <!-- Dropdown menu links -->
-        <li class="maio-media-options"
-            data-bs-toggle="modal"
-            data-bs-target="#modal_maio_viewer_{{ medium.id }}"
-        >
-          View Media in Maio Viewer
-        </li>
-        <li class="maio-media-options"><a href="{{ medium.get_static_media_uri }}" target="_new">View Raw Media</a></li>
-        <li class="maio-media-options"
-            data-bs-toggle="modal"
-            data-bs-target="#modal_delete_media_{{ medium.id }}"
-        >
-          Delete
-        </li>
-      </ul>
-    </div>
     {% endif %}
   </div>
   <!-- /properties -->

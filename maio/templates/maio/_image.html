@@ -6,13 +6,21 @@
 
 {% if medium and width %}
   <!-- image -->
-  <div style="height: {{width}}px; overflow: hidden; border-radius: 5px;">
+  <div style="height: {{width}}px; overflow: hidden; border-radius: 5px; position: relative;">
     {% include 'maio/_medium_icon.html' %}
+    {% if user_setting.default_dashboard_view == 'thumbnails' %}
+      <h6 style="text-align: center; width: 100%; position: absolute; cursor: pointer; margin-top: 79%;"
+          data-bs-toggle="modal"
+          data-bs-target="#modal_maio_viewer_{{ medium.id }}"
+          title="{{ medium.name }}.{{ medium.extension }}"
+      >{{ medium.name }}.{{ medium.extension }}</h6>
+    {% endif %}
     <img class="card-img-top"
          data-bs-toggle="modal"
          data-bs-target="#modal_maio_viewer_{{ medium.id }}"
          src="{{medium.get_static_thumbnail_uri }}"
          alt="{{ medium.name }}.{{ medium.extension }}"
+         title="{{ medium.name }}.{{ medium.extension }}"
          style="{% if medium.tn_width > medium.tn_height %}
                   height: {{ width }}px; width: auto;
                   margin-left: {{ medium.margin_left }}px;
