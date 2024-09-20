@@ -1,7 +1,7 @@
 '''
-File: dashboard.py
+File: delete_media.py
 
-Module: ``maio.views.dashboard``
+Module: ``maio.views.ajax.delete_media``
 '''
 
 from __future__ import annotations

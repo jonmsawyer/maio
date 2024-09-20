@@ -11,5 +11,8 @@
 </div>
 
 {% include 'maio/_modal_delete_media.html' %}
+{% if medium.file.mime_type.maio_type.maio_type == 'video' and medium.slideshow_tn_uri %}
+  {% include 'maio/_modal_change_thumbnail.html' %}
+{% endif %}
 {% include 'maio/_modal_maio_viewer.html' %}
 {% endif %}

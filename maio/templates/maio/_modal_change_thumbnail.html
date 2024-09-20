@@ -1,0 +1,54 @@
+{# modal delete media file #}
+{# requires a Media instance named 'image' and an integer named 'width' context variables #}
+
+{% load static %}
+{% load maio_extras %}
+
+{% if medium and width %}
+  <!-- modal delete media -->
+  <script>
+    $(function() {
+      $("#modal_change_thumbnail_{{ medium.id }}").on('show.bs.modal', function() {
+        highlight_media('{{ medium.id }}');
+      });
+      $("#modal_change_thumbnail_{{ medium.id }}").on('hidden.bs.modal', function() {
+        unhighlight_media('{{ medium.id }}');
+      });
+    });
+  </script>
+  <div class="modal fade" id="modal_change_thumbnail_{{ medium.id }}" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Change Thumbnail?</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            {% for tn_uri in medium.get_static_slideshow_uri_list %}
+              <div id="change_thumbnail_{{ forloop.counter0 }}_{{ medium.id }}"
+                   class="
+                      col
+                      {% if medium.slideshow_index == forloop.counter0 %}maio-thumbnail-current{% endif %}
+                      maio-slideshow-col
+                   "
+                   onclick="click_thumbnail('{{ medium.id }}', {{ forloop.counter0 }});"
+                   data-index="{{ forloop.counter0 }}"
+                   data-uri="{{ tn_uri }}"
+              >
+                <img src="{{ tn_uri }}">
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No, Cancel</button>
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="change_thumbnail('{{ medium.id }}');">
+            Yes, Change Thumbnail</i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- /modal delete media -->
+  {% endif %}

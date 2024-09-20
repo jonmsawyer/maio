@@ -154,3 +154,25 @@ div.maio-div-index {
     border: 1px solid rgb(196, 200, 203);
     border-radius: 5px;
 }
+
+.maio-slideshow-col {
+    text-align: center;
+    padding: 1em;
+}
+
+.maio-slideshow-col img {
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+div.maio-thumbnail-clicked {
+    border: 2px solid rgb(128, 35, 35);
+    border-radius: 5px;
+    padding: -2px;
+}
+
+.maio-thumbnail-current {
+    border: 2px solid rgb(70, 151, 35);
+    border-radius: 5px;
+    padding: -2px;
+}

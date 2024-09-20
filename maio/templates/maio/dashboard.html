@@ -4,6 +4,21 @@
 
 {% block title %}Dashboard{% endblock title %}
 
+{% block scripts %}
+  <script src="{% static 'maio/js/utils.js' %}"></script>
+  <script src="{% static 'maio/js/dashboard.js' %}"></script>
+{% endblock %}
+
+{% block script %}
+  <script>
+  var config = new Config({
+    'csrf_token': '{{ csrf_token }}',
+    'delete_media_url': '{% url "delete_media" %}',
+    'change_thumbnail_url': '{% url "change_thumbnail" %}',
+  });
+  </script>
+{% endblock script %}
+
 {% block content %}
   <div class="container"> <!-- container -->
     <h1>{% if with_user %}Maio Admin: User Dashboard ({{ with_user.username }}){% else %}Dashboard{% endif %}</h1>
@@ -64,14 +79,3 @@
     {% include 'maio/_stats.html' %}
   </div> <!-- /container -->
 {% endblock content %}
-
-{% block script %}
-  <script src="{% static 'maio/js/utils.js' %}"></script>
-  <script src="{% static 'maio/js/dashboard.js' %}"></script>
-  <script>
-  var config = new Config({
-    'csrf_token': '{{ csrf_token }}',
-    'delete_media_url': '{% url "delete_media" %}',
-  });
-  </script>
-{% endblock script %}

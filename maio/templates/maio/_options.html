@@ -16,7 +16,17 @@
       >
         View Media in Maio Viewer
       </li>
-      <li class="maio-media-options"><a href="{{ medium.get_static_media_uri }}" target="_new">View Raw Media</a></li>
+      <li class="maio-media-options">
+        <a href="{{ medium.get_static_media_uri }}" target="_new">View Raw Media</a>
+      </li>
+      {% if medium.file.mime_type.maio_type.maio_type == 'video' and medium.slideshow_tn_uri %}
+        <li class="maio-media-options"
+            data-bs-toggle="modal"
+            data-bs-target="#modal_change_thumbnail_{{ medium.id }}"
+        >
+          Change Thumbnail
+        </li>
+      {% endif %}
       <li class="maio-media-options"
           data-bs-toggle="modal"
           data-bs-target="#modal_delete_media_{{ medium.id }}"

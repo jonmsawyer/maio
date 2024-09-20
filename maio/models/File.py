@@ -5,7 +5,7 @@ Module: ``maio.models.File``
 '''
 
 from __future__ import annotations
-# from typing import Any
+from typing import Any, Optional
 
 import os
 import uuid
@@ -14,11 +14,12 @@ import json
 import subprocess
 from unidecode import unidecode
 
-from django.db import IntegrityError
-
+import numpy
+import ffmpeg
 import magic # for mime types
 from PIL import Image, ExifTags
 
+from django.db import IntegrityError
 from django.conf import settings
 from django.utils import timezone
 from django.http import HttpRequest
@@ -39,6 +40,7 @@ from .MaioType import MaioType, MaioTypeChoices
 from .Thumbnail import Thumbnail
 from .MetaFile import MetaFile
 from .Log import Log
+from .Slideshow import Slideshow
 
 
 maio_conf = MaioConf(config=settings.MAIO_SETTINGS)
@@ -258,6 +260,94 @@ class File(Model, metaclass=FileMeta):
             return True
         return False
 
+    def generate_slideshow(
+        self,
+        in_filename: str,
+        out_filename: str,
+        tn_extension: str,
+    ) -> tuple[Slideshow, str]:
+        '''Generate Slideshow for this File.'''
+        tn_path: Optional[str] = None
+        new_out_filename: str = out_filename
+
+        # Get video length
+        ffprobe_cmd = [
+            maio_conf.get_ffprobe_bin_path(),
+            "-show_entries", "format=duration",
+            "-v", "quiet",
+            "-of", "csv=p=0",
+            "-i", in_filename,
+        ]
+        try:
+            output = subprocess.run(ffprobe_cmd, capture_output=True)
+            output = str(output.stdout, encoding='UTF-8')
+            video_length = float(output.strip())
+        except subprocess.CalledProcessError:
+            raise
+        # /Get video length
+
+
+        # Generate Slideshow for this video.
+        indexes = numpy.linspace(0.0, video_length, 22)[1:-1].tolist()
+        for index, time in enumerate(indexes):
+            out_filename_name = '.'.join(out_filename.split('.')[:-1])
+            new_out_filename = f"{out_filename_name}_{index}.{tn_extension}"
+            if not tn_path:
+                tn_path = new_out_filename
+
+            # _deets = f'''
+            #     In Filename: {in_filename}
+            #     Out Filename: {out_filename}
+            #     Thumbnail Extension: {tn_extension}
+            #     Video Length: {video_length}
+            #     Indexes: {indexes}
+            #     Index: {index}
+            #     Time: {time}
+            #     Initial Thumbnail Path: {tn_path}
+            # '''
+            # raise Exception(_deets)
+
+            try:
+                _any: Any = (
+                    ffmpeg
+                        .input(in_filename, ss=time)
+                        .filter('scale', 300, -1)
+                        .output(new_out_filename, vframes=1)
+                        .overwrite_output()
+                        .run(capture_stdout=True, capture_stderr=True)
+                )
+            except ffmpeg.Error as e:
+                # print(e.stderr.decode(), file=sys.stderr)
+                _deets = f'''
+                    In Filename: {in_filename}
+                    Out Filename: {out_filename}
+                    Video Length: {video_length}
+                    Indexes: {indexes}
+                    Index: {index}
+                    Time: {time}
+                '''
+                raise Exception(f'''
+                    Error:
+                    {e.stderr.decode()}
+                    {_deets}
+                ''')
+
+        slideshow, ss_created = Slideshow.objects.get_or_create(file=self,
+            defaults={
+                'indexes': indexes,
+                'num_slices': 20,
+                'length': video_length,
+            })
+        if ss_created:
+            slideshow.save()
+        else:
+            slideshow.indexes = indexes
+            slideshow.num_slices = 20
+            slideshow.length = video_length
+            slideshow.save()
+        # /Generate Slideshow
+        return slideshow, tn_path if tn_path else ''
+
     def process_thumbnail(self) -> tuple[bool | str, bool]:
         '''Process the thumbnail for this file.'''
         maio_type_choice = self.mime_type.maio_type.get_choice()
@@ -304,22 +394,19 @@ class File(Model, metaclass=FileMeta):
         if maio_type_choice == MaioTypeChoices.VIDEO:
             tn_path = '.'.join(os.path.join(root, self.get_filename()).split('.')[:-1])
             tn_path = f"{tn_path}.{tn_extension}"
-            ffmpeg_cmd: list[str] = [
-                maio_conf.get_ffpmeg_bin_path(),
-                "-ss", "00:00:01.00",
-                "-i", os.path.join(fs.mk_md5_dir_media(self.md5sum), self.get_filename()),
-                "-vf", "scale=300:300:force_original_aspect_ratio=decrease",
-                "-vframes", "1",
-                tn_path,
-            ]
-            # raise Exception(f"FFmpeg cmd: `{ffmpeg_cmd}`")
-            try:
-                _output = subprocess.run(ffmpeg_cmd, capture_output=True)
-                image = Image.open(tn_path)
-                image.load()
-                is_processed = True
-            except subprocess.CalledProcessError:
-                raise
+            in_filename = os.path.join(fs.mk_md5_dir_media(self.md5sum), self.get_filename())
+            out_filename = os.path.join(fs.mk_md5_dir_slideshow(self.md5sum), self.get_filename())
+
+            _slideshow, initial_tn_path = self.generate_slideshow(
+                in_filename,
+                out_filename,
+                tn_extension,
+            )
+            tn_path = initial_tn_path
+
+            image = Image.open(tn_path)
+            image.load()
+            is_processed = True
 
         if maio_type_choice == MaioTypeChoices.AUDIO:
             audio_tn_path = maio_conf.get_audio_thumbnail_path()
@@ -469,6 +556,12 @@ class File(Model, metaclass=FileMeta):
         '''Generate the filename of this file.'''
         if self.original_extension:
             return f"{self.md5sum}.{self.original_extension}"
+        return self.md5sum
+
+    def get_tn_filename(self) -> str:
+        '''Generate the thumbnail filename of this file.'''
+        if self.thumbnail_extension:
+            return f"{self.md5sum}.{self.thumbnail_extension}"
         return self.md5sum
 
     def get_media_path(self) -> str:

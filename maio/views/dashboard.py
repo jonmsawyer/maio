@@ -96,5 +96,4 @@ def dashboard(request: HttpRequest, with_username: Optional[str] = None) -> Http
     cd['num_media'] = media_list.count()
     cd['pages'] = media # for pagination
     cd['per_page'] = per_page
-    cd['delete_media_url'] = reverse('delete_media')
     return render(request, 'maio/dashboard.html', cd)

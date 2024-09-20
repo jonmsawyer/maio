@@ -15,10 +15,11 @@
           title="{{ medium.name }}.{{ medium.extension }}"
       >{{ medium.name }}.{{ medium.extension }}</h6>
     {% endif %}
-    <img class="card-img-top"
+    <img id="medium_{{ medium.id }}"
+         class="card-img-top"
          data-bs-toggle="modal"
          data-bs-target="#modal_maio_viewer_{{ medium.id }}"
-         src="{{medium.get_static_thumbnail_uri }}"
+         src="{{ medium.get_static_thumbnail_uri }}"
          alt="{{ medium.name }}.{{ medium.extension }}"
          title="{{ medium.name }}.{{ medium.extension }}"
          style="{% if medium.tn_width > medium.tn_height %}

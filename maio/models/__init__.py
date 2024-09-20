@@ -26,6 +26,8 @@ from .Thumbnail import Thumbnail
 from .MetaFile import MetaFile
 from .FileStat import FileStat
 from .UserSetting import UserSetting
+from .Slideshow import Slideshow
+
 
 __all__: list[str] = [
     'Log',
@@ -46,6 +48,7 @@ __all__: list[str] = [
     'MetaFile',
     'FileStat',
     'UserSetting',
+    'Slideshow',
 ]
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)

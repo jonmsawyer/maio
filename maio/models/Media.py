@@ -18,7 +18,7 @@ from django.http import HttpRequest
 from django.core.files.uploadedfile import UploadedFile
 from django.db.models import (
     Model, UUIDField, ForeignKey, ManyToManyField, CharField, FloatField, PositiveIntegerField,
-    DateTimeField, BooleanField, URLField, TextField, QuerySet,
+    PositiveSmallIntegerField, DateTimeField, BooleanField, URLField, TextField, JSONField,
     CASCADE, DO_NOTHING,
 )
 from django.db.models.base import ModelBase
@@ -107,6 +107,12 @@ class Media(Model, metaclass=MediaMeta):
 
     #: The thumbnail height
     tn_height = PositiveIntegerField('Thumbnail Height (Pixels)', null=True, blank=True)
+
+    #: Slideshow Thumbnail Chosen Index
+    slideshow_index = PositiveSmallIntegerField('Slideshow Chosen Index', null=True, blank=True)
+
+    #: Slideshow Thumbnail URI
+    slideshow_tn_uri = URLField('Slideshow Thumbnail URI', null=True, blank=True)
 
     #: The length (in seconds for Audio or Video, null for Image and Document)
     length = FloatField('Length (Seconds)', null=True, blank=True)
@@ -289,6 +295,8 @@ class Media(Model, metaclass=MediaMeta):
         height = None
         length = None
         tn_path = ''
+        slideshow_index: Optional[int] = None
+        slideshow_tn_uri: Optional[str] = None
         tn_extension = maio_file.thumbnail_extension if maio_file.thumbnail_extension else 'jpg'
         if maio_file.mime_type.get_maio_type_choice() == MaioTypeChoices.IMAGE:
             image, _image_path = maio_file.load_image()
@@ -296,6 +304,28 @@ class Media(Model, metaclass=MediaMeta):
             height = image.height
             image.close()
         if maio_file.mime_type.get_maio_type_choice() == MaioTypeChoices.VIDEO:
+            slideshow_index = 0
+            tn_static_root = maio_conf.get_chain('slideshow', 'static_uri')
+            md5_dir_slideshow = fs.mk_md5_dir_slideshow(maio_file.md5sum)
+            md5_1, md5_2 = (
+                md5_dir_slideshow.split('\\')[-2],
+                md5_dir_slideshow.split('\\')[-1],
+            )
+            slideshow_tn_uri = (
+                os.path
+                    .join(tn_static_root, md5_1, md5_2, maio_file.get_tn_filename())
+                    .replace('\\', '/')
+            )
+            slideshow_tn_uri = (
+                f"{slideshow_tn_uri.split('.')[0]}_{slideshow_index}"
+                f".{slideshow_tn_uri.split('.')[-1]}"
+            )
+            # raise Exception(f'''
+            #     tn_static_root: {tn_static_root}
+            #     md5_dir_slideshow: {md5_dir_slideshow}
+            #     slideshow_index: {slideshow_index}
+            #     slideshow_tn_uri: {slideshow_tn_uri}
+            # ''')
             video_path = os.path.join(fs.mk_md5_dir_media(maio_file.md5sum), maio_file.get_filename())
             ffprobe_cmd = [
                 maio_conf.get_ffprobe_bin_path(),
@@ -356,6 +386,8 @@ class Media(Model, metaclass=MediaMeta):
             length=length,
             tn_width=tn_image.width,
             tn_height=tn_image.height,
+            slideshow_index=slideshow_index,
+            slideshow_tn_uri=slideshow_tn_uri,
         )
 
         tn_image.close()
@@ -363,8 +395,6 @@ class Media(Model, metaclass=MediaMeta):
 
     def get_static_media_uri(self) -> str | None:
         '''Get the static URL of this resource.'''
-        # static_uri = settings.STATIC_URL
-        # media_path = settings.MAIO_SETTINGS.get('media', {'directory': 'media'}).get('directory')
         static_uri = maio_conf.get_static_media_uri()
         if not static_uri:
             raise StaticMediaURINotSetError(
@@ -375,11 +405,27 @@ class Media(Model, metaclass=MediaMeta):
     def get_static_thumbnail_uri(self) -> str | None:
         '''Get the static URL of this resource.'''
         static_uri = maio_conf.get_static_thumbnail_uri()
+        if self.file.calculate_maio_type().maio_type == MaioTypeChoices.VIDEO:
+            if self.slideshow_tn_uri:
+                return self.slideshow_tn_uri
         if not static_uri:
             raise StaticThumbnailURINotSetError(
                 'Static Thumbnail URI must be set. See settings.MAIO_SETTINGS'
             )
         return f"{static_uri}{self.get_thumbnail_path()}"
+
+    def get_static_slideshow_uri_list(self) -> list[str]:
+        '''Get the static URL list of slideshow thumbnails for this video.'''
+        if not self.file.calculate_maio_type().maio_type == MaioTypeChoices.VIDEO:
+            return []
+        if not self.slideshow_tn_uri:
+            return []
+        uri_list: list[str] = []
+        num_slices = int(self.file.slideshow_set.get().num_slices)
+        static_uri = self.slideshow_tn_uri.replace(f"_{self.slideshow_index}.", "_{index}.")
+        for index in range(0, num_slices):
+            uri_list.append(static_uri.format(index=index))
+        return uri_list
 
     def get_media_path(self) -> str:
         '''Get the media's relative path.'''

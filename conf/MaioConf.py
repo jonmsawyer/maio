@@ -84,6 +84,18 @@ class MaioConf():
         # return self.get_chain('maio_types', 'video', 'media_directory')
         return self.get_chain('media', 'directory')
 
+    # Slideshow
+
+    def get_slideshow_directory(self) -> Optional[str]:
+        '''get_slideshow_path'''
+        # return self.get_chain('maio_types', 'slideshow', 'media_directory')
+        return self.get_chain('slideshow', 'directory')
+
+    def get_slideshow_static_uri(self) -> Optional[str]:
+        '''get_slideshow_static_uri'''
+        # return self.get_chain('maio_types', 'slideshow', 'media_directory')
+        return self.get_chain('slideshow', 'static_uri')
+
     # Other
 
     def get_video_thumbnail_path(self) -> Optional[str]:

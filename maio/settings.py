@@ -192,6 +192,10 @@ MAIO_SETTINGS: dict[str, dict[str, Any]] = {
         'directory': os.path.join(MEDIA_ROOT, 'thumbnails'),
         'static_uri': f'/{STATIC_URL}thumbnails/',
     },
+    'slideshow': {
+        'directory': os.path.join(MEDIA_ROOT, 'slideshows'),
+        'static_uri': f'/{STATIC_URL}slideshows/',
+    },
     'ffmpeg': {
         'ffmpeg_exe': 'ffmpeg',
         'ffprobe_exe': 'ffprobe',
