@@ -51,6 +51,7 @@
     padding: 2px;
     border-top: 1px solid rgb(33, 37, 41);
     border-left: 1px solid rgb(33, 37, 41);
+    cursor: pointer;
 }
 
 .maio-text-white {
@@ -94,4 +95,62 @@ video.maio-viewer {}
 
 .maio-card-title.maio-simple {
     max-height: 1.4em;
+}
+
+div.maio-card-options ul.dropdown-menu.show {
+    background-color: rgb(179, 179, 179);
+    padding: 5px;
+    width: 15em;
+    cursor: pointer;
+}
+
+li.maio-media-options {
+    border-radius: 5px;
+    border: 1px solid rgb(179, 179, 179);
+}
+
+h6.maio-thumbnail-title {
+    text-align: center;
+    width: 100%;
+    position: absolute;
+    cursor: pointer;
+    margin-top: 79%;
+    background-color: rgba(0, 0, 0, 0.262);
+    color: white;
+}
+
+.maio-upload-image {
+    width: 200px;
+}
+
+.maio-upload-image-index {
+    opacity: 0;
+    position: absolute;
+    z-index: -1;
+    top: 0;
+    left: 0;
+}
+
+pre.maio-upload-image-index {
+    width: 200px;
+    height: 200px;
+    overflow: auto;
+    opacity: 1;
+    z-index: 0;
+    left: 1em;
+}
+
+.maio-upload-image-preview {
+    margin: 0 0 0.5em 0;
+}
+
+div.maio-div-index {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    margin: 0;
+    padding: 0 0.5em;
+    color: rgb(54, 54, 54);
+    border: 1px solid rgb(196, 200, 203);
+    border-radius: 5px;
 }

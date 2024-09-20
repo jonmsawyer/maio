@@ -3,6 +3,25 @@
 
 {% block title %}Upload Media{% endblock title %}
 
+{% block scripts %}
+  <script src="{% static 'maio/js/upload_media.js' %}"></script>
+{% endblock %}
+
+{% block script %}
+  <script>
+    $(function() {
+      document.config = new Config({
+        csrf_token: '{{ csrf_token }}',
+        video_tn: '{% static "icons/tn_video.png" %}',
+        audio_tn: '{% static "icons/tn_audio.png" %}',
+        document_tn: '{% static "icons/tn_doc.png" %}',
+        other_tn: '{% static "icons/tn_doc.png" %}',
+      });
+      document.getElementById('id_content_file').addEventListener('change', handleFileSelect, false);
+    });
+  </script>
+{% endblock %}
+
 {% block content %}
   <div class="container"> <!-- container -->
     <h1>Upload Media</h1>
@@ -56,6 +75,7 @@
       </div>
     </div>
     {% endfor %}
+    <output id="list"></output>
     <form method="post" enctype="multipart/form-data">
       {% csrf_token %}
       <h3>File Form</h3>

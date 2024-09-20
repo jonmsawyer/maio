@@ -7,3 +7,4 @@
  * Image `msexcel.png` was downloaded from [Document icons created by Freepik - Flaticon](https://www.flaticon.com/free-icons/document).
  * Image `xml.png` was downloaded from [Files and folders icons created by Prashanth Rapolu 15 - Flaticon](https://www.flaticon.com/free-icons/files-and-folders).
  * Image `text.png` was downloaded from [Document icons created by Anggara - Flaticon](https://www.flaticon.com/free-icons/document).
+ * Image `video.png` was download from [Youtube icons created by Ruslan Babkin - Flaticon](https://www.flaticon.com/free-icons/youtube)
