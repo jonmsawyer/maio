@@ -193,9 +193,9 @@ MAIO_SETTINGS: dict[str, dict[str, Any]] = {
         'static_uri': f'/{STATIC_URL}thumbnails/',
     },
     'ffmpeg': {
-        'ffmpeg_exe': 'C:\\Users\\jonms\\scoop\\shims\\ffmpeg.exe',
-        'ffprobe_exe': 'C:\\Users\\jonms\\scoop\\shims\\ffprobe.exe',
-        'ffplay_exe': 'C:\\Users\\jonms\\scoop\\shims\\ffplay.exe',
+        'ffmpeg_exe': 'ffmpeg',
+        'ffprobe_exe': 'ffprobe',
+        'ffplay_exe': 'ffplay',
     },
     'maio_types': {
         'image': {
