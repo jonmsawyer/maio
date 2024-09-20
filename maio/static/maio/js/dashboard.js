@@ -22,6 +22,8 @@ function change_thumbnail(media_uuid) {
         console.log('Response:', response);
         $('#modal_change_thumbnail_'+media_uuid).modal('hide');
         $(`#medium_${media_uuid}`).attr('src', response.slideshow_tn_uri);
+        $('.maio-thumbnail-current').removeClass('maio-thumbnail-current');
+        $(`#change_thumbnail_${index}_${media_uuid}`).addClass('maio-thumbnail-current');
     })
     .fail(function(response) {
         console.log('Error Response:', response);
