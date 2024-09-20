@@ -27,6 +27,10 @@ class Config {
     get(key) {
         return this.config[key];
     }
+
+    copy() {
+        return this.config.copy()
+    }
 }
 
 /**

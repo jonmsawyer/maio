@@ -10,12 +10,15 @@ function escape(text) {
   return text.replace(/"/g, '&quot;');
 }
 
-function process_properties(index) {
-  var index_str = String(index);
-  var el = document.getElementById('index_'+index_str);
-  console.log(`Processing Width and Height for index ${index}. El:`, el, 'Width:', el.width, 'Height:', el.height);
-  $('#width_index_'+index_str).html(String(el.width));
-  $('#height_index_'+index_str).html(String(el.height));
+function process_properties(index, maio_type, maio_subtype) {
+  var el = $(`#index_${index}`);
+  console.log(` -> Maio Type is ${maio_type}, Maio Subtype is ${maio_subtype}`);
+  var by_id = document.getElementById(`index_${index}`);
+  if (maio_type == 'image') {
+    console.log(`Processing Width and Height for index ${index}.`);
+    $(`#width_index_${index}`).html(String(by_id.width));
+    $(`#height_index_${index}`).html(String(by_id.height));
+  }
 }
 
 /**
@@ -23,7 +26,7 @@ function process_properties(index) {
  *
  * @param {domEvent} evt
  */
-function handleFileSelect(evt) {
+function handleFileSelect(evt, config) {
   console.log('Config:', config);
   var files = evt.target.files; // FileList object
   var index = 0;
@@ -31,67 +34,70 @@ function handleFileSelect(evt) {
   // Loop through the FileList and render image files as thumbnails.
   for (var i = 0, f; f = files[i]; i++) {
     console.log('File:', f);
-    f.maio_type = 'other';
-    f.maio_subtype = '';
+    var maio_type = 'other';
+    var maio_subtype = 'other';
 
     // Only process image files.
     if (f.type.match('image.*')) {
-      f.maio_type = 'image';
+      maio_type = 'image';
     }
 
     if (f.type.match('audio.*')) {
-      f.maio_type = 'audio';
+      maio_type = 'audio';
     }
 
     if (f.type.match('video.*')) {
-      f.maio_type = 'video';
+      maio_type = 'video';
     }
 
     if (f.type.match('text.*')) {
-      f.maio_type = 'document';
-      f.maio_subtype = 'text';
+      maio_type = 'document';
+      maio_subtype = 'text';
     }
+
+    console.log(`Maio Type: ${maio_type}`, `Maio Subtype: ${maio_subtype}`);
 
     var reader = new FileReader();
 
     // Closure to capture the file information.
-    reader.onload = (function(theFile, index, config) {
+    reader.onload = (function(theFile, index, config, maio_type, maio_subtype) {
       return function(e) {
         // Render thumbnail.
         var div = document.createElement('div');
         var tn_html = `
-                  <img id="index_${index}" src="${config.get('other_tn')}" class="maio-upload-image-index">
-                  <img src="${config.get('other_tn')}" alt="${escape(theFile.name)}" class="maio-upload-image" data-mime-type="${escape(theFile.type)}">
+                  <img id="index_${index}" src="${config.get('other_tn')}" class="maio-upload-image-index" data-maio-type="other">
+                  <img src="${config.get('other_tn')}" alt="${escape(theFile.name)}" class="maio-upload-image">
         `;
-        if (theFile.maio_type == 'image') {
+        console.log('tn_html', tn_html);
+        if (maio_type == 'image') {
           tn_html = `
-                  <img id="index_${index}" src="${e.target.result}" alt="${escape(theFile.name)}" class="maio-upload-image-index">
-                  <img src="${e.target.result}" alt="${escape(theFile.name)}" class="maio-upload-image" data-mime-type="${escape(theFile.type)}">
+                  <img id="index_${index}" src="${e.target.result}" alt="${escape(theFile.name)}" class="maio-upload-image-index" data-maio-type="image">
+                  <img src="${e.target.result}" alt="${escape(theFile.name)}" class="maio-upload-image">
           `;
         }
-        if (theFile.maio_type == 'audio') {
+        if (maio_type == 'audio') {
           tn_html = `
-                  <img id="index_${index}" src="${config.get('audio_tn')}" class="maio-upload-image-index">
-                  <img src="${config.get('audio_tn')}" alt="${escape(theFile.name)}" class="maio-upload-image" data-mime-type="${escape(theFile.type)}">
+                  <img id="index_${index}" src="${config.get('audio_tn')}" class="maio-upload-image-index" data-maio-type="audio">
+                  <audio src="${e.target.result}" alt="${escape(theFile.name)}" class="maio-upload-image"></audio>
           `;
         }
-        if (theFile.maio_type == 'video') {
+        if (maio_type == 'video') {
           tn_html = `
-                  <img id="index_${index}" src="${config.get('video_tn')}" class="maio-upload-image-index">
-                  <img src="${config.get('video_tn')}" alt="${escape(theFile.name)}" class="maio-upload-image" data-mime-type="${escape(theFile.type)}">
+                  <img id="index_${index}" src="${config.get('video_tn')}" class="maio-upload-image-index" data-maio-type="video">
+                  <video src="${e.target.result}" alt="${escape(theFile.name)}" class="maio-upload-image"></video>
           `;
         }
-        if (theFile.maio_type == 'document') {
-          if (theFile.maio_subtype == 'text') {
+        if (maio_type == 'document') {
+          if (maio_subtype == 'text') {
             tn_html = `
-                  <img id="index_${index}" src="${config.get('document_tn')}" alt="${escape(theFile.name)}" class="maio-upload-image-index">
-                  <img src="${config.get('document_tn')}" alt="${escape(theFile.name)}" class="maio-upload-image" data-mime-type="${escape(theFile.type)}" style="display: none;">
+                  <img id="index_${index}" src="${config.get('document_tn')}" alt="${escape(theFile.name)}" class="maio-upload-image-index" data-maio-type="document">
+                  <img src="${config.get('document_tn')}" alt="${escape(theFile.name)}" class="maio-upload-image" style="display: none;">
                   <pre class="maio-upload-image-index">${escape(e.target.result)})</pre>
             `;
           } else {
             tn_html = `
-                  <img id="index_${index}" src="${config.get('document_tn')}" class="maio-upload-image-index">
-                  <img src="${config.get('document_tn')}" alt="${escape(theFile.name)}" class="maio-upload-image" data-mime-type="${escape(theFile.type)}">
+                  <img id="index_${index}" src="${config.get('document_tn')}" class="maio-upload-image-index" data-maio-type="document">
+                  <img src="${config.get('document_tn')}" alt="${escape(theFile.name)}" class="maio-upload-image">
             `;
           }
         }
@@ -117,17 +123,25 @@ function handleFileSelect(evt) {
         `;
         document.getElementById('list').insertBefore(div, null);
       };
-    })(f, index, document.config);
+    })(f, index, config, maio_type, maio_subtype);
 
     $(`#index_${index}`).onload = (function(index) {
-      setTimeout(process_properties, 500, index);
+      setTimeout(process_properties, 1000, index, maio_type, maio_subtype);
     })(index);
 
     document.getElementById('list').innerHTML = '';
 
-    if (f.maio_type == 'image') {
+    if (maio_type == 'image') {
+      console.log('Reading file as `image`');
+      reader.readAsDataURL(f);
+    } else if (maio_type == 'audio') {
+      console.log('Reading file as `audio`');
+      reader.readAsDataURL(f);
+    } else if (maio_type == 'video') {
+      console.log('Reading file as `video`');
       reader.readAsDataURL(f);
     } else {
+      console.log('Reading file as `other`');
       reader.readAsText(f);
     }
     // Read in the image file as a data URL.

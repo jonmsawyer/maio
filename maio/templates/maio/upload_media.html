@@ -9,16 +9,21 @@
 
 {% block script %}
   <script>
-    $(function() {
-      document.config = new Config({
-        csrf_token: '{{ csrf_token }}',
-        video_tn: '{% static "icons/tn_video.png" %}',
-        audio_tn: '{% static "icons/tn_audio.png" %}',
-        document_tn: '{% static "icons/tn_doc.png" %}',
-        other_tn: '{% static "icons/tn_doc.png" %}',
-      });
-      document.getElementById('id_content_file').addEventListener('change', handleFileSelect, false);
+    var config = new Config({
+      csrf_token: '{{ csrf_token }}',
+      video_tn: '{% static "icons/tn_video.png" %}',
+      audio_tn: '{% static "icons/tn_audio.png" %}',
+      document_tn: '{% static "icons/tn_doc.png" %}',
+      other_tn: '{% static "icons/tn_doc.png" %}',
     });
+    console.log('1) Config:', config);
+    document.getElementById('id_content_file').addEventListener('change', (function(evt) {
+      return function(evt) {
+        console.log('2) Config:', config);
+        return handleFileSelect(evt, config)
+      }
+    })(), false);
+    document.config = config;
   </script>
 {% endblock %}
 

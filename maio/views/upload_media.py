@@ -43,11 +43,15 @@ class UploadMediaView(FormView):
                 maio_file, content_file, _is_created = File.handle_uploaded_file(request, content_file=f)
                 num_media = Media.objects.filter(file=maio_file).count()
                 if num_media > 0 and data.get('skip_duplicates', True):
-                    cd['media']['old'].append(maio_file.media_set.filter(owner=request.user)[0])
-                    cd['media']['old_count'] += 1
-                else:
-                    media_file = Media.create_from_maio_file(request, maio_file, content_file)
-                    cd['media']['new'].append(media_file)
-                    cd['media']['new_count'] += 1
+                    try:
+                        cd['media']['old'].append(maio_file.media_set.filter(owner=request.user)[0])
+                        cd['media']['old_count'] += 1
+                        continue
+                    except IndexError:
+                        pass
+
+                media_file = Media.create_from_maio_file(request, maio_file, content_file)
+                cd['media']['new'].append(media_file)
+                cd['media']['new_count'] += 1
         context = super(UploadMediaView, self).get_context_data(**cd)
         return render(request, self.template_name, context)
