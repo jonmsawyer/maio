@@ -393,6 +393,8 @@ class File(Model, metaclass=FileMeta):
             except (OSError, UnidentifiedImageError):
                 path = str(os.path.join(fs.mk_md5_dir_media(self.md5sum), self.get_filename()))
                 tn_path = str(os.path.join(fs.mk_md5_dir_thumbnail(self.md5sum), self.get_filename()))
+                image = Image.open(tn_path)
+                image.load()
                 shutil.copyfile(path, tn_path)
                 os.stat(tn_path)
 

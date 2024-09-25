@@ -350,25 +350,42 @@ function uploadFile(file, idx, config, file_index) {
           .removeClass('alert-success')
           .removeClass('alert-danger')
           .addClass('alert-warning');
+          config.get('files_to_upload').get(file_index).set('is_uploaded', true);
+      } else if (resp.status == 'Error') {
+        Maio.log('Upload request was OK, but response has an error:', resp.reason);
+        prev_index_div
+          .removeClass('alert-secondary')
+          .removeClass('alert-warning')
+          .removeClass('alert-success')
+          .addClass('alert-danger')
+          .attr('title', resp.reason);
+        config.get('files_to_upload').get(file_index).set('is_uploaded', false);
+        prev_index_div.data('uploaded', false);
       } else {
         prev_index_div
           .removeClass('alert-secondary')
           .removeClass('alert-warning')
           .removeClass('alert-danger')
           .addClass('alert-success');
+        config.get('files_to_upload').get(file_index).set('is_uploaded', true);
       }
-      config.get('files_to_upload').get(file_index).set('is_uploaded', true);
     }
     else if (xhr.readyState == 4 && xhr.status != 200) {
       Maio.log('Upload failed! Response:', xhr);
-      resp = JSON.parse(xhr.response);
-      Maio.log('Response obj:', resp);
-      var prev_index_div = $(`#preview_index_${resp.file_index} > div`);
+      try {
+        resp = JSON.parse(xhr.response);
+        Maio.log('Response obj:', resp);
+      } catch (error) {
+        resp = xhr.response;
+        Maio.log('Response is not JSON. Reponse:', resp);
+      }
+      var prev_index_div = $(`#preview_index_${file_index} > div`);
       prev_index_div
         .removeClass('alert-secondary')
         .removeClass('alert-warning')
         .removeClass('alert-success')
-        .addClass('alert-danger');
+        .addClass('alert-danger')
+        .attr('title', resp.reason);
       prev_index_div.data('uploaded', false);
       }
   })

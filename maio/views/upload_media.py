@@ -7,6 +7,8 @@ Module: ``maio.views.dashboard``
 from __future__ import annotations
 from typing import Any
 
+from PIL.Image import UnidentifiedImageError
+
 # from django.urls import reverse
 from django.conf import settings
 from django.http import HttpRequest, HttpResponse, JsonResponse
@@ -43,6 +45,7 @@ def _get_context(request: HttpRequest) -> dict[str, Any]:
             'new_count': 0,
             'old': [],
             'old_count': 0,
+            'invalid_cound': 0,
         },
     }
     return pre_populate_context_dict(request, context)
@@ -60,31 +63,40 @@ class UploadMediaView(FormView):
         if form.is_valid():
             data = form.cleaned_data
             for f in files:
-                maio_file, content_file, _is_created = File.handle_uploaded_file(request, content_file=f)
-                num_media = Media.objects.filter(file=maio_file).count()
-                if num_media > 0 and data.get('skip_duplicates', True):
-                    try:
-                        cd['media']['old'].append(maio_file.media_set.filter(owner=request.user)[0])
-                        cd['media']['old_count'] += 1
-                        if request.POST.get('from_ajax', False):
-                            return JsonResponse({
-                                'status': 'OK',
-                                'is_duplicate': True,
-                                'file_index': request.POST.get('file_index'),
-                            })
-                        continue
-                    except IndexError:
-                        pass
+                try:
+                    maio_file, content_file, _is_created = File.handle_uploaded_file(request, content_file=f)
+                    num_media = Media.objects.filter(file=maio_file).count()
+                    if num_media > 0 and data.get('skip_duplicates', True):
+                        try:
+                            cd['media']['old'].append(maio_file.media_set.filter(owner=request.user)[0])
+                            cd['media']['old_count'] += 1
+                            if request.POST.get('from_ajax', False):
+                                return JsonResponse({
+                                    'status': 'OK',
+                                    'is_duplicate': True,
+                                    'file_index': request.POST.get('file_index'),
+                                })
+                            continue
+                        except IndexError:
+                            pass
 
-                media_file = Media.create_from_maio_file(request, maio_file, content_file)
-                cd['media']['new'].append(media_file)
-                cd['media']['new_count'] += 1
-                if request.POST.get('from_ajax', False):
-                    return JsonResponse({
-                        'status': 'OK',
-                        'is_duplicate': False,
-                        'file_index': request.POST.get('file_index'),
-                    })
+                    media_file = Media.create_from_maio_file(request, maio_file, content_file)
+                    cd['media']['new'].append(media_file)
+                    cd['media']['new_count'] += 1
+                    if request.POST.get('from_ajax', False):
+                        return JsonResponse({
+                            'status': 'OK',
+                            'is_duplicate': False,
+                            'file_index': request.POST.get('file_index'),
+                        })
+                except (UnidentifiedImageError, FileNotFoundError) as e:
+                    cd['media']['invalid_cound'] += 1
+                    if request.POST.get('from_ajax', False):
+                        return JsonResponse({
+                            'status': 'Error',
+                            'reason': str(e),
+                            'file_index': request.POST.get('file_index'),
+                        }, status=400)
         if request.POST.get('from_ajax', False):
             return JsonResponse({
                 'status': 'Error',
