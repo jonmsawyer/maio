@@ -352,7 +352,10 @@ class Media(Model, metaclass=MediaMeta):
             try:
                 output = subprocess.run(ffprobe_cmd, capture_output=True)
                 output = str(output.stdout, encoding='UTF-8')
-                length = float(output.strip())
+                try:
+                    length = float(output.strip())
+                except ValueError:
+                    length = 1.0
             except subprocess.CalledProcessError:
                 raise
         if maio_file.mime_type.get_maio_type_choice() == MaioTypeChoices.AUDIO:

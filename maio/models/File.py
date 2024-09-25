@@ -288,7 +288,10 @@ class File(Model, metaclass=FileMeta):
         try:
             output = subprocess.run(ffprobe_cmd, capture_output=True)
             output = str(output.stdout, encoding='UTF-8')
-            video_length = float(output.strip())
+            try:
+                video_length = float(output.strip())
+            except ValueError:
+                video_length = 1.0
         except subprocess.CalledProcessError:
             raise
         # /Get video length
