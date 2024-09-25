@@ -1,0 +1,17 @@
+{# Debug Config partial template. #}
+
+{% load static %}
+{% load maio_extras %}
+
+{% if request.user.is_superuser and user_setting.display_debug %}
+<div id="maio_debug_config">
+  <div class="dropdown flex">
+    <button class="btn btn-warning dropdown-toggle float-end" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+      Debug Config
+    </button>
+    <div style="clear: both;"></div>
+    <pre class="dropdown-menu border-warning bg-warning-subtle">
+    </pre>
+  </div>
+</div>
+{% endif %}

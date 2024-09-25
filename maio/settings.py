@@ -184,6 +184,10 @@ MAIO_SETTINGS: dict[str, dict[str, Any]] = {
     },
     'upload': {
         'directory': os.path.join(MEDIA_ROOT, 'uploads'),
+        'restricted': {
+            'extensions': ['exe', 'msi'],
+            'mime_types': ['application/x-msdownload'],
+        }
     },
     'meta': {
         'directory': os.path.join(MEDIA_ROOT, 'meta'),

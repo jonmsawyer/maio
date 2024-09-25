@@ -1,17 +1,15 @@
 {% if not request.user.is_authenticated %}
-<div style="text-align: center; float: right;">
-  <form action="" method="post">
+  <form method="post" style="text-align: center;">
     {% csrf_token %}
-    <div style="width: 600px;
-                border: 1px solid #212529;
+    <div style="border: 1px solid #212529;
                 margin: 0 auto;
                 padding: 20px;
                 border-radius: 10px;">
         <h3>Maio Login</h3>
-        <div class="input-group input-group-lg">
+        <div class="input-group maio-input-group">
           <div class="input-group-prepend">
             <label class="input-group-text"
-                    id="inputGroup-sizing-lg"
+                    id="input-group-username"
                     for="{{ form.username.id_for_label }}"
             >{{ form.username.label }}</label>
           </div>
@@ -22,10 +20,10 @@
                   name="{{ form.username.name }}"
                   id="{{ form.username.id_for_label }}">
         </div>
-        <div class="input-group input-group-lg" style="margin-top: 10px;">
+        <div class="input-group maio-input-group" style="margin-top: 10px;">
           <div class="input-group-prepend">
             <label class="input-group-text"
-                    id="inputGroup-sizing-lg"
+                    id="input-group-password"
                     for="{{ form.password.id_for_label }}"
             >{{ form.password.label }}</label>
           </div>
@@ -41,17 +39,16 @@
         </div>
     </div>
   </form>
-</div>
 {% else %}
-<div style="text-align: center; float: right;">
-    <div style="width: 600px;
-                border: 1px solid #212529;
-                margin: 0 auto;
-                padding: 20px;
-                border-radius: 10px;">
-        <h3>Maio Dashboard</h3>
-        <a class="btn btn-primary btn-lg" href="{% url 'dashboard' %}"
-        >Go to the Maio Dashboard</a>
-    </div>
-</div>
+  <div style="text-align: center; float: right;">
+      <div style="width: 600px;
+                  border: 1px solid #212529;
+                  margin: 0 auto;
+                  padding: 20px;
+                  border-radius: 10px;">
+          <h3>Maio Dashboard</h3>
+          <a class="btn btn-primary btn-lg" href="{% url 'dashboard' %}"
+          >Go to the Maio Dashboard</a>
+      </div>
+  </div>
 {% endif %}

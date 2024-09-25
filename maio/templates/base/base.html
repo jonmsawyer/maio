@@ -1,14 +1,19 @@
 {% load static %}<!doctype html>
-<html lang="en">
+<html lang="en" class="maio maio-theme-default">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="Maio: Media All In One">
     <meta name="author" content="Jonathan Sawyer <https://github.com/jonmsawyer/maio">
-    <link rel="shortcut icon" href="{% static 'maio/imgs/favicon.ico' %}" type="image/x-icon">
-    <link rel="icon" href="{% static 'maio/imgs/favicon.ico' %}" type="image/x-icon">
-    <link rel="apple-touch-icon" sizes="52x52" href="{% static 'maio/imgs/favicon.png' %}">
-    <link rel="icon" type="image/png" sizes="52x52" href="{% static 'maio/imgs/favicon.png' %}">
+    <meta name="keywords" content="maio, media, all, in, one, all-in-one, file, media, images,
+                                   pictures, video, songs, audio, clips, movies, documents, text">
+
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon"> <!-- IE -->
+    <link rel="apple-touch-icon" type="image/png" href="{% static 'icons/favicon.png' %}"> <!-- iPhone -->
+    <link rel="apple-touch-icon" type="image/png" sizes="72x72" href="{% static 'icons/favicon.png' %}"> <!-- iPad -->
+    <link rel="apple-touch-icon" type="image/png" sizes="52x52" href="{% static 'icons/favicon.png' %}"> <!-- iPad -->
+    <link rel="apple-touch-icon" type="image/png" sizes="114x114" href="{% static 'icons/favicon.png' %}"> <!-- iPhone4 -->
+    <link rel="icon" type="image/png" href="{% static 'icons/favicon.png' %}"> <!-- Modern Browsers -->
 
     <title>{% block title %}Maio{% endblock title %} | Maio</title>
 
@@ -19,7 +24,7 @@
           crossorigin="anonymous">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
           rel="stylesheet">
-    <link href="{% static 'maio/css/site.css' %}" rel="stylesheet">
+    <link href="{% static 'maio/css/core.css' %}" rel="stylesheet">
 
     <!-- Core JavaScript -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"
@@ -31,9 +36,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
             integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
             crossorigin="anonymous"></script>
-
-    <!-- Maio Scripts -->
-    <script src="{% static 'maio/js/utils.js' %}"></script>
+    <script src="{% static 'maio/js/core.js' %}"></script>
 
     <!-- Template Styles and Scripts -->
     {% block stylesheets %}{% endblock stylesheets %}
@@ -43,17 +46,11 @@
 
   <body>
     {% include 'base/nav.html' %}
-
-    <main role="main">
-      <div class="mt-5"></div>
+    <main role="main" class="mt-5">
       {% block content %}{% endblock content %}
     </main>
-
     {% include 'base/footer.html' %}
-
-    {% if request.user.is_superuser %}
-      {% include 'base/debug.html' %}
-    {% endif %}
+    {% include 'base/debug.html' %}
   </body>
   {% block script %}{% endblock script %}
 </html>

@@ -54,6 +54,8 @@ class UserSettingMiddleware:
                 user_setting.save()
         except TypeError:
             user_setting = UserSetting()
+        user_setting.previous_page = request.META.get('HTTP_REFERER' , '/') # type: ignore;
+        user_setting.save()
         setattr(request, 'user_setting', user_setting)
 
         response = self.get_response(request)

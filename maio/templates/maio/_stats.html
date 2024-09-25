@@ -1,45 +1,40 @@
 {# stats partial file #}
 
-<div class="row mt-5 center"> <!-- stats -->
-  <div class="col-md-2">
-    <h2>
-      Images
-    </h2>
-    <p>
-      Count: {{ file_stat.num_images }}<br />
-      Size: {{ file_stat.get_file_sizes_human.0 }}
-    </p>
-  </div>
-  <div class="col-md-2">
-    <h2>
-      Audio
-    </h2>
+<!-- Stats -->
+<div class="row mt-5 center">
+  <div class="col col-lg-2 col-md-4 col-sm-4 col-6 maio-stat-col">
+    <h2>Audio</h2>
     <p>
       Count: {{ file_stat.num_audio }}<br />
       Size: {{ file_stat.get_file_sizes_human.1 }}
     </p>
   </div>
-  <div class="col-md-2">
-    <h2>
-      Video
-    </h2>
+  <div class="col col-lg-2 col-md-4 col-sm-4 col-6 maio-stat-col">
+    <h2>Video</h2>
     <p>
       Count: {{ file_stat.num_videos }}<br />
       Size: {{ file_stat.get_file_sizes_human.2 }}
    </p>
   </div>
-  <div class="col-md-2">
+  <div class="col col-md-4 col-sm-4 col-6 maio-stat-col">
     <h2>Documents</h2>
     <p>
       Count: {{ file_stat.num_documents }}<br />
       Size: {{ file_stat.get_file_sizes_human.3 }}
     </p>
   </div>
-  <div class="col-md-2">
+  <div class="col col-lg-2 col-md-6 col-6 maio-stat-col">
+    <h2>Images</h2>
+    <p>
+      Count: {{ file_stat.num_images }}<br />
+      Size: {{ file_stat.get_file_sizes_human.0 }}
+    </p>
+  </div>
+  <div class="col col-lg-2 col-md-6 maio-stat-col">
     <h2>Other</h2>
     <p>
       Count: {{ file_stat.num_others }}<br />
       Size: {{ file_stat.get_file_sizes_human.4 }}
     </p>
   </div>
-</div> <!-- /stats -->
+</div> <!-- /Stats -->

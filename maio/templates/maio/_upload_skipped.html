@@ -1,0 +1,28 @@
+{# medium icon file #}
+{# requires a Media instance named 'image' and an integer named 'width' context variables #}
+
+{% load static %}
+{% load maio_extras %}
+
+{% if medium %}
+<div class="alert alert-warning">
+  <h4>Upload skipped.</h4>
+  <div class="row">
+    <div class="col-lg">
+      <img src="{{ medium.get_static_thumbnail_uri }}" alt="{{ medium.name }}">
+    </div>
+    <div class="col-lg">
+      <div>File ID: {{ medium.file.id }}</div>
+      <div>Media ID: {{ medium.id }}</div>
+      <div>Name: {{ medium.name }}</div>
+      <div>Extension: {{ medium.extension }}</div>
+      <div>Date Added: {{ medium.date_added }}</div>
+      <div>Date Modified: {{ medium.date_modified }}</div>
+      <div>Width: {{ medium.width }}</div>
+      <div>Height: {{ medium.height }}</div>
+      <div>Thumbnail Width: {{ medium.tn_width }}</div>
+      <div>Thumbnail Height: {{ medium.tn_height }}</div>
+    </div>
+  </div>
+</div>
+{% endif %}

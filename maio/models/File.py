@@ -12,12 +12,14 @@ import uuid
 import hashlib
 import json
 import subprocess
+import shutil
 from unidecode import unidecode
 
 import numpy
 import ffmpeg
 import magic # for mime types
 from PIL import Image, ExifTags
+from PIL.Image import UnidentifiedImageError
 
 from django.db import IntegrityError
 from django.conf import settings
@@ -176,6 +178,15 @@ class File(Model, metaclass=FileMeta):
     def save_upload_file(self) -> None:
         '''Save the file referenced by `self.content_file`.'''
         self.content_file.name = unidecode(self.content_file.name)
+        name = '.'.join(self.content_file.name.split('.')[:-1]).strip()
+        extension = self.content_file.name.split('.')[-1]
+        if not extension:
+            extension = 'file'
+        else:
+            extension = extension.lower().strip()
+        if extension == 'jpeg':
+            extension = 'jpg'
+        self.content_file.name = f"{name}.{extension}"
         path: str = str(os.path.join(File.content_file.field.upload_to, self.content_file.name))
         with open(path, 'wb+') as destination:
             for chunk in self.content_file.chunks():
@@ -186,9 +197,11 @@ class File(Model, metaclass=FileMeta):
         if not self.content_file:
             raise ContentFileNotSetError('`content_file` is not set.')
         self.original_name = '.'.join(self.content_file.name.split('.')[:-1])
-        self.original_extension = ''.join(self.content_file.name.split('.')[-1])
+        self.original_extension = ''.join(self.content_file.name.split('.')[-1]).lower()
+        if self.original_extension == 'jpeg':
+            self.original_extension = 'jpg'
         if not self.original_extension:
-            ext = 'bin'
+            ext = 'file'
             try:
                 extensions = str(MaioMimeType.objects.get(mime_type=self.mime_type).extensions)
                 extensions = extensions.split()
@@ -248,17 +261,11 @@ class File(Model, metaclass=FileMeta):
     def process_media(self) -> bool:
         '''Process the media for this file.'''
         path: str = str(os.path.join(File.content_file.field.upload_to, self.content_file.name))
-        with open(path, 'rb') as fh:
-            buf = fh.read()
-        root: str = fs.mk_md5_dir_media(self.md5sum)
-        if root:
-            file_path = os.path.join(root, self.get_filename())
-            with open(file_path, 'wb') as fh:
-                fh.write(buf)
-            os.unlink(path)
-            self.content_file = file_path
-            return True
-        return False
+        file_path = os.path.join(fs.mk_md5_dir_media(self.md5sum), self.get_filename())
+        shutil.copyfile(path, file_path)
+        os.unlink(path)
+        self.content_file = file_path
+        return True
 
     def generate_slideshow(
         self,
@@ -379,15 +386,15 @@ class File(Model, metaclass=FileMeta):
                         image = image.rotate(270, expand=True)
                     elif exif[orientation] == 8:
                         image = image.rotate(90, expand=True)
-            except Exception:
-                raise
 
-            image.thumbnail((300, 300), Image.Resampling.LANCZOS)
+                    image.thumbnail((300, 300), Image.Resampling.LANCZOS)
 
-            try:
                 image.save(tn_path)
-            except OSError:
-                image.convert('RGB').save(tn_path)
+            except (OSError, UnidentifiedImageError):
+                path = str(os.path.join(fs.mk_md5_dir_media(self.md5sum), self.get_filename()))
+                tn_path = str(os.path.join(fs.mk_md5_dir_thumbnail(self.md5sum), self.get_filename()))
+                shutil.copyfile(path, tn_path)
+                os.stat(tn_path)
 
             is_processed = True
 
@@ -414,6 +421,13 @@ class File(Model, metaclass=FileMeta):
             tn_path = os.path.join(root, self.get_filename())
             tn_path_name = '.'.join(tn_path.split('.')[:-1])
             tn_path = f"{tn_path_name}.{tn_extension}"
+
+            # _deets = f'''
+            #     audio_tn_path: {audio_tn_path}
+            #     tn_extension: {tn_extension}
+            #     tn_path: {tn_path}
+            # '''
+            # raise Exception(_deets)
 
             image = Image.open(audio_tn_path)
             image.load()

@@ -26,8 +26,8 @@ urlpatterns: list[Any] = [
     path('admin/', admin_site.urls),
 
     # Maio Views
-    path('dashboard/', views.dashboard, name='dashboard'),
-    path('logout/', views.logout, name='logout'),
+    path('dashboard/', login_required(views.dashboard), name='dashboard'),
+    path('logout/', login_required(views.logout), name='logout'),
     path('upload_media/', login_required(views.UploadMediaView.as_view()), name='upload_media'),
     path('edit_profile/', login_required(views.edit_profile), name='edit_profile'),
     path('search/', login_required(views.search), name='search'),

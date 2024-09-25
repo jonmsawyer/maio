@@ -1,13 +1,20 @@
-{# image card, simple #}
-{# requires a Media instance named 'image' and an integer named 'width' context variables #}
+{# Maio Debug #}
 
 {% load static %}
 {% load maio_extras %}
 
+{% if request.user.is_superuser and user_setting.display_debug %}
 <div class="container maio-debug">
   <hr>
   <h4>Debug</h4>
   <pre>User: {{ request.user }}
 Query Dict: {{ query_dict.urlencode }}
-User Setting: {{ user_setting.default_dashboard_view }}</pre>
-  </div>
+Maio Theme: {{ user_setting.maio_theme }}
+Default Dashboard View: {{ user_setting.default_dashboard_view }}
+Default Dashboard Sort: {{ user_setting.default_dashboard_sort }}
+Default Upload Media View: {{ user_setting.default_upload_media_view }}
+Auto Upload Media: {{ user_setting.auto_upload_media }}
+Redirect to Previous Page: {{ user_setting.redirect_to_previous_page_after_setting_save }}
+Previous Page: {{ user_setting.previous_page }}</pre>
+</div>
+{% endif %}

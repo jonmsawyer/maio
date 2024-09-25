@@ -28,11 +28,11 @@ def _user_profile(request: HttpRequest, context: dict[str, Any]) -> HttpResponse
     context['user_profile_saved'] = False
     context['user_profile_form'] = user_profile_form
 
-    if request.method == 'POST' and user_profile_form.is_valid():
-        if action == 'user_profile':
-            user_profile_form.save()
-            context['user_profile_saved'] = True
-
+    if user_profile_form.is_valid():
+        if request.method == 'POST':
+            if action == 'user_profile':
+                user_profile_form.save()
+                context['user_profile_saved'] = True
     return user_profile_form
 
 def _user_setting(request: HttpRequest, context: dict[str, Any]) -> HttpResponse | HttpResponseRedirect:
@@ -46,11 +46,11 @@ def _user_setting(request: HttpRequest, context: dict[str, Any]) -> HttpResponse
     context['user_settings_saved'] = False
     context['user_settings_form'] = user_settings_form
 
-    if request.method == 'POST' and user_settings_form.is_valid():
-        if action == 'user_setting':
-            user_settings_form.save()
-            context['user_settings_saved'] = True
-
+    if user_settings_form.is_valid():
+        if request.method == 'POST':
+            if action == 'user_setting':
+                user_settings_form.save()
+                context['user_settings_saved'] = True
     return user_settings_form
 
 def edit_profile(request: HttpRequest) -> HttpResponse | HttpResponseRedirect:
@@ -58,8 +58,10 @@ def edit_profile(request: HttpRequest) -> HttpResponse | HttpResponseRedirect:
     cd['action'] = request.POST.get('action')
     user_profile_form = _user_profile(request, cd)
     user_settings_form = _user_setting(request, cd)
-    redirect = request.user_setting.redirect_to_dashboard_after_setting_save
-    if request.method  == 'POST' and request.user_setting.redirect_to_dashboard_after_setting_save:
-        return HttpResponseRedirect(reverse('dashboard'))
+    do_redirect = False
+    if request.method == 'POST':
+        do_redirect = request.user_setting.redirect_to_previous_page_after_setting_save
+        if do_redirect:
+            return HttpResponseRedirect(request.user_setting.previous_page)
 
     return render(request, 'maio/edit_profile.html', cd)

@@ -15,6 +15,7 @@ from django.db.models import (
 )
 from django.db.models.base import ModelBase
 from django.utils.translation import gettext_lazy as _T
+from django.urls import reverse
 # from django.utils.safestring import mark_safe
 
 from .MaioUser import MaioUser
@@ -22,6 +23,19 @@ from .MaioMapType import MaioMapTypeChoices # MaioMapType
 
 
 USER_SETTINGS: dict[str, Any] = {
+    'maio_theme': {
+        'name': _T('Maio Theme'),
+        'maio_type': MaioMapTypeChoices.TEXT,
+        'max_length': 50,
+        'default': 'default',
+        'choices': (
+            ('default', _T('Default: standard Maio theme')),
+        ),
+        'help': _T(
+            'Set the default Maio theme. '
+            'This setting will affect how you experience Maio.'
+        ),
+    },
     'default_dashboard_view': {
         'name': _T('Default Dashboard View'),
         'maio_type': MaioMapTypeChoices.TEXT,
@@ -72,12 +86,54 @@ USER_SETTINGS: dict[str, Any] = {
             'This setting will affect how you experience Maio.'
         ),
     },
-    'redirect_to_dashboard_after_setting_save': {
-        'name': _T('Redirect to Dashboard After Setting Save'),
+    'default_upload_media_view': {
+        'name': _T('Default Upload Media View'),
+        'maio_type': MaioMapTypeChoices.TEXT,
+        'max_length': 50,
+        'default': 'default',
+        'choices': (
+            ('default', _T('Default: full preview display')),
+            ('simple', _T('Simple: thumbnails with a minimal amount of meta data')),
+            ('list', _T('List: thumbnails in their own row with useful meta data')),
+            ('thumbnails', _T('Thumbnails: display only thumbnails')),
+        ),
+        'help': _T(
+            'Set the default Upload Media view. '
+            'This setting will affect how you experience Maio.'
+        ),
+    },
+    'auto_upload_media': {
+        'name': _T('Auto Upload Media'),
         'maio_type': MaioMapTypeChoices.BOOL,
         'default': False,
         'help': _T(
-            'Set whether or not to redirect to the Dashboard after saving these settings.'
+            'Set whether or not to automatically upload media when choosing files.'
+        ),
+    },
+    'redirect_to_previous_page_after_setting_save': {
+        'name': _T('Redirect to Previous Page After Profile/Settings Save'),
+        'maio_type': MaioMapTypeChoices.BOOL,
+        'default': False,
+        'help': _T(
+            'Set whether or not to redirect to the previous page after saving '
+            'this profile or these settings.'
+        ),
+    },
+    'previous_page': {
+        'name': _T('Previous Page'),
+        'maio_type': MaioMapTypeChoices.URL,
+        'max_length': 1024,
+        'default': '/',
+        'disabled': True,
+        'help': _T('The page you came from.'),
+    },
+    'display_debug': {
+        'name': _T('Display Debug'),
+        'maio_type': MaioMapTypeChoices.BOOL,
+        'default': False,
+        'help': _T(
+            'Display on-page and JavaScript debug information on each page? '
+            'Regular users may ignore this setting as it only applies to Superusers.'
         ),
     },
 }
@@ -107,6 +163,13 @@ class UserSetting(Model, metaclass=UserSettingMeta):
 
     # Site-wide settings
 
+    maio_theme = CharField(
+        _T('Maio Theme'),
+        max_length=USER_SETTINGS['maio_theme']['max_length'],
+        default=USER_SETTINGS['maio_theme']['default'],
+        choices=USER_SETTINGS['maio_theme']['choices'],
+    )
+
     default_dashboard_view = CharField(
         _T('Default Dashboard View'),
         max_length=USER_SETTINGS['default_dashboard_view']['max_length'],
@@ -121,9 +184,32 @@ class UserSetting(Model, metaclass=UserSettingMeta):
         choices=USER_SETTINGS['default_dashboard_sort']['choices'],
     )
 
-    redirect_to_dashboard_after_setting_save = BooleanField(
-        _T('Redirect to Dashboard After Settings Save'),
-        default=USER_SETTINGS['redirect_to_dashboard_after_setting_save']['default'],
+    default_upload_media_view = CharField(
+        _T('Default Upload Media View'),
+        max_length=USER_SETTINGS['default_upload_media_view']['max_length'],
+        default=USER_SETTINGS['default_upload_media_view']['default'],
+        choices=USER_SETTINGS['default_upload_media_view']['choices'],
+    )
+
+    auto_upload_media = BooleanField(
+        _T('Auto Upload Media'),
+        default=USER_SETTINGS['auto_upload_media']['default'],
+    )
+
+    redirect_to_previous_page_after_setting_save = BooleanField(
+        _T('Redirect to Previous Page After Settings Save'),
+        default=USER_SETTINGS['redirect_to_previous_page_after_setting_save']['default'],
+    )
+
+    previous_page = CharField(
+        _T('Previous Page'),
+        default=USER_SETTINGS['previous_page']['default'],
+        max_length=USER_SETTINGS['previous_page']['max_length'],
+    )
+
+    display_debug = BooleanField(
+        _T('Display Debug'),
+        default=USER_SETTINGS['display_debug']['default'],
     )
 
     # Non-model fields

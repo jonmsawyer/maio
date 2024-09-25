@@ -3,27 +3,72 @@
 
 {% block title %}Upload Media{% endblock title %}
 
+{% block stylesheets %}
+  <link href="{% static 'maio/css/upload_media.css' %}" rel="stylesheet">
+{% endblock %}
+
 {% block scripts %}
   <script src="{% static 'maio/js/upload_media.js' %}"></script>
 {% endblock %}
 
 {% block script %}
   <script>
-    var config = new Config({
+    maio_conf = new Config({
+      js_debug: Boolean({{ js_debug }}),
+      render_div_index: Boolean({{ render_div_index }}),
       csrf_token: '{{ csrf_token }}',
+      upload_media_view: '{{ user_setting.default_upload_media_view }}',
+      upload_media_view_toggle: {% if user_setting.default_upload_media_view == 'default' %}true{% else %}false{% endif %},
       video_tn: '{% static "icons/tn_video.png" %}',
       audio_tn: '{% static "icons/tn_audio.png" %}',
       document_tn: '{% static "icons/tn_doc.png" %}',
+      pdf_tn: '{% static "icons/tn_pdf.png" %}',
+      text_tn: '{% static "icons/tn_text.png" %}',
+      archive_tn: '{% static "icons/tn_archive.png" %}',
       other_tn: '{% static "icons/tn_doc.png" %}',
+      upload_media_url: '{% url "upload_media" %}',
+      restricted_extensions: {{ restricted_extensions }},
+      restricted_mime_types: {{ restricted_mime_types }},
+      preview_view: '{{ preview_view }}',
+      global_index: 0,
+      files_to_upload: new Config({}),
     });
-    console.log('1) Config:', config);
+
+    // Handle `dropArea` events.
+    let dropArea = document.getElementById('drop-area');
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      dropArea.addEventListener(eventName, preventDefaults, false);
+    });
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropArea.addEventListener(eventName, highlight, false);
+    });
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropArea.addEventListener(eventName, unhighlight, false);
+    });
+    dropArea.addEventListener('drop', handleDrop, false);
+
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      document.addEventListener(eventName, preventDefaults, false);
+    });
+    document.addEventListener('drop', handleDrop, false);
+    document.addEventListener('paste', handlePaste, false);
+
+    // Handle document drop and paste events.
     document.getElementById('id_content_file').addEventListener('change', (function(evt) {
       return function(evt) {
-        console.log('2) Config:', config);
-        return handleFileSelect(evt, config)
+        return handleFileSelect(evt, 'choose');
       }
     })(), false);
-    document.config = config;
+
+    document.getElementById('id_upload').addEventListener('click', upload_files, false);
+
+    var global_index = 0;
+    var file_index = 0;
+    let progressBar;
+    let chooseProgressItems = [];
+    let uploadProgressItems = [];
+    let progressItems = chooseProgressItems;
+    Maio.update_debug_config();
   </script>
 {% endblock %}
 
@@ -33,63 +78,65 @@
     {% if media.new %}
     <h4>Uploaded {{media.new_count}} new media</h4>
     {% endif %}
-    {% for medium in media.new %}
-    <div class="alert alert-success">
-      <h4>Upload successful.</h4>
-      <div class="row">
-        <div class="col-lg">
-          <img src="{{medium.get_static_thumbnail_uri}}" alt="{{medium.name}}">
-        </div>
-        <div class="col-lg">
-          <div>File ID: {{medium.file.id}}</div>
-          <div>Media ID: {{medium.id}}</div>
-          <div>Name: {{medium.name}}</div>
-          <div>Extension: {{medium.extension}}</div>
-          <div>Date Added: {{medium.date_added}}</div>
-          <div>Date Modified: {{medium.date_modified}}</div>
-          <div>Width: {{medium.width}}</div>
-          <div>Height: {{medium.height}}</div>
-          <div>Thumbnail Width: {{medium.tn_width}}</div>
-          <div>Thumbnail Height: {{medium.tn_height}}</div>
-        </div>
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      {% include 'maio/_debug_config.html' %}
+      <div id="drop-area">
+        <form class="maio-upload-form">
+          <p>
+            Upload multiple files with the
+            <label class="btn btn-success btn-sm" for="id_content_file">Choose Files</label>
+            button or by dragging and dropping files onto the dashed region. Pasting an image,
+            video, or other file from the clipboard is also supported. Chosen files will not
+            automatically upload unless the
+            <span class="btn btn-sm btn-secondary btn-secondary-subtle">Auto upload media?</span>
+            switch (below) is turned on.
+          </p>
+          <div class="row" style="margin-bottom: 1em;">
+            <div class="col col-lg-2 col-md-3">
+              <input type="file" id="id_content_file" multiple name="content_file">
+              <label id="content_file_label" class="btn btn-success" for="id_content_file">Choose Files</label>
+            </div>
+            {% include 'maio/_spinner.html' with name='choose' title='File previews in progress...' %}
+          </div>
+          <div class="form-check form-switch">
+            <input id="id_skip_duplicates"
+                   class="form-check-input"
+                   type="checkbox"
+                   role="switch"
+                   name="skip_duplicates"
+                   checked>
+            <label class="form-check-label" for="id_skip_duplicates">Skip duplicate media?</label>
+          </div>
+          <div class="form-check form-switch" style="margin-top: 0.5em;">
+            <input id="id_auto_upload_media"
+                   class="form-check-input"
+                   type="checkbox"
+                   role="switch"
+                   {% if user_setting.auto_upload_media %}checked{% endif %}>
+            <label class="form-check-label" for="id_auto_upload_media">Auto upload media?</label>
+          </div>
+          <div class="row" style="margin-top: 1em;">
+            <div class="col col-lg-2 col-md-3">
+              <input id="id_upload" name="submit" value="Upload" class="btn btn-primary">
+            </div>
+            {% include 'maio/_spinner.html' with name='upload' title='Upload in progress...' %}
+          </div>
+        </form>
       </div>
+    </form>
+    <div class="col" id="maio_preview_files">
+      <h5>Preview (<span id="num_preview_files">0</span> files to upload)</h5>
+      <output id="list" class="row"></output>
     </div>
+    {% for medium in media.new %}
+      {% include 'maio/_upload_success.html' %}
     {% endfor %}
     {% if media.old %}
     <h4>Skipped {{media.old_count}} existing media</h4>
     {% endif %}
     {% for medium in media.old %}
-    <div class="alert alert-warning">
-      <h4>Upload skipped.</h4>
-      <div class="row">
-        <div class="col-lg">
-          <img src="{{medium.get_static_thumbnail_uri}}" alt="{{medium.name}}">
-        </div>
-        <div class="col-lg">
-          <div>File ID: {{medium.file.id}}</div>
-          <div>Media ID: {{medium.id}}</div>
-          <div>Name: {{medium.name}}</div>
-          <div>Extension: {{medium.extension}}</div>
-          <div>Date Added: {{medium.date_added}}</div>
-          <div>Date Modified: {{medium.date_modified}}</div>
-          <div>Width: {{medium.width}}</div>
-          <div>Height: {{medium.height}}</div>
-          <div>Thumbnail Width: {{medium.tn_width}}</div>
-          <div>Thumbnail Height: {{medium.tn_height}}</div>
-        </div>
-      </div>
-    </div>
+      {% include 'maio/_upload_skipped.html' %}
     {% endfor %}
-    <output id="list"></output>
-    <form method="post" enctype="multipart/form-data">
-      {% csrf_token %}
-      <h3>File Form</h3>
-      <div>
-        {{form.as_div}}
-      </div>
-      <div>
-        <input type="submit" name="submit" value="Upload">
-      </div>
-    </form>
   </div> <!-- /container -->
 {% endblock content %}

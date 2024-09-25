@@ -5,13 +5,12 @@
 {% block title %}Dashboard{% endblock title %}
 
 {% block scripts %}
-  <script src="{% static 'maio/js/utils.js' %}"></script>
   <script src="{% static 'maio/js/dashboard.js' %}"></script>
 {% endblock %}
 
 {% block script %}
   <script>
-  var config = new Config({
+  maio_conf = new Config({
     'csrf_token': '{{ csrf_token }}',
     'delete_media_url': '{% url "delete_media" %}',
     'change_thumbnail_url': '{% url "change_thumbnail" %}',

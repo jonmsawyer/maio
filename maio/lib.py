@@ -16,7 +16,7 @@ from django.http import HttpRequest
 
 def pre_populate_context_dict(
     request: HttpRequest,
-    cd: Optional[dict[Any, Any]] = None,
+    cd: Optional[dict[str, Any]] = None,
 ) -> dict[Any, Any]:
     '''Pre-populate the context dictionary with common attributes.'''
     if cd is None:

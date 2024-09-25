@@ -3,15 +3,27 @@
 
 {% block title %}Home{% endblock title %}
 
+{% block stylesheets %}
+  <link href="{% static 'maio/css/home.css' %}" rel="stylesheet">
+{% endblock %}
+
 {% block content %}
   <!-- Main jumbotron for a primary marketing message or call to action -->
   <div class="jumbotron">
-    <div class="container" style="">
-      {% include 'base/login.html' %}
-      <h1 class="display-3" style="margin-top: 0em;">Maio</h1>
-      <h2 class="display-5">Media All In One</h2>
+    <div class="container">
+      <div class="row">
+        <div class="col col-xxl-2 col-xl-2 col-lg-3 col-md-4 col-sm-5 col-4">
+          {% include 'base/logo.html' %}
+        </div>
+        <div class="col col-xxl-6 col-xl-6 col-lg-5 col-md-8 col-sm-7 col-8">
+          {% include 'base/heading.html' %}
+        </div>
+        <div class="col col-xxl-4 col-xl-4 col-lg-4 col-md-12 col-sm-12 col-12">
+          {% include 'base/login.html' %}
+        </div>
+      </div>
       <div style="clear: both;"></div>
-      {% include 'maio/_stats.html' with file_stat=file_stat %}
+      {% include 'maio/_stats.html' %}
     </div>
   </div>
 {% endblock content %}

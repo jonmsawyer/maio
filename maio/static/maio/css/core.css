@@ -1,0 +1,199 @@
+html.maio {
+    .modal-dialog {
+        max-width: max-content !important;
+    }
+
+    .modal-body {
+        display: flex;
+    }
+
+    .modal-body img {
+        object-fit: contain;
+    }
+    
+    img.maio-logo {
+        float: left;
+        margin: 0 0.5em 0.5em 0;
+        width: 180px;
+    }
+
+    & .maio-stat-col {
+        text-align: center;
+    }
+
+    & .maio-media-options {
+        padding-left: 10px;
+    }
+
+    & .maio-media-options a {
+        text-decoration: none;
+        color: rgb(33, 37, 41);
+        width: 100%;
+    }
+
+    & .maio-media-options:hover {
+        background-color: rgb(13, 110, 253);
+        color: white;
+    }
+
+    & .maio-media-options:hover a {
+        text-decoration: none;
+        color: white;
+    }
+
+    & .maio-highlight-media {
+        background-color: rgb(243, 218, 60);
+    }
+
+    & .maio-media-icon {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 1;
+        background-color: white;
+        border-bottom: 1px solid black;
+        border-right: 1px solid black;
+        border-top: 0;
+        border-left: 0;
+        border-radius: 5px 0;
+        padding: 0 5px;
+    }
+
+    & .maio-file-name {
+        word-wrap: break-word;
+        text-decoration: underline;
+    }
+
+    & .maio-card-options {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        z-index: 1;
+        background-color: white;
+        border-radius: 5px 0;
+        padding: 2px;
+        border-top: 1px solid rgb(33, 37, 41);
+        border-left: 1px solid rgb(33, 37, 41);
+        cursor: pointer;
+    }
+
+    & .maio-text-white {
+        color: white;
+    }
+
+    & .maio-text-white:hover {
+        color: white;
+    }
+
+    & div.maio-viewer-container {
+        display: flex;
+        justify-content: center;
+    }
+
+    & .maio-viewer {
+        width: 100%;
+        position: relative;
+    }
+
+    & img.maio-viewer {
+        width: 100%;
+        height: auto;
+        object-fit: contain;
+        display: block;
+        margin-right: 8px;
+    }
+
+    img.maio-viewer-gif {
+        width: auto;
+    }
+
+    & .maio-card-title {
+        max-height: 3.6em;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    & .maio-card-title.maio-simple {
+        max-height: 1.4em;
+    }
+
+    & div.maio-card-options ul.dropdown-menu.show {
+        background-color: rgb(179, 179, 179);
+        padding: 5px;
+        width: 15em;
+        cursor: pointer;
+    }
+
+    & li.maio-media-options {
+        border-radius: 5px;
+        border: 1px solid rgb(179, 179, 179);
+    }
+
+    & h6.maio-thumbnail-title {
+        text-align: center;
+        width: 100%;
+        position: absolute;
+        cursor: pointer;
+        margin-top: 79%;
+        background-color: rgba(0, 0, 0, 0.262);
+        color: white;
+    }
+
+    & .maio-upload-image {
+        max-width: 200px;
+        max-height: 200px;
+    }
+
+    & .maio-upload-image-index {
+        opacity: 0;
+        position: absolute;
+        z-index: -1;
+        top: 0;
+        left: 0;
+    }
+
+    & .maio-upload-image-preview {
+        margin: 0 0 0.5em 0;
+    }
+
+    & div.maio-div-index {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        margin: 0;
+        padding: 0 0.5em;
+        color: rgb(54, 54, 54);
+        border: 1px solid rgb(196, 200, 203);
+        border-radius: 5px;
+    }
+
+    & .maio-slideshow-col {
+        text-align: center;
+        padding: 1em;
+    }
+
+    & .maio-slideshow-col img {
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    & div.maio-thumbnail-clicked {
+        border: 2px solid rgb(128, 35, 35);
+        border-radius: 5px;
+        padding: -2px;
+    }
+
+    & .maio-thumbnail-current {
+        border: 2px solid rgb(70, 151, 35);
+        border-radius: 5px;
+        padding: -2px;
+    }
+
+    & div.col.col-xxl-6.col-xl-6.col-lg-5.col-md-8.col-sm-7 {
+        min-width: 15em;
+    }
+
+    & #maio_debug_config pre {
+        font-size: 10pt;
+    }
+}
