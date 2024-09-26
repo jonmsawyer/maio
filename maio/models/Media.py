@@ -192,9 +192,9 @@ class Media(Model, metaclass=MediaMeta):
             return Media.get_all_media(request, with_user)
 
     @staticmethod
-    def get_all_media(request: HttpRequest, with_user: Optional[User]) -> QuerySet[Media]:
+    def get_all_media(request: HttpRequest, with_user: Optional[User] = None) -> QuerySet[Media]:
         user = request.user
-        if request.user.is_superuser and with_user:
+        if with_user:
             user = with_user
         return Media.objects.filter(
             owner=user,
@@ -207,9 +207,9 @@ class Media(Model, metaclass=MediaMeta):
         ).order_by(request.user_setting.default_dashboard_sort)
 
     @staticmethod
-    def get_all_images(request: HttpRequest, with_user: Optional[User]) -> QuerySet[Media]:
+    def get_all_images(request: HttpRequest, with_user: Optional[User] = None) -> QuerySet[Media]:
         user = request.user
-        if request.user.is_superuser and with_user:
+        if with_user:
             user = with_user
         return Media.objects.filter(
             owner=user,
@@ -222,9 +222,9 @@ class Media(Model, metaclass=MediaMeta):
         ).order_by(request.user_setting.default_dashboard_sort)
 
     @staticmethod
-    def get_all_audio(request: HttpRequest, with_user: Optional[User]) -> QuerySet[Media]:
+    def get_all_audio(request: HttpRequest, with_user: Optional[User] = None) -> QuerySet[Media]:
         user = request.user
-        if request.user.is_superuser and with_user:
+        if with_user:
             user = with_user
         return Media.objects.filter(
             owner=user,
@@ -237,9 +237,9 @@ class Media(Model, metaclass=MediaMeta):
         ).order_by(request.user_setting.default_dashboard_sort)
 
     @staticmethod
-    def get_all_videos(request: HttpRequest, with_user: Optional[User]) -> QuerySet[Media]:
+    def get_all_videos(request: HttpRequest, with_user: Optional[User] = None) -> QuerySet[Media]:
         user = request.user
-        if request.user.is_superuser and with_user:
+        if with_user:
             user = with_user
         return Media.objects.filter(
             owner=user,
@@ -252,9 +252,9 @@ class Media(Model, metaclass=MediaMeta):
         ).order_by(request.user_setting.default_dashboard_sort)
 
     @staticmethod
-    def get_all_documents(request: HttpRequest, with_user: Optional[User]) -> QuerySet[Media]:
+    def get_all_documents(request: HttpRequest, with_user: Optional[User] = None) -> QuerySet[Media]:
         user = request.user
-        if request.user.is_superuser and with_user:
+        if with_user:
             user = with_user
         return Media.objects.filter(
             owner=user,
@@ -268,9 +268,9 @@ class Media(Model, metaclass=MediaMeta):
 
 
     @staticmethod
-    def get_all_other_file(request: HttpRequest, with_user: Optional[User]) -> QuerySet[Media]:
+    def get_all_other_file(request: HttpRequest, with_user: Optional[User] = None) -> QuerySet[Media]:
         user = request.user
-        if request.user.is_superuser and with_user:
+        if with_user:
             user = with_user
         return Media.objects.filter(
             owner=user,
@@ -311,7 +311,7 @@ class Media(Model, metaclass=MediaMeta):
                 md5_dir_slideshow.split('\\')[-2],
                 md5_dir_slideshow.split('\\')[-1],
             )
-            slideshow_tn_uri = (
+            slideshow_tn_uri = str(
                 os.path
                     .join(tn_static_root, md5_1, md5_2, maio_file.get_tn_filename())
                     .replace('\\', '/')
@@ -320,14 +320,8 @@ class Media(Model, metaclass=MediaMeta):
                 f"{slideshow_tn_uri.split('.')[0]}_{slideshow_index}"
                 f".{slideshow_tn_uri.split('.')[-1]}"
             )
-            # raise Exception(f'''
-            #     tn_static_root: {tn_static_root}
-            #     md5_dir_slideshow: {md5_dir_slideshow}
-            #     slideshow_index: {slideshow_index}
-            #     slideshow_tn_uri: {slideshow_tn_uri}
-            # ''')
             video_path = os.path.join(fs.mk_md5_dir_media(maio_file.md5sum), maio_file.get_filename())
-            ffprobe_cmd = [
+            ffprobe_cmd: list[str] = [
                 maio_conf.get_ffprobe_bin_path(),
                 "-v", "error",
                 "-select_streams", "v",

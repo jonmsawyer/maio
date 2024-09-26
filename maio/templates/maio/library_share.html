@@ -1,0 +1,32 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Library Share{% endblock title %}
+
+{% block content %}
+  <!-- Main jumbotron for a primary marketing message or call to action -->
+  <div class="jumbotron">
+    <div class="container" style="">
+      <h1 class="display-3" style="margin-top: 0em;">Library Share</h1>
+      <div class="card">
+        <h4 class="card-title">Library Share</h4>
+        <div class="card-body">
+          <div class="card-text">
+            <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
+              <div class="btn-group" role="group">
+                <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                  Libraries Shared With Me
+                </button>
+                <ul class="dropdown-menu">
+                  {% for share in shares %}
+                    <li><a class="dropdown-item" href="{% url 'library_share' share.from_user.user.username %}">{{ share.from_user.user.username }}</a></li>
+                  {% endfor %}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}

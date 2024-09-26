@@ -27,6 +27,7 @@ from .MetaFile import MetaFile
 from .FileStat import FileStat
 from .UserSetting import UserSetting
 from .Slideshow import Slideshow
+from .LibraryShare import LibraryShare
 
 
 __all__: list[str] = [
@@ -49,6 +50,7 @@ __all__: list[str] = [
     'FileStat',
     'UserSetting',
     'Slideshow',
+    'LibraryShare',
 ]
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)

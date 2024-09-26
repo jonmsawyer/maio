@@ -17,7 +17,6 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.paginator import Page, Paginator
 from django.db.models import QuerySet
-from django.urls import reverse
 
 from maio.lib import pre_populate_context_dict
 from maio.models import Media
@@ -51,14 +50,16 @@ def sanitize_filter_media_type(media_type: str) -> str:
 
 
 @login_required
-def dashboard(request: HttpRequest, with_username: Optional[str] = None) -> HttpResponse:
+def dashboard(request: HttpRequest, with_username: Optional[str] = None, is_admin: Optional[bool] = None) -> HttpResponse:
+    cd = pre_populate_context_dict(request, {})
+
     with_user = None
-    if request.user.is_superuser and with_username:
+    if with_username:
         try:
             with_user = User.objects.get(username=with_username)
         except User.DoesNotExist:
             pass
-    cd = pre_populate_context_dict(request, {})
+
     width = 260
     media_type = sanitize_filter_media_type(request.GET.get('media_type', 'all'))
     media_list = Media.get_all_by_media_type(request, media_type, with_user)
@@ -86,6 +87,8 @@ def dashboard(request: HttpRequest, with_username: Optional[str] = None) -> Http
     qd['per_page'] = per_page
     # /query_dict
 
+    cd['js_debug'] = 'true'
+    cd['is_admin'] = is_admin
     cd['with_user'] = with_user
     cd['query_dict'] = qd
     cd['width'] = width

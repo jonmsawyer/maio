@@ -52,10 +52,10 @@ class UserSettingMiddleware:
             user_setting, user_setting_created = UserSetting.objects.get_or_create(user=MaioUser.objects.get(user=request.user))
             if user_setting_created:
                 user_setting.save()
+            user_setting.previous_page = request.META.get('HTTP_REFERER' , '/') # type: ignore;
+            user_setting.save()
         except TypeError:
             user_setting = UserSetting()
-        user_setting.previous_page = request.META.get('HTTP_REFERER' , '/') # type: ignore;
-        user_setting.save()
         setattr(request, 'user_setting', user_setting)
 
         response = self.get_response(request)
