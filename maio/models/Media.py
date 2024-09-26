@@ -27,8 +27,6 @@ from django.contrib.auth.models import User
 from conf import MaioConf
 from maio import filestore as fs
 
-# from maio import filestore as fs
-
 from .File import File
 from .Tag import Tag
 from .MaioType import MaioType, MaioTypeChoices
