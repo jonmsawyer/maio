@@ -24,7 +24,10 @@ def delete_media(request: HttpRequest) -> JsonResponse:
                 delete_all = True
             else:
                 delete_all = False
-        media = Media.objects.get(pk=media_uuid, owner=request.user)
+        try:
+            media = Media.objects.get(pk=media_uuid, owner=request.user)
+        except Media.DoesNotExist:
+            return JsonResponse({'error': 'You do not have access to delete this media.'})
         if delete_all:
             f = media.file
             for med in f.media_set.all():
@@ -33,9 +36,11 @@ def delete_media(request: HttpRequest) -> JsonResponse:
         else:
             media_deleted.append(media.id)
             ret = media.delete()
-    return JsonResponse({
-        'delete_media_uuid': media_uuid,
-        'delete_all': delete_all,
-        'deleted_media': media_deleted,
-        'ret': ret,
-    })
+        return JsonResponse({
+            'delete_media_uuid': media_uuid,
+            'delete_all': delete_all,
+            'deleted_media': media_deleted,
+            'ret': ret,
+        })
+    else:
+        return JsonResponse({'error': 'I only understand POST requests.'})

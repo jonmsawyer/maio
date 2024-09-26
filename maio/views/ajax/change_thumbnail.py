@@ -18,7 +18,7 @@ def change_thumbnail(request: HttpRequest) -> JsonResponse:
             media_uuid = request.POST.get('media_uuid');
             media = Media.objects.get(pk=media_uuid, owner=request.user)
         except Media.DoesNotExist:
-            return JsonResponse({'error': 'Media with UUID does not exist for this user.'})
+            return JsonResponse({'error': "You do not have access to change this media's thumbnail."})
         slideshow = media.file.slideshow_set.get()
         try:
             index = int(request.POST.get('index'))

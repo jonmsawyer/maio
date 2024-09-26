@@ -11,6 +11,7 @@
 {% block script %}
   <script>
   maio_conf = new Config({
+    'js_debug': Boolean({{ js_debug }}),
     'csrf_token': '{{ csrf_token }}',
     'delete_media_url': '{% url "delete_media" %}',
     'change_thumbnail_url': '{% url "change_thumbnail" %}',
@@ -20,7 +21,7 @@
 
 {% block content %}
   <div class="container"> <!-- container -->
-    <h1>{% if with_user %}Maio Admin: User Dashboard ({{ with_user.username }}){% else %}Dashboard{% endif %}</h1>
+    <h1>{% if is_admin %}Maio Admin: User Dashboard ({{ with_user.username }}){% else %}Dashboard{% if with_user %} ({{ with_user.username }}){% endif%}{% endif %}</h1>
 
     <h4>{{ num_media }} media found</h4>
     {% include 'maio/_pagination.html' %}

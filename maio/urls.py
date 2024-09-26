@@ -31,6 +31,8 @@ urlpatterns: list[Any] = [
     path('upload_media/', login_required(views.UploadMediaView.as_view()), name='upload_media'),
     path('edit_profile/', login_required(views.edit_profile), name='edit_profile'),
     path('search/', login_required(views.search), name='search'),
+    path('library_share/<str:username>/', login_required(views.library_share), name='library_share'),
+    path('library_share/', login_required(views.library_share), name='library_share'),
 
     # AJAX
     path('ajax/delete_media/', login_required(ajax.delete_media), name='delete_media'),

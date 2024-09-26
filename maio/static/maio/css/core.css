@@ -10,7 +10,7 @@ html.maio {
     .modal-body img {
         object-fit: contain;
     }
-    
+
     img.maio-logo {
         float: left;
         margin: 0 0.5em 0.5em 0;
@@ -195,5 +195,19 @@ html.maio {
 
     & #maio_debug_config pre {
         font-size: 10pt;
+    }
+
+    & .maio-error-panel {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        margin: 1em;
+        z-index: 100;
+        max-width: 30em;
+        width: 30em;
+    }
+
+    & .maio-error-panel #error-panel {
+        display: none;
     }
 }

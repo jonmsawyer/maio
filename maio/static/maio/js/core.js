@@ -17,6 +17,13 @@ class Config {
         this.config = config;
     }
 
+    *[Symbol.iterator]() {
+        var keys = this.get_keys();
+        for (let index = 0; index < keys.length; index += 1) {
+              yield keys[index];
+        }
+    }
+
     set(key, value) {
         this.config[key] = value;
     }
@@ -35,6 +42,10 @@ class Config {
 
     length() {
         return Object.keys(this.config).length;
+    }
+
+    get_keys() {
+        return Object.keys(this.config);
     }
 }
 
@@ -104,9 +115,13 @@ let Maio = {
      * @param {any} data
      */
     show_error_panel: function(msg, data) {
+        Maio.close_error_panel();
         Maio.log('Error:', msg, data);
         $('#error').html(msg);
         $('#error-panel').slideDown();
+        Maio.input_timer($('#error'), function(el) {
+            Maio.close_error_panel();
+        }, 10000);
     },
 
     /**

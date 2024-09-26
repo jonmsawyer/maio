@@ -18,6 +18,10 @@ function change_thumbnail(media_uuid) {
         'index': index,
     }, function(response, data) {
         Maio.log('Response:', response);
+        if (response.error) {
+            Maio.show_error_panel(response.error);
+            return;
+        }
         $('#modal_change_thumbnail_'+media_uuid).modal('hide');
         $(`#medium_${media_uuid}`).attr('src', response.slideshow_tn_uri);
         $('.maio-thumbnail-current').removeClass('maio-thumbnail-current');
@@ -60,6 +64,10 @@ function delete_media(media_uuid) {
         Maio.log('Response:', response);
         Maio.log('Data:', data);
         $('#modal_'+media_uuid).modal('hide');
+        if (response.error) {
+            Maio.show_error_panel(response.error);
+            return;
+        }
         for (var key in response.deleted_media) {
             var uid = response.deleted_media[key];
             Maio.log('Remove:', response.deleted_media[key]);

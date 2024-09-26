@@ -11,7 +11,7 @@ from django.contrib.auth.models import User, Group, Permission
 from maio.models import (
     File, Caption, Media, Playlist, Tag, MaioMap, MaioUser, MaioType, MaioMapType,
     Love, Like, Rating, MaioMimeType, FileStat, Log, MetaFile, Thumbnail, UserSetting,
-    Slideshow,
+    Slideshow, LibraryShare,
 )
 
 from .MaioAdminSite import MaioAdminSite
@@ -36,6 +36,7 @@ from .MetaFileAdmin import MetaFileAdmin
 from .ThumbnailAdmin import ThumbnailAdmin
 from .UserSettingAdmin import UserSettingAdmin
 from .SlideshowAdmin import SlideshowAdmin
+from .LibraryShareAdmin import LibraryShareAdmin
 
 # auth Admins
 from .UserAdmin import UserAdmin
@@ -66,6 +67,7 @@ __all__: list[str] = [
     'ThumbnailAdmin',
     'UserSettingAdmin',
     'SlideshowAdmin',
+    'LibraryShareAdmin',
 
     # auth Admins
     'UserAdmin',
@@ -95,6 +97,7 @@ admin_site.register(MetaFile, MetaFileAdmin)
 admin_site.register(Thumbnail, ThumbnailAdmin)
 admin_site.register(UserSetting, UserSettingAdmin)
 admin_site.register(Slideshow, SlideshowAdmin)
+admin_site.register(LibraryShare, LibraryShareAdmin)
 
 # auth Admins
 admin_site.register(User, UserAdmin)
