@@ -1,7 +1,7 @@
 '''
-File: KeyValue.py
+File: MaioMap.py
 
-Module: ``maio.models.KeyValue``
+Module: ``maio.models.MaioMap``
 '''
 
 from __future__ import annotations
@@ -22,15 +22,15 @@ from .MaioMapType import MaioMapType
 
 
 class MaioMapMeta(ModelBase):
-    '''Metaclass for Map model.'''
+    '''Metaclass for MaioMap model.'''
     class Meta:
-        verbose_name = 'Maio User'
-        verbose_name_plural = 'Maio Users'
+        verbose_name = 'Maio Map'
+        verbose_name_plural = 'Maio Map'
         app_label = 'maio'
-        db_table_comment = 'Maio users are also Django users.'
-        get_latest_by = ['-upd_dttm']
+        db_table_comment = 'Maio Map maps types to values.'
+        get_latest_by = ['-date_modified']
         # order_with_respect_to = ['user', 'key']
-        ordering = ['-upd_dttm']
+        ordering = ['-date_modified']
         # indexes = [
         #     Index(fields=('sort', 'name', 'is_default', 'date_added', '-date_modified'))
         # ]
@@ -46,22 +46,18 @@ class MaioMap(Model, metaclass=MaioMapMeta):
     id = UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = ForeignKey(to=MaioUser, on_delete=CASCADE, default=MaioUser.default)
     type = ForeignKey(to=MaioMapType, on_delete=DO_NOTHING, default=MaioMapType.default)
-    key = CharField('Key', max_length=254, unique=True)
-    value = TextField('Value', null=True, blank=True)
-    allow_null = BooleanField('Allow Null?', default=False)
-    is_enabled = BooleanField('Is Enabled?', default=True)
-    ins_dttm = DateTimeField('Insert DateTime', auto_now_add=True)
-    upd_dttm = DateTimeField('Updated DateTime', auto_now=True)
+    key = CharField(_T('Key'), max_length=254, unique=True)
+    value = TextField(_T('Value'), null=True, blank=True)
+    allow_null = BooleanField(_T('Allow Null?'), default=False)
+    is_enabled = BooleanField(_T('Is Enabled?'), default=True)
+    date_added = DateTimeField(_T('Insert DateTime'), auto_now_add=True)
+    date_modified = DateTimeField(_T('Updated DateTime'), auto_now=True)
 
     def __str__(self):
         return f"{self.key} -> ({self.type.maio_map_type}) `{self.value[0:20] if self.value else None}`"
 
     @staticmethod
     def get(request: HttpRequest, key: str) -> dict[str, str] | None:
-        # try:
-        #     return Map.objects.filter(key=key).values()
-        # except IndexError:
-        #     return None
         return None
 
     @staticmethod

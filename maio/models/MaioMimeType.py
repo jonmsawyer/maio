@@ -1,14 +1,13 @@
 '''
-File: File.py
+File: MaioMimeType.py
 
-Module: ``maio.models.File``
+Module: ``maio.models.MaioMimeType``
 '''
 
 from __future__ import annotations
 
 import os
 import uuid
-# from pprint import pprint
 
 from django.conf import settings
 from django.utils import timezone

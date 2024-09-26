@@ -1,7 +1,7 @@
 '''
 File: apps.py
 
-Module: ``maio.apps``
+Module: ``maioadmin.apps``
 '''
 
 from __future__ import annotations

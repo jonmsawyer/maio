@@ -1,17 +1,19 @@
-.input-group {
-    border-color: gray;
-}
+html.maio {
+    .input-group {
+        border-color: gray;
+    }
 
-.maio-input-group {
-    border: 1px solid black;
-    border-radius: 5px;
-}
+    & .maio-input-group {
+        border: 1px solid black;
+        border-radius: 5px;
+    }
 
-#input-group-username,
-#input-group-password {
-    width: 6em;
-    /* border: 1px solid black; */
-    background-color: rgb(179, 179, 179);
-    border-radius: 5px 0 0 5px;
-    color: rgb(47, 47, 47);
+    & #input-group-username,
+    #input-group-password {
+        width: 6em;
+        /* border: 1px solid black; */
+        background-color: rgb(179, 179, 179);
+        border-radius: 5px 0 0 5px;
+        color: rgb(47, 47, 47);
+    }
 }

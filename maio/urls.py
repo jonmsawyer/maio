@@ -3,7 +3,7 @@ File: urls.py
 
 Module: ``maio.urls``
 
-Maio URL Configuration
+Maio URL Configuration.
 '''
 
 from __future__ import annotations

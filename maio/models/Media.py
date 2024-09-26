@@ -18,7 +18,7 @@ from django.http import HttpRequest
 from django.core.files.uploadedfile import UploadedFile
 from django.db.models import (
     Model, UUIDField, ForeignKey, ManyToManyField, CharField, FloatField, PositiveIntegerField,
-    PositiveSmallIntegerField, DateTimeField, BooleanField, URLField, TextField, JSONField,
+    PositiveSmallIntegerField, DateTimeField, BooleanField, URLField, TextField,
     CASCADE, DO_NOTHING,
 )
 from django.db.models.base import ModelBase

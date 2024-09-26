@@ -2,16 +2,12 @@
 File: FileForm.py
 
 Module: ``maio.forms.FileForm``
-
-Media form for Maio.
 '''
 
 from __future__ import annotations
 from typing import Any, Optional
 
 from django import forms
-# from django.forms.models import ModelFormMetaclass
-# from django.forms import FileField, ClearableFileInput
 
 from maio.models import File
 

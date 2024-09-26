@@ -2,15 +2,11 @@
 File: MediaForm.py
 
 Module: ``maio.forms.MediaForm``
-
-Media form for Maio.
 '''
 
 from django.forms import ModelForm
-# from django.forms.models import ModelFormMetaclass
 
 from maio.models import Media
-
 
 
 class MediaForm(ModelForm):

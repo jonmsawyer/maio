@@ -1,16 +1,12 @@
 '''
-File: LoginForm.py
+File: UserChangeForm.py
 
-Module: ``maio.forms.LoginForm``
-
-Main log-in form for Maio.
+Module: ``maio.forms.UserChangeForm``
 '''
 
 from __future__ import annotations
 from typing import Any, Optional
 
-# from django.forms import ModelForm #, CharField, TextInput, PasswordInput
-# from django.utils.safestring import mark_safe
 from django.http import HttpRequest
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserChangeForm as UCF

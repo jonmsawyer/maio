@@ -5,23 +5,15 @@ Module: ``maio.models.Category``
 '''
 
 from __future__ import annotations
-# from typing import Any
 
-# import os
 import uuid
 
-# from django.conf import settings
 from django.db.models import (
     Model, UUIDField, CharField, DateTimeField, IntegerField, BooleanField,
     ForeignKey, Index,
     CASCADE,
 )
 from django.db.models.base import ModelBase
-
-# from conf import MaioConf
-
-
-# maio_conf = MaioConf(config=settings.MAIO_SETTINGS)
 
 
 class CategoryMeta(ModelBase):

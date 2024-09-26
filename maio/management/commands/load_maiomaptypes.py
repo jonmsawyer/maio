@@ -3,7 +3,7 @@ File: load_maiomaptypes.py
 
 Module: ``maio.management.commands.load_maiomaptypes``
 
-Custom manage.py command. Loads the Maio Map Type data into the database.
+Loads the Maio Map Type data into the database.
 '''
 
 from __future__ import annotations

@@ -49,17 +49,13 @@ class MetaFile(Model, metaclass=MetaFileMeta):
     md5sum = CharField('MD5 Sum', max_length=32, unique=True, editable=False)
 
     #: The File path stored in ./filestore/media/
-    content_file = FileField('Meta File', max_length=1024)
+    content_file = FileField('Meta File', max_length=1024, upload_to=maio_conf.get_chain('meta', 'directory'))
 
     #: Date added
     date_added = DateTimeField(auto_now_add=True)
 
     #: Date modified
     date_modified = DateTimeField(auto_now=True)
-
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
-        super().__init__(*args, **kwargs)
-        self.content_file.field.upload_to = maio_conf.get_chain('meta', 'directory')
 
     def __str__(self) -> str:
         id = str(self.id)[0:6]

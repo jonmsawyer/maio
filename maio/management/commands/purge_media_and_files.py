@@ -3,22 +3,20 @@ File: sync_maio_users.py
 
 Module: ``maio.management.commands.sync_maio_users``
 
-Custom manage.py command. Pruge the Media from the database and filesystem.
+Purge the Media from the database and filesystem.
+
+Doesn't work quite yet.
 '''
 
 from __future__ import annotations
 from typing import Any, Dict
 
 from django.core.management.base import BaseCommand
-# from django.contrib.auth.models import User
 
 from maio.models import File, Media, Thumbnail, MetaFile
 
 class Command(BaseCommand):
-    help = 'Pruge the Media from the database and filesystem.'
-
-    #def add_arguments(self, parser):
-    #    parser.add_argument('poll_ids', nargs='+', type=int)
+    help = 'Purge the Media from the database and filesystem.'
 
     def handle(self, *args: Any, **options: Dict[str, Any]) -> None:
         '''Purge all Media and File objects. Does not delete the files off the filesystem yet.'''

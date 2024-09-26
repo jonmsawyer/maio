@@ -1,7 +1,7 @@
 '''
-File: Caption.py
+File: UserSetting.py
 
-Module: ``maio.models.Caption``
+Module: ``maio.models.UserSetting``
 '''
 
 from __future__ import annotations
@@ -15,11 +15,9 @@ from django.db.models import (
 )
 from django.db.models.base import ModelBase
 from django.utils.translation import gettext_lazy as _T
-from django.urls import reverse
-# from django.utils.safestring import mark_safe
 
 from .MaioUser import MaioUser
-from .MaioMapType import MaioMapTypeChoices # MaioMapType
+from .MaioMapType import MaioMapTypeChoices
 
 
 USER_SETTINGS: dict[str, Any] = {

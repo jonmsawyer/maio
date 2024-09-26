@@ -15,6 +15,6 @@ __all__: list[str] = [
     'LoginForm',
     'FileForm',
     'MediaForm',
-    'UserSettingsForm',
+    'UserSettingForm',
     'UserChangeForm',
 ]

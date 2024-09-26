@@ -44,6 +44,8 @@ class Caption(Model, metaclass=CaptionMeta):
     caption_date = DateTimeField(_T('Caption Date'), null=True, blank=True)
     caption_type = ForeignKey(to=MaioMapType, on_delete=DO_NOTHING, default=MaioMapType.default) # type: ignore
     caption = TextField(_T('Caption'))
+    date_added = DateTimeField('Date Added', auto_now_add=True)
+    date_modified = DateTimeField('Date Modified', auto_now_add=True)
 
     def __str__(self):
         return f"{self.media.name} - {self.caption_date} - {self.caption[0:20]}"

@@ -1,7 +1,7 @@
 '''
-File: dashboard.py
+File: user_dashboard.py
 
-Module: ``maioadmin.views.dashboard``
+Module: ``maioadmin.views.user_dashboard``
 '''
 
 from __future__ import annotations

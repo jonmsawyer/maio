@@ -13,8 +13,6 @@ from django.urls import path #, include
 from django.contrib.auth.decorators import login_required
 
 from maio import views
-# from maio.views import ajax
-# from maio.admin import admin_site
 
 from maioadmin import views
 

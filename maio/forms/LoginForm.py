@@ -2,8 +2,6 @@
 File: LoginForm.py
 
 Module: ``maio.forms.LoginForm``
-
-Main log-in form for Maio.
 '''
 
 from __future__ import annotations
@@ -32,8 +30,7 @@ class LoginForm(Form):
         label=mark_safe('Password')
     )
 
-    # Method: clean
-    # See: DocString
+    #: Clean
     def clean(self) -> dict[str, Any]:
         '''
         Main cleaning method.

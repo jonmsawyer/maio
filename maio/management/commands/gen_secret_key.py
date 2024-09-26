@@ -1,7 +1,9 @@
 '''
-File: maio_gen_secret_key.py
+File: gen_secret_key.py
 
-Module: ``maio.management.commands.maio_gen_secret_key``
+Module: ``maio.management.commands.gen_secret_key``
+
+Generate a 66 character secret key to be used in `site_settings.SECRET_KEY`.
 '''
 
 from __future__ import annotations

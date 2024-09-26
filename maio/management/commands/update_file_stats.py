@@ -2,6 +2,8 @@
 File: maio_get_images.py
 
 Module: ``maio.management.commands.maio_get_images.py``
+
+Update the file stats from the database.
 '''
 
 from __future__ import annotations

@@ -1,7 +1,7 @@
 '''
-File: KeyValue.py
+File: MaioUser.py
 
-Module: ``maio.models.KeyValue``
+Module: ``maio.models.MaioUser``
 '''
 
 from __future__ import annotations

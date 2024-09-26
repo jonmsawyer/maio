@@ -1,16 +1,13 @@
 '''
-File: LoginForm.py
+File: UserSettingForm.py
 
-Module: ``maio.forms.LoginForm``
-
-Main log-in form for Maio.
+Module: ``maio.forms.UserSettingForm``
 '''
 
 from __future__ import annotations
-# from typing import Any
+from typing import Any
 
-from django.forms import ModelForm, SelectDateWidget, TextInput #, CharField, TextInput, PasswordInput
-# from django.utils.safestring import mark_safe
+from django.forms import ModelForm, SelectDateWidget, TextInput
 
 from maio.models import UserSetting
 from maio.models.UserSetting import USER_SETTINGS as US
@@ -41,6 +38,7 @@ class UserSettingForm(ModelForm):
             'previous_page': US['previous_page']['name'],
             'display_debug': US['display_debug']['name'],
         }
+
         help_texts = {
             'maio_theme': US['maio_theme']['help'],
             'default_dashboard_view': US['default_dashboard_view']['help'],
@@ -52,9 +50,9 @@ class UserSettingForm(ModelForm):
             'previous_page': US['previous_page']['help'],
             'display_debug': US['display_debug']['help'],
         }
-        widgets = {
+
+        widgets: dict[str, Any] = {
             'date_added': SelectDateWidget(attrs={'disabled': True}),
             'date_modified': SelectDateWidget(attrs={'disabled': True}),
             'previous_page': TextInput(attrs={'disabled': True}),
-            # 'user': TextInput(attrs={'disabled': True}),
         }

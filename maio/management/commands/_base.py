@@ -1,5 +1,5 @@
 '''
-File: base.py
+File: _base.py
 
 Module: ``maio.management.commands._base``
 '''
@@ -9,7 +9,7 @@ from typing import Any
 
 from pprint import pformat
 
-from django.core.management.base import BaseCommand #, CommandError
+from django.core.management.base import BaseCommand
 
 
 class MaioBaseCommand(BaseCommand):

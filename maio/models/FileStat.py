@@ -1,7 +1,7 @@
 '''
-File: Log.py
+File: FileStat.py
 
-Module: ``maio.models.Log``
+Module: ``maio.models.FileStat``
 '''
 
 from __future__ import annotations
@@ -17,7 +17,7 @@ from maio.lib import sizeof_fmt
 
 
 class FileStatMeta(ModelBase):
-    '''Metaclass for Log model.'''
+    '''Metaclass for FileStat model.'''
     class Meta:
         verbose_name = 'File Stat'
         verbose_name_plural = 'File Stats'

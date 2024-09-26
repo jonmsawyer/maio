@@ -5,7 +5,6 @@ Module: ``maio.models.LibraryShare``
 '''
 
 from __future__ import annotations
-# from typing import Any
 
 import uuid
 
@@ -20,10 +19,8 @@ from .MaioUser import MaioUser
 from .choices import PermissionChoices
 
 
-
-
 class LibraryShareMeta(ModelBase):
-    '''Metaclass for Caption model.'''
+    '''Metaclass for LibraryShare model.'''
     class Meta:
         verbose_name = 'Library Share'
         verbose_name_plural = 'Library Shares'

@@ -1,7 +1,7 @@
 '''
-File: dashboard.py
+File: edit_profile.py
 
-Module: ``maio.views.dashboard``
+Module: ``maio.views.edit_profile``
 '''
 
 from __future__ import annotations
@@ -9,9 +9,6 @@ from typing import Any
 
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
-from django.urls import reverse
-# from django.contrib.auth.models import User
-# from django.contrib.auth.forms import UserChangeForm
 
 from maio.lib import pre_populate_context_dict
 

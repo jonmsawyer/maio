@@ -1,7 +1,7 @@
 '''
-File: dashboard.py
+File: upload_media.py
 
-Module: ``maio.views.dashboard``
+Module: ``maio.views.upload_media``
 '''
 
 from __future__ import annotations
@@ -9,13 +9,9 @@ from typing import Any
 
 from PIL.Image import UnidentifiedImageError
 
-# from django.urls import reverse
 from django.conf import settings
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import render
-# from django.contrib.auth.models import User
-# from django.contrib.auth.decorators import login_required
-# from django.core.files.uploadedfile import UploadedFile
 from django.views.generic.edit import FormView
 from django.utils.safestring import mark_safe
 

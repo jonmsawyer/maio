@@ -1,12 +1,12 @@
-"""
+'''
 Django settings for Maio project.
 
 For more information on this file, see
-https://docs.djangoproject.com/en/5.1/topics/settings/
+https://docs.djangoproject.com/en/5.0/topics/settings/
 
 For the full list of settings and their values, see
-https://docs.djangoproject.com/en/5.1/ref/settings/
-"""
+https://docs.djangoproject.com/en/5.0/ref/settings/
+'''
 
 from __future__ import annotations
 from typing import Any
@@ -106,7 +106,7 @@ LOGGING: dict[str, Any] = {
 
 
 # Password validation
-# https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
+# https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -124,7 +124,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 # Internationalization
-# https://docs.djangoproject.com/en/5.1/topics/i18n/
+# https://docs.djangoproject.com/en/5.0/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
 
@@ -139,7 +139,7 @@ APPEND_SLASH = True
 LOGIN_URL = '/'
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.1/howto/static-files/
+# https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
@@ -152,7 +152,7 @@ MEDIA_URL = 'uploads/'
 MAIO_STATIC_ROOT = os.path.join(BASE_DIR, 'maio', 'static')
 
 # Default primary key field type
-# https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
+# https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -251,7 +251,7 @@ MAIO_SETTINGS: dict[str, dict[str, Any]] = {
                     'application/vnd.openxmlformats-officedocument.wordprocessingml.template',
                     'application/vnd.openxmlformats-officedocument.wordprocessingml.template.main+xml',
                     'application/vnd.wordperfect',
-                    'application/wordperfect5.1',
+                    'application/wordperfect5.0',
                     'application/x-abiword',
                 ],
                 'thumbnail_path': os.path.join(MAIO_STATIC_ROOT, 'maio', 'imgs', 'tn_msdoc.png'),

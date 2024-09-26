@@ -7,7 +7,6 @@ Module: ``maio.models.Thumbnail``
 from __future__ import annotations
 from typing import Any
 
-# import os
 import uuid
 
 from django.conf import settings

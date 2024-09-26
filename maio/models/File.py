@@ -138,20 +138,6 @@ class File(Model, metaclass=FileMeta):
             logger.exception(str(e))
             raise e
 
-        # _deets = f'''
-        #     Content File
-        #     ------------
-        #     Name: {maio_file.content_file.name}
-        #     Size: {maio_file.content_file.size}
-        #     Content Type: {content_file.content_type}
-        #     Content Type Extra: {content_file.content_type_extra}
-        #     Charset: {content_file.charset}
-        #     Upload To: {maio_file.content_file.field.upload_to}
-        #     Content Name: {content_file}
-        #     Maio File Path: {maio_file.content_file.path}
-        # '''
-        # raise Exception(_deets)
-
         maio_file.calculate_md5sum()
 
         try:
@@ -229,8 +215,6 @@ class File(Model, metaclass=FileMeta):
 
     def calculate_md5sum(self) -> str:
         '''Return the md5sum of the file represented by this object.'''
-        # path = os.path.join(File.content_file.field.upload_to, self.content_file.name)
-        # self.md5sum = hashlib.md5(open(path, 'rb').read()).hexdigest()
         self.md5sum = hashlib.md5(self.content_file.read()).hexdigest()
         return self.md5sum
 
@@ -305,18 +289,6 @@ class File(Model, metaclass=FileMeta):
             if not tn_path:
                 tn_path = new_out_filename
 
-            # _deets = f'''
-            #     In Filename: {in_filename}
-            #     Out Filename: {out_filename}
-            #     Thumbnail Extension: {tn_extension}
-            #     Video Length: {video_length}
-            #     Indexes: {indexes}
-            #     Index: {index}
-            #     Time: {time}
-            #     Initial Thumbnail Path: {tn_path}
-            # '''
-            # raise Exception(_deets)
-
             try:
                 _any: Any = (
                     ffmpeg
@@ -327,7 +299,6 @@ class File(Model, metaclass=FileMeta):
                         .run(capture_stdout=True, capture_stderr=True)
                 )
             except ffmpeg.Error as e:
-                # print(e.stderr.decode(), file=sys.stderr)
                 _deets = f'''
                     In Filename: {in_filename}
                     Out Filename: {out_filename}
@@ -427,13 +398,6 @@ class File(Model, metaclass=FileMeta):
             tn_path_name = '.'.join(tn_path.split('.')[:-1])
             tn_path = f"{tn_path_name}.{tn_extension}"
 
-            # _deets = f'''
-            #     audio_tn_path: {audio_tn_path}
-            #     tn_extension: {tn_extension}
-            #     tn_path: {tn_path}
-            # '''
-            # raise Exception(_deets)
-
             image = Image.open(audio_tn_path)
             image.load()
 
@@ -493,12 +457,6 @@ class File(Model, metaclass=FileMeta):
             tn_path = os.path.join(root, self.get_filename())
             tn_path_name = '.'.join(tn_path.split('.')[:-1])
             tn_path = f"{tn_path_name}.{tn_extension}"
-
-            # _deets = f'''
-            #     tn_extension: {tn_extension}
-            #     tn_path: {tn_path}
-            # '''
-            # raise Exception(_deets)
 
             image = Image.open(document_tn_path)
             image.load()

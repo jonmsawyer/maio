@@ -1,17 +1,16 @@
 '''
-File: maio_get_images.py
+File: get_images.py
 
-Module: ``maio.management.commands.maio_get_images.py``
+Module: ``maio.management.commands.get_images.py``
+
+Get images from the filesystem.
 '''
 
 from __future__ import annotations
 from typing import Any
 
 import os
-# import sys
 import hashlib
-# from pprint import pprint
-# from getpass import getpass
 from datetime import datetime
 
 import magic
@@ -20,10 +19,9 @@ import pytz
 
 from django.conf import settings
 from django.core.management.base import CommandParser
+from django.contrib.auth.models import User
 import django.db.utils
 
-# from django.contrib.auth import authenticate
-from django.contrib.auth.models import User
 
 from maio import lib
 from maio.models import File, Media, Tag

@@ -16,9 +16,6 @@ from maio.models import MaioUser, UserSetting
 class Command(BaseCommand):
     help = 'Syncs the User Settings database table with current Maio Users.'
 
-    #def add_arguments(self, parser):
-    #    parser.add_argument('poll_ids', nargs='+', type=int)
-
     def handle(self, *args: Any, **options: dict[str, Any]) -> None:
         for user in MaioUser.objects.all():
             UserSetting.objects.get_or_create(user=user)
