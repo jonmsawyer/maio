@@ -9,7 +9,6 @@ Extra template tags and filters.
 from __future__ import annotations
 
 from django import template
-# from django.template.defaultfilters import stringfilter
 
 from maio.lib import sizeof_duration_fmt, sizeof_fmt
 

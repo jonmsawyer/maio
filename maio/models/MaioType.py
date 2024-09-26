@@ -13,7 +13,6 @@ from django.db.models import (
     Model, UUIDField, CharField, TextChoices,
 )
 from django.db.models.base import ModelBase
-# from django.db import IntegrityError
 from django.utils.translation import gettext_lazy as _T
 
 
