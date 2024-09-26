@@ -10,6 +10,7 @@ from __future__ import annotations
 from typing import Any, Callable
 
 from django.http import HttpRequest, HttpResponse
+from django.db import IntegrityError
 
 from maio.models import FileStat, UserSetting, MaioUser
 
@@ -52,8 +53,6 @@ class UserSettingMiddleware:
             user_setting, user_setting_created = UserSetting.objects.get_or_create(user=MaioUser.objects.get(user=request.user))
             if user_setting_created:
                 user_setting.save()
-            user_setting.previous_page = request.META.get('HTTP_REFERER' , '/') # type: ignore;
-            user_setting.save()
         except TypeError:
             user_setting = UserSetting()
         setattr(request, 'user_setting', user_setting)
@@ -62,5 +61,12 @@ class UserSettingMiddleware:
 
         # Code to be executed for each request/response after
         # the view is called.
+
+        try:
+            user_setting = request.user_setting
+            user_setting.previous_page = request.META.get('HTTP_REFERER' , '/') # type: ignore
+            user_setting.save()
+        except (IntegrityError, AttributeError):
+            request.user_setting = UserSetting()
 
         return response

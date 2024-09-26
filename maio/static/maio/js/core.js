@@ -128,9 +128,8 @@ let Maio = {
      * Close the info panel.
      */
     close_info_panel: function() {
-        window.info_panel_handle = window.info_panel_handle || 0;
-        clearTimeout(window.info_panel_handle);
         $('#info-panel').slideUp();
+        $('#info').html('');
     },
 
     /**
@@ -142,9 +141,11 @@ let Maio = {
     show_info_panel: function(msg, data) {
         Maio.close_info_panel()
         Maio.log('Info:', msg, data);
-        window.info_panel_handle = setTimeout(Maio.close_info_panel, 5000);
         $('#info').html(msg);
         $('#info-panel').slideDown();
+        Maio.input_timer($('#info'), function(el) {
+            Maio.close_info_panel();
+        }, 10000);
     },
 
     /**

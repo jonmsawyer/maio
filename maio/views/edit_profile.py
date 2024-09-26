@@ -56,12 +56,11 @@ def _user_setting(request: HttpRequest, context: dict[str, Any]) -> HttpResponse
 def edit_profile(request: HttpRequest) -> HttpResponse | HttpResponseRedirect:
     cd = pre_populate_context_dict(request, {})
     cd['action'] = request.POST.get('action')
-    user_profile_form = _user_profile(request, cd)
-    user_settings_form = _user_setting(request, cd)
-    do_redirect = False
+    _user_profile_form = _user_profile(request, cd)
+    _user_settings_form = _user_setting(request, cd)
     if request.method == 'POST':
-        do_redirect = request.user_setting.redirect_to_previous_page_after_setting_save
-        if do_redirect:
-            return HttpResponseRedirect(request.user_setting.previous_page)
+        if cd['user_profile_saved'] or cd['user_settings_saved']:
+            if request.user_setting.redirect_to_previous_page_after_setting_save:
+                return HttpResponseRedirect(request.user_setting.previous_page)
 
     return render(request, 'maio/edit_profile.html', cd)
