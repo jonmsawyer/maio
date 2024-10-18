@@ -227,4 +227,23 @@ html.maio {
     & .maio-info-panel #info-panel {
         display: none;
     }
+
+    & .page-item.active .page-link {
+        cursor: pointer;
+    }
+
+    & .maio-choose-page {
+        display: none;
+        position: absolute;
+        margin: 0 auto;
+        z-index: 10;
+        left: 0;
+        right: 0;
+        margin-inline: auto;
+        width: fit-content;
+    }
+
+    & .maio-choose-page input {
+        width: 4em;
+    }
 }

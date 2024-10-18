@@ -91,5 +91,14 @@ function unhighlight_media(media_uuid) {
 
 function stop_audio_playback(media_uuid) {
     var el = $('#audio_'+media_uuid);
+}
 
+function choose_page(instance, page = null) {
+    if (page) {
+        url = Maio.update_url_parameter(window.location.href, 'page', page);
+        window.location.assign(url);
+        return;
+    }
+
+    $(`#maio_choose_page_${instance}`).toggle();
 }

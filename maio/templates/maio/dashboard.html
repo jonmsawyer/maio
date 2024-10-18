@@ -24,7 +24,7 @@
     <h1>{% if is_admin %}Maio Admin: User Dashboard ({{ with_user.username }}){% else %}Dashboard{% if with_user %} ({{ with_user.username }}){% endif%}{% endif %}</h1>
 
     <h4>{{ num_media }} media found</h4>
-    {% include 'maio/_pagination.html' %}
+    {% include 'maio/_pagination.html' with instance=1 %}
     <!-- Filters -->
     <div class="btn-group" role="group" style="font-size: 18pt;">
       Filters: &nbsp; <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
@@ -75,7 +75,7 @@
         </div>
       {% endfor %}
     </div> <!-- /row -->
-    {% include 'maio/_pagination.html' %}
+    {% include 'maio/_pagination.html' with instance=2 %}
     {% include 'maio/_stats.html' %}
   </div> <!-- /container -->
 {% endblock content %}

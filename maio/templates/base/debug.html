@@ -8,7 +8,8 @@
   <hr>
   <h4>Debug</h4>
   <pre>User: {{ request.user }}
-Query Dict: {{ query_dict.urlencode }}
+Query Dict: {{ query_dict.dict }}
+Querystring: {{ query_dict.urlencode }}
 Maio Theme: {{ user_setting.maio_theme }}
 Default Dashboard View: {{ user_setting.default_dashboard_view }}
 Default Dashboard Sort: {{ user_setting.default_dashboard_sort }}

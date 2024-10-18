@@ -22,13 +22,15 @@
 
       {% for page in pages.paginator.custom_page_range %}
         <li class="page-item {% if pages.number == page %}active{% endif %}">
-          <a class="page-link" href="?page={{ page }}&amp;per_page={{ per_page }}{% if media_type %}&amp;media_type={{ media_type }}{% endif %}">
             {% if pages.number == page %}
+            <a class="page-link" onclick="choose_page({{ instance }});">
               Page {{ page }} of {{ pages.paginator.num_pages }}
+            </a>
             {% else %}
+            <a class="page-link" href="?page={{ page }}&amp;per_page={{ per_page }}{% if media_type %}&amp;media_type={{ media_type }}{% endif %}">
               {{ page }}
+            </a>
             {% endif %}
-          </a>
         </li>
       {% empty %}
         <li class="page-item">
@@ -54,5 +56,11 @@
         </li>
       {% endif %}
     </ul>
+
+    <div id="maio_choose_page_{{ instance }}" class="maio-choose-page alert alert-warning">
+      Go to page: <input id="page_number_{{ instance }}" type="text">
+      <button class="btn btn-primary" onclick="choose_page({{ instance }}, $('#page_number_{{ instance }}').val());">Go</button>
+      <button class="btn btn-secondary" onclick="choose_page({{ instance }});">Cancel</button>
+    </div>
   </nav> <!-- pagination -->
 {% endif %}
