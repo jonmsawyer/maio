@@ -64,9 +64,9 @@ def dashboard(request: HttpRequest, with_username: Optional[str] = None, is_admi
     media_type = sanitize_filter_media_type(request.GET.get('media_type', 'all'))
     media_list = Media.get_all_by_media_type(request, media_type, with_user)
     try:
-        per_page = int(request.GET.get('per_page', 28))
+        per_page = int(request.GET.get('per_page', 56))
     except:
-        per_page = 28
+        per_page = 56
     media = get_pagination(request, media_list, per_page)
     for medium in media:
         logger.debug('  processing image: {} (time={})'.format(medium, time.time()))

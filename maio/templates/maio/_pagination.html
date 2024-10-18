@@ -6,10 +6,10 @@
     <ul class="pagination justify-content-center" style="width: 100%;">
       {% if pages.has_previous %}
         <li class="page-item">
-          <a class="page-link" href="?page=1&amp;per_page={{ per_page }}">&laquo; First</a>
+          <a class="page-link" href="?page=1&amp;per_page={{ per_page }}{% if media_type %}&amp;media_type={{ media_type }}{% endif %}">&laquo; First</a>
         </li>
         <li class="page-item">
-          <a class="page-link" href="?page={{ pages.previous_page_number }}&amp;per_page={{ per_page }}">&lsaquo; Previous</a>
+          <a class="page-link" href="?page={{ pages.previous_page_number }}&amp;per_page={{ per_page }}{% if media_type %}&amp;media_type={{ media_type }}{% endif %}">&lsaquo; Previous</a>
         </li>
       {% else %}
         <li class="page-item disabled">
@@ -19,10 +19,10 @@
           <a class="page-link" href="#">&lsaquo; Previous</a>
         </li>
       {% endif %}
-      
+
       {% for page in pages.paginator.custom_page_range %}
         <li class="page-item {% if pages.number == page %}active{% endif %}">
-          <a class="page-link" href="?page={{ page }}&amp;per_page={{ per_page }}">
+          <a class="page-link" href="?page={{ page }}&amp;per_page={{ per_page }}{% if media_type %}&amp;media_type={{ media_type }}{% endif %}">
             {% if pages.number == page %}
               Page {{ page }} of {{ pages.paginator.num_pages }}
             {% else %}
@@ -37,13 +37,13 @@
           </a>
         </li>
       {% endfor %}
-      
+
       {% if pages.has_next %}
         <li class="page-item">
-          <a class="page-link" href="?page={{ pages.next_page_number }}&amp;per_page={{ per_page }}">Next &rsaquo;</a>
+          <a class="page-link" href="?page={{ pages.next_page_number }}&amp;per_page={{ per_page }}{% if media_type %}&amp;media_type={{ media_type }}{% endif %}">Next &rsaquo;</a>
         </li>
         <li class="page-item">
-          <a class="page-link" href="?page={{ pages.paginator.num_pages }}&amp;per_page={{ per_page }}">Last &raquo;</a>
+          <a class="page-link" href="?page={{ pages.paginator.num_pages }}&amp;per_page={{ per_page }}{% if media_type %}&amp;media_type={{ media_type }}{% endif %}">Last &raquo;</a>
         </li>
       {% else %}
         <li class="page-item disabled">

@@ -13,6 +13,7 @@ import hashlib
 import json
 import subprocess
 import shutil
+from decimal import Decimal
 from unidecode import unidecode
 
 import numpy
@@ -27,9 +28,10 @@ from django.utils import timezone
 from django.http import HttpRequest
 from django.core.files.uploadedfile import UploadedFile
 from django.db.models import (
-    Model, UUIDField, CharField, PositiveIntegerField, FloatField, DateTimeField, ForeignKey,
-    FileField, Index, DO_NOTHING,
+    Model, UUIDField, CharField, PositiveIntegerField, FloatField, DateTimeField,
+    ForeignKey, FileField, Index, DO_NOTHING,
 )
+from django.db.models.manager import BaseManager
 from django.db.models.base import ModelBase
 from django.db import IntegrityError
 from django.utils.datastructures import MultiValueDictKeyError
@@ -251,13 +253,15 @@ class File(Model, metaclass=FileMeta):
         self.content_file = file_path
         return True
 
-    def generate_slideshow(
-        self,
-        in_filename: str,
-        out_filename: str,
-        tn_extension: str,
-    ) -> tuple[Slideshow, str]:
+    def generate_slideshow(self) -> tuple[Slideshow | BaseManager[Slideshow], str]:
         '''Generate Slideshow for this File.'''
+        maio_type_choice = self.mime_type.maio_type.get_choice()
+        if maio_type_choice != MaioTypeChoices.VIDEO:
+            return Slideshow.objects.none(), ''
+
+        in_filename = os.path.join(fs.mk_md5_dir_media(self.md5sum), self.get_filename())
+        out_filename = os.path.join(fs.mk_md5_dir_slideshow(self.md5sum), self.get_filename())
+        tn_extension = 'jpg'
         tn_path: Optional[str] = None
         new_out_filename: str = out_filename
 
@@ -272,17 +276,12 @@ class File(Model, metaclass=FileMeta):
         try:
             output = subprocess.run(ffprobe_cmd, capture_output=True)
             output = str(output.stdout, encoding='UTF-8')
-            try:
-                video_length = float(output.strip())
-            except ValueError:
-                video_length = 1.0
+            video_length = Decimal(output.strip())
         except subprocess.CalledProcessError:
             raise
-        # /Get video length
-
 
         # Generate Slideshow for this video.
-        indexes = numpy.linspace(0.0, video_length, 22)[1:-1].tolist()
+        indexes = numpy.linspace(0.0, float(video_length), 22)[1:-1].tolist()
         for index, time in enumerate(indexes):
             out_filename_name = '.'.join(out_filename.split('.')[:-1])
             new_out_filename = f"{out_filename_name}_{index}.{tn_extension}"
@@ -313,23 +312,23 @@ class File(Model, metaclass=FileMeta):
                     {_deets}
                 ''')
 
-        slideshow, ss_created = Slideshow.objects.get_or_create(file=self,
+        slideshow, ss_created = Slideshow.objects.get_or_create(
+            file=self,
             defaults={
                 'indexes': indexes,
                 'num_slices': 20,
                 'length': video_length,
-            })
-        if ss_created:
-            slideshow.save()
-        else:
+            },
+        )
+        if not ss_created:
             slideshow.indexes = indexes
             slideshow.num_slices = 20
             slideshow.length = video_length
-            slideshow.save()
+        slideshow.save()
         # /Generate Slideshow
         return slideshow, tn_path if tn_path else ''
 
-    def process_thumbnail(self) -> tuple[bool | str, bool]:
+    def process_thumbnail(self, update: bool = False) -> tuple[bool | str, bool]:
         '''Process the thumbnail for this file.'''
         maio_type_choice = self.mime_type.maio_type.get_choice()
         root = fs.mk_md5_dir_thumbnail(self.md5sum)
@@ -377,14 +376,8 @@ class File(Model, metaclass=FileMeta):
         if maio_type_choice == MaioTypeChoices.VIDEO:
             tn_path = '.'.join(os.path.join(root, self.get_filename()).split('.')[:-1])
             tn_path = f"{tn_path}.{tn_extension}"
-            in_filename = os.path.join(fs.mk_md5_dir_media(self.md5sum), self.get_filename())
-            out_filename = os.path.join(fs.mk_md5_dir_slideshow(self.md5sum), self.get_filename())
 
-            _slideshow, initial_tn_path = self.generate_slideshow(
-                in_filename,
-                out_filename,
-                tn_extension,
-            )
+            _slideshow, initial_tn_path = self.generate_slideshow()
             tn_path = initial_tn_path
 
             image = Image.open(tn_path)
@@ -483,6 +476,14 @@ class File(Model, metaclass=FileMeta):
                 )
             except IntegrityError:
                 self.thumbnail = Thumbnail.objects.get(md5sum=self.md5sum)
+                if update:
+                    self.content_file = tn_path
+                    self.extension = tn_extension
+                    self.uri = tn_uri
+                    self.width = image.width
+                    self.height = image.height
+                    self.size = os.stat(tn_path).st_size
+                    self.save()
                 is_created = False
             finally:
                 image.close()

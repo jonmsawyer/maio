@@ -332,10 +332,10 @@ function uploadFile(file, idx, config, file_index) {
   var formData = new FormData();
   var resp;
   var xhr = new XMLHttpRequest();
-  xhr.open('POST', url, true);
+  xhr.open('POST', url, true); // setting async to false causes mobile devices to freeze
 
   xhr.upload.addEventListener("progress", function(e) {
-    updateProgress('upload', idx, (e.loaded / e.total) || 1)
+    updateProgress('upload', idx, (e.loaded / e.total) || 1);
   })
 
   xhr.addEventListener('readystatechange', function(e) {
@@ -387,7 +387,7 @@ function uploadFile(file, idx, config, file_index) {
         .addClass('alert-danger')
         .attr('title', resp.reason);
       prev_index_div.data('uploaded', false);
-      }
+    }
   })
 
   formData.append('csrfmiddlewaretoken', config.get('csrf_token'));
