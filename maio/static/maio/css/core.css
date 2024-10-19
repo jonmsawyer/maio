@@ -97,6 +97,10 @@ html.maio {
         position: relative;
     }
 
+    & .maio-viewer audio {
+        width: 30em;
+    }
+
     & img.maio-viewer {
         width: 100%;
         height: auto;

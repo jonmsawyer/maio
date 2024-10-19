@@ -58,10 +58,10 @@
               </figcaption>
               {% if medium.file.mime_type.mime_type != 'video/mp4' and not medium.file.is_converted %}
               <div class="alert alert-warning" style="margin-top: 1em;">
-                The Maio Viewer cannot play this type of video in your browser. This video<br>
-                is in the queue to be converted into a web playable format. This can take a<br>
-                while depending on the size of the video. Please try again in 10 minutes by<br>
-                refreshing the page.
+                The Maio Viewer may not be able to play this type of video in your browser.<br>
+                This video is in the queue to be converted into a web playable format. This<br>
+                can take a while depending on the size of the video. Please try again in 10<br>
+                minutes by refreshing the page.
               </div>
               {% endif %}
               <video controls class="maio-viewer" id="video_{{ medium.id }}">
@@ -75,8 +75,20 @@
           {% elif medium.file.mime_type.maio_type.maio_type == 'audio' %}
             <figure class="maio-viewer">
               <figcaption>{{ medium.name }}.{{ medium.extension }}</b></figcaption>
+              {% if medium.file.mime_type.mime_type != 'audio/mpeg' and not medium.file.is_converted %}
+              <div class="alert alert-warning" style="margin-top: 1em;">
+                The Maio Viewer may not be able to play this type of audio in your browser.<br>
+                This audio is in the queue to be converted into a web playable format. This<br>
+                can take a while depending on the size of the audio. Please try again in 5<br>
+                minutes by refreshing the page.
+              </div>
+              {% endif %}
               <audio controls class="maio-viewer" id="audio_{{ medium.id }}">
-                <source src="{{ medium.get_static_media_uri }}">
+                {% if medium.file.is_converted %}
+                  <source src="{{ medium.get_static_converted_uri }}"/>
+                {% else %}
+                  <source src="{{ medium.get_static_media_uri }}"/>
+                {% endif %}
               </audio>
             </figure>
           {% elif medium.file.mime_type.maio_type.maio_type == 'document' %}

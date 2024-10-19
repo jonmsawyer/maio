@@ -445,7 +445,8 @@ class Media(Model, metaclass=MediaMeta):
     def get_converted_path(self) -> str:
         '''Get the converted's relative path.'''
         md5sum = self.file.md5sum
-        extension = 'mp4'
+        filename = self.file.converted_set.get().content_file.name
+        extension = filename.split('.')[-1]
         level_one = md5sum[0:2]
         level_two = md5sum[2:4]
         return f"{level_one}/{level_two}/{md5sum}.{extension}"

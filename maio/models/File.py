@@ -640,6 +640,79 @@ class File(Model, metaclass=FileMeta):
 
         return converted, is_created
 
+    def convert_audio(self) -> tuple[Converted, bool]:
+        '''Convert this file's audio into audio/mpeg.'''
+        maio_type_choice = self.mime_type.maio_type.get_choice()
+        maio_mime_type = MaioMimeType.objects.get(mime_type='audio/mpeg')
+        if maio_type_choice != MaioTypeChoices.AUDIO:
+            return Converted(), False
+
+        in_filename = os.path.join(fs.mk_md5_dir_media(self.md5sum), self.get_filename())
+        out_filename = os.path.join(fs.mk_md5_dir_converted(self.md5sum), self.get_filename())
+        out_filename = '.'.join(out_filename.split('.')[:-1]) + '.mp3'
+
+        print(f" > In Filename: {in_filename}")
+        print(f" > Out Filename: {out_filename}")
+
+        # ffmpeg -i input.mov -preset slow -codec:a libfdk_aac -b:a 128k -codec:v libx264 -pix_fmt yuv420p -b:v 4500k -minrate 4500k -maxrate 9000k -bufsize 9000k output.mp4
+        try:
+            _any: Any = (
+                ffmpeg # type: ignore
+                    .input(in_filename)
+                    .output(
+                        out_filename,
+                        **{
+                            'threads': 4,
+                            'preset': 'slow',
+                            'codec:a': 'mp3',
+                        }
+                    )
+                    .overwrite_output()
+                    # .run(capture_stdout=True, capture_stderr=True)
+                    .run()
+            )
+        except ffmpeg.Error as e:
+            _deets = f'''
+                In Filename: {in_filename}
+                Out Filename: {out_filename}
+            '''
+            raise Exception(f'''
+                Error:
+                {e.stderr.decode()}
+                {_deets}
+            ''')
+
+        try:
+            probe = ffmpeg.probe(out_filename, **{'show_entries': 'format=duration'})
+        except ffmpeg.Error as e:
+            _deets = f'''
+                In Filename: {in_filename}
+                Out Filename: {out_filename}
+            '''
+            raise Exception(f'''
+                Error:
+                {e.stderr.decode()}
+                {_deets}
+            ''')
+
+        size = os.stat(out_filename).st_size
+        length = Decimal(probe.get('streams')[0].get('duration'))
+
+        converted, is_created = Converted.objects.get_or_create(
+            file=self,
+            mime_type=maio_mime_type,
+            content_file=out_filename,
+            defaults={
+                'size': size,
+                'width': 0,
+                'height': 0,
+                'length': length,
+            }
+        )
+        converted.save()
+
+        return converted, is_created
+
     def get_filename(self) -> str:
         '''Generate the filename of this file.'''
         if self.original_extension:
