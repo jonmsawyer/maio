@@ -92,7 +92,7 @@ USER_SETTINGS: dict[str, Any] = {
         'default': 28,
         'help': _T(
             'Set the default Dashboard number of media per page. Valid values '
-            'range from 1 to 1000. This setting will affect how you experience Maio.'
+            'range from 12 to 200. This setting will affect how you experience Maio.'
         ),
     },
     'default_upload_media_view': {
