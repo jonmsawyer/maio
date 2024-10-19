@@ -40,6 +40,9 @@ maio_conf = MaioConf(config=settings.MAIO_SETTINGS)
 class StaticMediaURINotSetError(Exception):
     '''Raise this error when the static media URI is not set.'''
 
+class StaticConvertedURINotSetError(Exception):
+    '''Raise this error when the static converted URI is not set.'''
+
 class StaticThumbnailURINotSetError(Exception):
     '''Raise this error when the static thumbnail URI is not set.'''
 
@@ -397,6 +400,15 @@ class Media(Model, metaclass=MediaMeta):
             )
         return f"{static_uri}{self.get_media_path()}"
 
+    def get_static_converted_uri(self) -> str | None:
+        '''Get the static URL of this resource.'''
+        static_uri = maio_conf.get_static_converted_uri()
+        if not static_uri:
+            raise StaticConvertedURINotSetError(
+                'Static Converted URI must be set. See settings.MAIO_SETTINGS'
+            )
+        return f"{static_uri}{self.get_converted_path()}"
+
     def get_static_thumbnail_uri(self) -> str | None:
         '''Get the static URL of this resource.'''
         static_uri = maio_conf.get_static_thumbnail_uri()
@@ -426,6 +438,14 @@ class Media(Model, metaclass=MediaMeta):
         '''Get the media's relative path.'''
         md5sum = self.file.md5sum
         extension = self.extension
+        level_one = md5sum[0:2]
+        level_two = md5sum[2:4]
+        return f"{level_one}/{level_two}/{md5sum}.{extension}"
+
+    def get_converted_path(self) -> str:
+        '''Get the converted's relative path.'''
+        md5sum = self.file.md5sum
+        extension = 'mp4'
         level_one = md5sum[0:2]
         level_two = md5sum[2:4]
         return f"{level_one}/{level_two}/{md5sum}.{extension}"

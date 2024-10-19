@@ -21,6 +21,7 @@ class UserSettingForm(ModelForm):
             'maio_theme',
             'default_dashboard_view',
             'default_dashboard_sort',
+            'default_dashboard_per_page',
             'default_upload_media_view',
             'auto_upload_media',
             'redirect_to_previous_page_after_setting_save',
@@ -31,6 +32,7 @@ class UserSettingForm(ModelForm):
             'maio_theme': US['maio_theme']['name'],
             'default_dashboard_view': US['default_dashboard_view']['name'],
             'default_dashboard_sort': US['default_dashboard_sort']['name'],
+            'default_dashboard_per_page': US['default_dashboard_per_page']['name'],
             'default_upload_media_view': US['default_upload_media_view']['name'],
             'auto_upload_media': US['auto_upload_media']['name'],
             'redirect_to_previous_page_after_setting_save':
@@ -43,6 +45,7 @@ class UserSettingForm(ModelForm):
             'maio_theme': US['maio_theme']['help'],
             'default_dashboard_view': US['default_dashboard_view']['help'],
             'default_dashboard_sort': US['default_dashboard_sort']['help'],
+            'default_dashboard_per_page': US['default_dashboard_per_page']['help'],
             'default_upload_media_view': US['default_upload_media_view']['help'],
             'auto_upload_media': US['auto_upload_media']['help'],
             'redirect_to_previous_page_after_setting_save':

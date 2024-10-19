@@ -27,6 +27,7 @@ from .MetaFile import MetaFile
 from .FileStat import FileStat
 from .UserSetting import UserSetting
 from .Slideshow import Slideshow
+from .Converted import Converted
 from .LibraryShare import LibraryShare
 
 
@@ -50,6 +51,7 @@ __all__: list[str] = [
     'FileStat',
     'UserSetting',
     'Slideshow',
+    'Converted',
     'LibraryShare',
 ]
 

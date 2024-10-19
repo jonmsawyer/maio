@@ -114,6 +114,10 @@ class MaioConf():
         '''get_media_uri'''
         return self.get_chain('media', 'static_uri')
 
+    def get_static_converted_uri(self) -> Optional[str]:
+        '''get_converted_uri'''
+        return self.get_chain('converted', 'static_uri')
+
     def get_static_thumbnail_uri(self) -> Optional[str]:
         '''get_media_uri'''
         return self.get_chain('thumbnail', 'static_uri')

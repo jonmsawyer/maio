@@ -10,11 +10,13 @@ from typing import Any
 import uuid
 
 from django.db.models import (
-    Model, UUIDField, ForeignKey, DateTimeField, CharField, BooleanField,
+    Model, UUIDField, ForeignKey, DateTimeField, CharField, BooleanField, PositiveSmallIntegerField,
     CASCADE,
 )
 from django.db.models.base import ModelBase
 from django.utils.translation import gettext_lazy as _T
+
+from maio.validators import validate_per_page
 
 from .MaioUser import MaioUser
 from .MaioMapType import MaioMapTypeChoices
@@ -84,6 +86,15 @@ USER_SETTINGS: dict[str, Any] = {
             'This setting will affect how you experience Maio.'
         ),
     },
+    'default_dashboard_per_page': {
+        'name': _T('Default Dashboard Number of Media Per Page'),
+        'maio_type': MaioMapTypeChoices.POS_INT,
+        'default': 28,
+        'help': _T(
+            'Set the default Dashboard number of media per page. Valid values '
+            'range from 1 to 1000. This setting will affect how you experience Maio.'
+        ),
+    },
     'default_upload_media_view': {
         'name': _T('Default Upload Media View'),
         'maio_type': MaioMapTypeChoices.TEXT,
@@ -136,7 +147,6 @@ USER_SETTINGS: dict[str, Any] = {
     },
 }
 
-
 class UserSettingMeta(ModelBase):
     '''Metaclass for Caption model.'''
     class Meta:
@@ -180,6 +190,12 @@ class UserSetting(Model, metaclass=UserSettingMeta):
         max_length=USER_SETTINGS['default_dashboard_sort']['max_length'],
         default=USER_SETTINGS['default_dashboard_sort']['default'],
         choices=USER_SETTINGS['default_dashboard_sort']['choices'],
+    )
+
+    default_dashboard_per_page = PositiveSmallIntegerField(
+        _T('Default Dashboard Number of Media Per Page'),
+        default=USER_SETTINGS['default_dashboard_per_page']['default'],
+        validators=[validate_per_page],
     )
 
     default_upload_media_view = CharField(

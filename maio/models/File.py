@@ -13,6 +13,7 @@ import hashlib
 import json
 import subprocess
 import shutil
+from pprint import pprint
 from decimal import Decimal
 from unidecode import unidecode
 
@@ -29,9 +30,9 @@ from django.http import HttpRequest
 from django.core.files.uploadedfile import UploadedFile
 from django.db.models import (
     Model, UUIDField, CharField, PositiveIntegerField, FloatField, DateTimeField,
-    ForeignKey, FileField, Index, DO_NOTHING,
+    ForeignKey, FileField, BooleanField, Index, DO_NOTHING,
 )
-from django.db.models.manager import BaseManager
+# from django.db.models.manager import BaseManager
 from django.db.models.base import ModelBase
 from django.db import IntegrityError
 from django.utils.datastructures import MultiValueDictKeyError
@@ -45,6 +46,7 @@ from .Thumbnail import Thumbnail
 from .MetaFile import MetaFile
 from .Log import Log
 from .Slideshow import Slideshow
+from .Converted import Converted
 
 
 maio_conf = MaioConf(config=settings.MAIO_SETTINGS)
@@ -106,6 +108,9 @@ class File(Model, metaclass=FileMeta):
 
     #: The File path stored in ./filestore/media/
     content_file = FileField(_T('Content File'), max_length=1024, upload_to=maio_conf.get_chain('upload', 'directory'))
+
+    #: Whether or not this file was Converted
+    is_converted = BooleanField(_T('Is Converted?'), default=False)
 
     #: The date time when this File was added to Maio.
     date_added = DateTimeField(_T('Date Added'), auto_now_add=True)
@@ -253,32 +258,59 @@ class File(Model, metaclass=FileMeta):
         self.content_file = file_path
         return True
 
-    def generate_slideshow(self) -> tuple[Slideshow | BaseManager[Slideshow], str]:
+    def generate_slideshow(self) -> tuple[Slideshow, str]:
         '''Generate Slideshow for this File.'''
         maio_type_choice = self.mime_type.maio_type.get_choice()
         if maio_type_choice != MaioTypeChoices.VIDEO:
-            return Slideshow.objects.none(), ''
+            return Slideshow(), ''
 
         in_filename = os.path.join(fs.mk_md5_dir_media(self.md5sum), self.get_filename())
+        fixed_filename = '.'.join(in_filename.split('.')[:-1])+'.fixed.'+in_filename.split('.')[-1]
         out_filename = os.path.join(fs.mk_md5_dir_slideshow(self.md5sum), self.get_filename())
         tn_extension = 'jpg'
         tn_path: Optional[str] = None
         new_out_filename: str = out_filename
+        is_fixed = False
 
         # Get video length
-        ffprobe_cmd = [
-            maio_conf.get_ffprobe_bin_path(),
-            "-show_entries", "format=duration",
-            "-v", "quiet",
-            "-of", "csv=p=0",
-            "-i", in_filename,
-        ]
         try:
-            output = subprocess.run(ffprobe_cmd, capture_output=True)
-            output = str(output.stdout, encoding='UTF-8')
-            video_length = Decimal(output.strip())
-        except subprocess.CalledProcessError:
-            raise
+            probe = ffmpeg.probe(in_filename, **{'show_entries': 'format=duration'})
+            video_length = Decimal(probe.get('streams')[0].get('duration'))
+        except ffmpeg.Error as e:
+            _deets = f'''
+                In Filename: {in_filename}
+                Out Filename: {out_filename}
+            '''
+            raise Exception(f'''
+                Error:
+                {e.stderr.decode()}
+                {_deets}
+            ''')
+        except TypeError:
+            # ffmpeg -i infile -c:v copy -c:a copy outfile
+            try:
+                _any = (
+                    ffmpeg # type: ignore
+                        .input(in_filename)
+                        .output(fixed_filename, **{'c:v': 'copy', 'c:a': 'copy'})
+                        .overwrite_output()
+                        .run(capture_stdout=True, capture_stderr=True)
+                )
+                os.replace(fixed_filename, in_filename)
+                probe = ffmpeg.probe(in_filename, **{'show_entries': 'format=duration'})
+                video_length = Decimal(probe.get('streams')[0].get('duration'))
+            except ffmpeg.Error as e:
+                _deets = f'''
+                    In Filename: {in_filename}
+                    Out Filename: {out_filename}
+                '''
+                raise Exception(f'''
+                    Error:
+                    {e.stderr.decode()}
+                    {_deets}
+                ''')
+            except TypeError:
+                video_length = Decimal(10.0)
 
         # Generate Slideshow for this video.
         indexes = numpy.linspace(0.0, float(video_length), 22)[1:-1].tolist()
@@ -290,7 +322,7 @@ class File(Model, metaclass=FileMeta):
 
             try:
                 _any: Any = (
-                    ffmpeg
+                    ffmpeg # type: ignore
                         .input(in_filename, ss=time)
                         .filter('scale', 300, -1)
                         .output(new_out_filename, vframes=1)
@@ -529,6 +561,84 @@ class File(Model, metaclass=FileMeta):
                 self.meta_file = MetaFile.objects.get(md5sum=self.md5sum)
             return True
         return False
+
+    def convert_video(self) -> tuple[Converted, bool]:
+        '''Convert this file's video into video/mp4.'''
+        maio_type_choice = self.mime_type.maio_type.get_choice()
+        maio_mime_type = MaioMimeType.objects.get(mime_type='video/mp4')
+        if maio_type_choice != MaioTypeChoices.VIDEO:
+            return Converted(), False
+
+        in_filename = os.path.join(fs.mk_md5_dir_media(self.md5sum), self.get_filename())
+        out_filename = os.path.join(fs.mk_md5_dir_converted(self.md5sum), self.get_filename())
+        out_filename = '.'.join(out_filename.split('.')[:-1]) + '.mp4'
+
+        print(f" > In Filename: {in_filename}")
+        print(f" > Out Filename: {out_filename}")
+
+        # ffmpeg -i input.mov -preset slow -codec:a libfdk_aac -b:a 128k -codec:v libx264 -pix_fmt yuv420p -b:v 4500k -minrate 4500k -maxrate 9000k -bufsize 9000k output.mp4
+        try:
+            _any: Any = (
+                ffmpeg # type: ignore
+                    .input(in_filename)
+                    .output(
+                        out_filename,
+                        **{
+                            'threads': 4,
+                            'preset': 'slow',
+                            'codec:a': 'aac',
+                            'codec:v': 'libx264',
+                            'pix_fmt': 'yuv420p',
+                            'movflags': '+faststart',
+                        }
+                    )
+                    .overwrite_output()
+                    # .run(capture_stdout=True, capture_stderr=True)
+                    .run()
+            )
+        except ffmpeg.Error as e:
+            _deets = f'''
+                In Filename: {in_filename}
+                Out Filename: {out_filename}
+            '''
+            raise Exception(f'''
+                Error:
+                {e.stderr.decode()}
+                {_deets}
+            ''')
+
+        try:
+            probe = ffmpeg.probe(out_filename, **{'show_entries': 'format=duration'})
+        except ffmpeg.Error as e:
+            _deets = f'''
+                In Filename: {in_filename}
+                Out Filename: {out_filename}
+            '''
+            raise Exception(f'''
+                Error:
+                {e.stderr.decode()}
+                {_deets}
+            ''')
+
+        size = os.stat(out_filename).st_size
+        width = probe.get('streams')[0].get('coded_width')
+        height = probe.get('streams')[0].get('coded_height')
+        length = Decimal(probe.get('streams')[0].get('duration'))
+
+        converted, is_created = Converted.objects.get_or_create(
+            file=self,
+            mime_type=maio_mime_type,
+            content_file=out_filename,
+            defaults={
+                'size': size,
+                'width': width,
+                'height': height,
+                'length': length,
+            }
+        )
+        converted.save()
+
+        return converted, is_created
 
     def get_filename(self) -> str:
         '''Generate the filename of this file.'''

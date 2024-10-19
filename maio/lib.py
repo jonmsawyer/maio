@@ -64,13 +64,15 @@ def sizeof_duration_fmt(num: int | float) -> str:
 
         https://stackoverflow.com/a/1094933
     '''
-    unit = "s"
-    for unit in ("s", "m", "h"):
-        if abs(num) < 60.0:
-            return f"{num:3.1f}{unit}"
-        num /= 60.0
-    return f"{num:.1f}{unit}"
-
+    try:
+        unit = "s"
+        for unit in ("s", "m", "h"):
+            if abs(num) < 60.0:
+                return f"{num:3.1f}{unit}"
+            num /= 60.0
+        return f"{num:.1f}{unit}"
+    except TypeError:
+        return '0s'
 
 def validate_filename(filename: str) -> bool:
     '''

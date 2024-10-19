@@ -67,6 +67,10 @@ def mk_md5_dir_slideshow(md5: str, length: int = 2) -> str:
     '''Make MD5 directory under Slideshow.'''
     return mk_md5_dir(md5, maio_conf.get_chain('slideshow', 'directory'), length)
 
+def mk_md5_dir_converted(md5: str, length: int = 2) -> str:
+    '''Make MD5 directory under Slideshow.'''
+    return mk_md5_dir(md5, maio_conf.get_chain('converted', 'directory'), length)
+
 def mk_md5_dir_images(md5: str, length: int = 2) -> str:
     '''Make MD5 directory under Images.'''
     return mk_md5_dir(md5, maio_conf.get_images_path(), length)
