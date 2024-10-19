@@ -9,7 +9,7 @@ Update the file stats from the database.
 from __future__ import annotations
 from typing import Any
 
-from maio.models import File, MaioType, MaioMimeType, FileStat
+from maio.models import File, MaioType, MaioMimeType, FileStat, Converted
 from maio.models.MaioType import MaioType, MaioTypeChoices
 
 from ._base import MaioBaseCommand
@@ -50,6 +50,17 @@ class Command(MaioBaseCommand):
 
         print(f"Audio: {num_audio} totaling {audio_bytes} bytes.")
 
+        maio_type = MaioType.objects.filter(maio_type=MaioTypeChoices.AUDIO)
+        audio_type = MaioMimeType.objects.filter(maio_type__in=maio_type)
+        audio = Converted.objects.filter(mime_type__in=audio_type)
+
+        num_audio_converted = len(audio)
+        audio_converted_bytes = 0
+        for aud in audio:
+            audio_converted_bytes += int(aud.size) # type: ignore
+
+        print(f"Converted Audio: {num_audio_converted} totaling {audio_converted_bytes} bytes.")
+
         maio_type = MaioType.objects.filter(maio_type=MaioTypeChoices.VIDEO)
         video_type = MaioMimeType.objects.filter(maio_type__in=maio_type)
         videos = File.objects.filter(mime_type__in=video_type)
@@ -60,6 +71,17 @@ class Command(MaioBaseCommand):
             videos_bytes += int(video.size) # type: ignore
 
         print(f"Videos: {num_videos} totaling {videos_bytes} bytes.")
+
+        maio_type = MaioType.objects.filter(maio_type=MaioTypeChoices.VIDEO)
+        video_type = MaioMimeType.objects.filter(maio_type__in=maio_type)
+        videos = Converted.objects.filter(mime_type__in=video_type)
+
+        num_videos_converted = len(videos)
+        videos_converted_bytes = 0
+        for video in videos:
+            videos_converted_bytes += int(video.size) # type: ignore
+
+        print(f"Converted Videos: {num_videos_converted} totaling {videos_converted_bytes} bytes.")
 
         maio_type = MaioType.objects.filter(maio_type=MaioTypeChoices.DOCUMENT)
         document_type = MaioMimeType.objects.filter(maio_type__in=maio_type)
@@ -88,8 +110,12 @@ class Command(MaioBaseCommand):
             images_bytes,
             num_audio,
             audio_bytes,
+            num_audio_converted,
+            audio_converted_bytes,
             num_videos,
             videos_bytes,
+            num_videos_converted,
+            videos_converted_bytes,
             num_documents,
             documents_bytes,
             num_others,

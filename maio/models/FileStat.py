@@ -38,8 +38,12 @@ class FileStat(Model, metaclass=FileStatMeta):
     images_bytes = PositiveBigIntegerField(_T('Number of Bytes of Images'), editable=False)
     num_audio = PositiveBigIntegerField(_T('Number of Audio Files'), editable=False)
     audio_bytes = PositiveBigIntegerField(_T('Number of Bytes of Audio'), editable=False)
+    num_audio_converted = PositiveBigIntegerField(_T('Number of Converted Audio Files'), editable=False)
+    audio_converted_bytes = PositiveBigIntegerField(_T('Number of Bytes of Converted Audio Files'), editable=False)
     num_videos = PositiveBigIntegerField(_T('Number of Videos'), editable=False)
     videos_bytes = PositiveBigIntegerField(_T('Number of Bytes of Video'), editable=False)
+    num_videos_converted = PositiveBigIntegerField(_T('Number of Converted Videos'), editable=False)
+    videos_converted_bytes = PositiveBigIntegerField(_T('Number of Bytes of Converted Videos'), editable=False)
     num_documents = PositiveBigIntegerField(_T('Number of Documents'), editable=False)
     documents_bytes = PositiveBigIntegerField(_T('Number of Bytes of Documents'), editable=False)
     num_others = PositiveBigIntegerField(_T('Number of Other Files'), editable=False)
@@ -57,12 +61,14 @@ class FileStat(Model, metaclass=FileStatMeta):
             f"Others: {self.num_others}"
         )
 
-    def get_file_sizes_human(self) -> tuple[str, str, str, str, str]:
+    def get_file_sizes_human(self) -> tuple[str, str, str, str, str, str, str]:
         '''Get the images size in human readable units.'''
         return (
             sizeof_fmt(self.images_bytes),
             sizeof_fmt(self.audio_bytes),
+            sizeof_fmt(self.audio_converted_bytes),
             sizeof_fmt(self.videos_bytes),
+            sizeof_fmt(self.videos_converted_bytes),
             sizeof_fmt(self.documents_bytes),
             sizeof_fmt(self.others_bytes),
         )
@@ -73,8 +79,12 @@ class FileStat(Model, metaclass=FileStatMeta):
         images_bytes: int,
         num_audio: int,
         audio_bytes: int,
+        num_audio_converted: int,
+        audio_converted_bytes: int,
         num_videos: int,
         videos_bytes: int,
+        num_videos_converted: int,
+        videos_converted_bytes: int,
         num_documents: int,
         documents_bytes: int,
         num_others: int,
@@ -87,8 +97,12 @@ class FileStat(Model, metaclass=FileStatMeta):
                 images_bytes=images_bytes,
                 num_audio=num_audio,
                 audio_bytes=audio_bytes,
+                num_audio_converted=num_audio_converted,
+                audio_converted_bytes=audio_converted_bytes,
                 num_videos=num_videos,
                 videos_bytes=videos_bytes,
+                num_videos_converted=num_videos_converted,
+                videos_converted_bytes=videos_converted_bytes,
                 num_documents=num_documents,
                 documents_bytes=documents_bytes,
                 num_others=num_others,
@@ -100,8 +114,12 @@ class FileStat(Model, metaclass=FileStatMeta):
                 images_bytes=images_bytes,
                 num_audio=num_audio,
                 audio_bytes=audio_bytes,
+                num_audio_converted=num_audio_converted,
+                audio_converted_bytes=audio_converted_bytes,
                 num_videos=num_videos,
                 videos_bytes=videos_bytes,
+                num_videos_converted=num_videos_converted,
+                videos_converted_bytes=videos_converted_bytes,
                 num_documents=num_documents,
                 documents_bytes=documents_bytes,
                 num_others=num_others,

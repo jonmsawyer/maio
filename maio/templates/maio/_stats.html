@@ -8,19 +8,27 @@
       Count: {{ file_stat.num_audio }}<br />
       Size: {{ file_stat.get_file_sizes_human.1 }}
     </p>
+    <p>
+      Converted Count: {{ file_stat.num_audio_converted }}<br />
+      Size: {{ file_stat.get_file_sizes_human.2 }}
+    </p>
   </div>
   <div class="col col-lg-2 col-md-4 col-sm-4 col-6 maio-stat-col">
     <h2>Video</h2>
     <p>
       Count: {{ file_stat.num_videos }}<br />
-      Size: {{ file_stat.get_file_sizes_human.2 }}
+      Size: {{ file_stat.get_file_sizes_human.3 }}
    </p>
-  </div>
+   <p>
+    Converted Count: {{ file_stat.num_videos_converted }}<br />
+    Size: {{ file_stat.get_file_sizes_human.4 }}
+ </p>
+</div>
   <div class="col col-md-4 col-sm-4 col-6 maio-stat-col">
     <h2>Documents</h2>
     <p>
       Count: {{ file_stat.num_documents }}<br />
-      Size: {{ file_stat.get_file_sizes_human.3 }}
+      Size: {{ file_stat.get_file_sizes_human.5 }}
     </p>
   </div>
   <div class="col col-lg-2 col-md-6 col-6 maio-stat-col">
@@ -34,7 +42,7 @@
     <h2>Other</h2>
     <p>
       Count: {{ file_stat.num_others }}<br />
-      Size: {{ file_stat.get_file_sizes_human.4 }}
+      Size: {{ file_stat.get_file_sizes_human.6 }}
     </p>
   </div>
 </div> <!-- /Stats -->
