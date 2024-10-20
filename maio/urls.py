@@ -37,5 +37,6 @@ urlpatterns: list[Any] = [
     # AJAX
     path('ajax/delete_media/', login_required(ajax.delete_media), name='delete_media'),
     path('ajax/change_thumbnail/', login_required(ajax.change_thumbnail), name='change_thumbnail'),
+    path('ajax/rating/', login_required(ajax.rating), name='rating'),
     path('', views.home, name='home'),
 ]

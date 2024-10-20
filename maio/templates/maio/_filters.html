@@ -1,0 +1,113 @@
+{# filters file #}
+{# requires a Media instance named 'image' and an integer named 'width' context variables #}
+
+{% load static %}
+{% load maio_extras %}
+
+<!-- Filters -->
+<div class="maio-filters">
+  <!-- Media Type -->
+  <div class="btn-group" role="group">
+    Filters: &nbsp; <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+      Media Type
+      {% if media_type == 'all' %}
+        (All)
+      {% elif media_type == 'image' %}
+        (Images)
+      {% elif media_type == 'audio' %}
+        (Audio)
+      {% elif media_type == 'video' %}
+        (Video)
+      {% elif media_type == 'document' %}
+        (Documents)
+      {% elif media_type == 'other' %}
+        (Other)
+      {% else %}
+        (Unknown)
+      {% endif %}
+    </button>
+    <ul class="dropdown-menu">
+      <li><a class="dropdown-item {% if media_type == 'all' %}bg-primary maio-text-white{% endif %}" onclick="choose_media_type('all');">All</a></li>
+      <li><a class="dropdown-item {% if media_type == 'image' %}bg-primary maio-text-white{% endif %}" onclick="choose_media_type('image');">Images</a></li>
+      <li><a class="dropdown-item {% if media_type == 'audio' %}bg-primary maio-text-white{% endif %}" onclick="choose_media_type('audio');">Audio</a></li>
+      <li><a class="dropdown-item {% if media_type == 'video' %}bg-primary maio-text-white{% endif %}" onclick="choose_media_type('video');">Video</a></li>
+      <li><a class="dropdown-item {% if media_type == 'document' %}bg-primary maio-text-white{% endif %}" onclick="choose_media_type('document');">Documents</a></li>
+      <li><a class="dropdown-item {% if media_type == 'other' %}bg-primary maio-text-white{% endif %}" onclick="choose_media_type('other');">Other</a></li>
+    </ul>
+  </div>
+  <!-- /Media Type -->
+
+  <!-- Love -->
+  <div class="btn-group" role="group">
+    <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+      Love
+      {% if love == 'all' %}
+        (All)
+      {% elif love == 'loved' %}
+        (Loved)
+      {% elif love == 'unloved' %}
+        (Unloved)
+      {% else %}
+        (Unknown)
+      {% endif %}
+    </button>
+    <ul class="dropdown-menu">
+      <li><a class="dropdown-item {% if love == 'all' %}bg-primary maio-text-white{% endif %}" onclick="choose_love('all');">All</a></li>
+      <li><a class="dropdown-item {% if love == 'loved' %}bg-primary maio-text-white{% endif %}" onclick="choose_love('loved');">Loved</a></li>
+      <li><a class="dropdown-item {% if love == 'unloved' %}bg-primary maio-text-white{% endif %}" onclick="choose_love('unloved');">Unloved</a></li>
+    </ul>
+  </div>
+  <!-- /Love -->
+
+  <!-- Bookmark -->
+  <div class="btn-group" role="group">
+    <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+      Bookmark
+      {% if bookmark == 'all' %}
+        (All)
+      {% elif bookmark == 'bookmarked' %}
+        (Bookmarked)
+      {% elif bookmark == 'unbookmarked' %}
+        (Unbookmarked)
+      {% else %}
+        (Unknown)
+      {% endif %}
+    </button>
+    <ul class="dropdown-menu">
+      <li><a class="dropdown-item {% if bookmark == 'all' %}bg-primary maio-text-white{% endif %}" onclick="choose_bookmark('all');">All</a></li>
+      <li><a class="dropdown-item {% if bookmark == 'bookmarked' %}bg-primary maio-text-white{% endif %}" onclick="choose_bookmark('bookmarked');">Bookmarked</a></li>
+      <li><a class="dropdown-item {% if bookmark == 'unbookmarked' %}bg-primary maio-text-white{% endif %}" onclick="choose_bookmark('unbookmarked');">Unbookmarked</a></li>
+    </ul>
+  </div>
+  <!-- /Bookmark -->
+
+  <!-- Per Page -->
+  <div class="btn-group" role="group">
+    <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+      Per Page ({{ per_page }})
+    </button>
+    <ul class="dropdown-menu">
+      <li><a class="dropdown-item" onclick="choose_per_page(12);">12</a></li>
+      <li><a class="dropdown-item" onclick="choose_per_page(24);">24</a></li>
+      <li><a class="dropdown-item" onclick="choose_per_page(36);">36</a></li>
+      <li><a class="dropdown-item" onclick="choose_per_page(48);">48</a></li>
+      <li><a class="dropdown-item" onclick="choose_per_page(60);">60</a></li>
+      <li><a class="dropdown-item" onclick="choose_per_page(72);">72</a></li>
+      <li><a class="dropdown-item" onclick="choose_per_page(84);">84</a></li>
+      <li><a class="dropdown-item" onclick="choose_per_page(96);">96</a></li>
+    </ul>
+  </div>
+  <!-- /Per Page -->
+
+  <!-- Options -->
+  <div class="btn-group" role="group">
+    <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+      Options
+    </button>
+    <ul class="dropdown-menu">
+      <li><a class="dropdown-item" onclick="choose_reset();">Reset Filters</a></li>
+    </ul>
+  </div>
+  <!-- /Per Page -->
+</div>
+<!-- /Filters -->

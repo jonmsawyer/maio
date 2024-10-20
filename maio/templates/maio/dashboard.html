@@ -15,6 +15,7 @@
     'csrf_token': '{{ csrf_token }}',
     'delete_media_url': '{% url "delete_media" %}',
     'change_thumbnail_url': '{% url "change_thumbnail" %}',
+    'rating_url': '{% url "rating" %}',
   });
   </script>
 {% endblock script %}
@@ -25,37 +26,7 @@
 
     <h4>{{ num_media }} media found</h4>
     {% include 'maio/_pagination.html' with instance=1 %}
-    <!-- Filters -->
-    <div class="btn-group" role="group" style="font-size: 18pt;">
-      Filters: &nbsp; <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-        Media Type
-        {% if media_type == 'all' %}
-          (All)
-        {% elif media_type == 'image' %}
-          (Images)
-        {% elif media_type == 'audio' %}
-          (Audio)
-        {% elif media_type == 'video' %}
-          (Video)
-        {% elif media_type == 'document' %}
-          (Documents)
-        {% elif media_type == 'other' %}
-          (Other)
-        {% else %}
-          (Unknown)
-        {% endif %}
-      </button>
-      <ul class="dropdown-menu">
-        <li><a class="dropdown-item {% if media_type == 'all' %}bg-primary maio-text-white{% endif %}" href="?">All</a></li>
-        <li><a class="dropdown-item {% if media_type == 'image' %}bg-primary maio-text-white{% endif %}" href="?media_type=image">Images</a></li>
-        <li><a class="dropdown-item {% if media_type == 'audio' %}bg-primary maio-text-white{% endif %}" href="?media_type=audio">Audio</a></li>
-        <li><a class="dropdown-item {% if media_type == 'video' %}bg-primary maio-text-white{% endif %}" href="?media_type=video">Video</a></li>
-        <li><a class="dropdown-item {% if media_type == 'document' %}bg-primary maio-text-white{% endif %}" href="?media_type=document">Documents</a></li>
-        <li><a class="dropdown-item {% if media_type == 'other' %}bg-primary maio-text-white{% endif %}" href="?media_type=other">Other</a></li>
-      </ul>
-    </div>
-    <!-- /Filters -->
-
+    {% include 'maio/_filters.html' with medium=medium media_type=media_type love=love bookmark=bookmark %}
     <div class="row justify-content-center">
       {% for medium in media %}
         {% if user_setting.default_dashboard_view == 'default' %}

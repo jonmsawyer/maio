@@ -50,10 +50,16 @@ class UserSettingMiddleware:
         # the view (and later middleware) are called.
 
         try:
-            user_setting, user_setting_created = UserSetting.objects.get_or_create(user=MaioUser.objects.get(user=request.user))
+            maio_user = MaioUser.objects.get(user=request.user)
+        except TypeError:
+            maio_user = MaioUser()
+        setattr(request, 'maio_user', maio_user)
+
+        try:
+            user_setting, user_setting_created = UserSetting.objects.get_or_create(user=maio_user)
             if user_setting_created:
                 user_setting.save()
-        except TypeError:
+        except (IntegrityError, TypeError):
             user_setting = UserSetting()
         setattr(request, 'user_setting', user_setting)
 

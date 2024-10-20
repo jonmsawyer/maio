@@ -250,4 +250,54 @@ html.maio {
     & .maio-choose-page input {
         width: 4em;
     }
+
+    & .maio-rating .maio-love {
+        margin: 1px 6px;
+        cursor: pointer;
+        color: rgb(128, 35, 35);
+        border: 1px solid white;
+        border-radius: 5px;
+    }
+
+    & .maio-rating .maio-love:hover {
+        border: 1px solid rgb(128, 35, 35, 0.8);
+    }
+
+    /* & .maio-rating .maio-bookmark {
+        margin: 0 6px;
+        cursor: pointer;
+        color: rgb(37, 138, 49);
+    }
+
+    & .maio-rating .maio-bookmark:hover {
+        margin: 0 6px;
+        cursor: pointer;
+        color: rgb(37, 138, 49, 0.5);
+    } */
+
+    & .maio-rating .maio-bookmark {
+        margin: 1px 6px;
+        cursor: pointer;
+        color: rgb(30, 77, 166);
+        border: 1px solid white;
+        border-radius: 5px;
+    }
+
+    & .maio-rating .maio-bookmark:hover {
+        border: 1px solid rgb(30, 77, 166, 0.8);
+    }
+
+    & .maio-filters {
+        text-align: center;
+    }
+
+    & .maio-filters .btn-group {
+        font-size: 18pt;
+        display: inline-block;
+    }
+
+    & .maio-filters a,
+    nav a {
+        cursor: pointer;
+    }
 }

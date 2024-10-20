@@ -93,6 +93,18 @@ function stop_audio_playback(media_uuid) {
     var el = $('#audio_'+media_uuid);
 }
 
+function choose_reset() {
+    var url = window.location.href;
+    url = Maio.update_url_parameter(url, 'per_page', null); // per_page comes before page due to regex substitution.
+    url = Maio.update_url_parameter(url, 'page', null);
+    url = Maio.update_url_parameter(url, 'media_type', null);
+    url = Maio.update_url_parameter(url, 'love', null);
+    url = Maio.update_url_parameter(url, 'bookmark', null);
+    window.location.assign(url);
+    return;
+}
+
+
 function choose_page(instance, page = null) {
     if (page) {
         url = Maio.update_url_parameter(window.location.href, 'page', page);
@@ -101,4 +113,108 @@ function choose_page(instance, page = null) {
     }
 
     $(`#maio_choose_page_${instance}`).toggle();
+}
+
+function choose_media_type(media_type) {
+    if (media_type) {
+        url = Maio.update_url_parameter(window.location.href, 'media_type', media_type);
+        window.location.assign(url);
+        return;
+    }
+}
+
+function choose_love(love) {
+    if (love) {
+        url = Maio.update_url_parameter(window.location.href, 'love', love);
+        window.location.assign(url);
+        return;
+    }
+}
+
+function choose_bookmark(bookmark) {
+    if (bookmark) {
+        url = Maio.update_url_parameter(window.location.href, 'bookmark', bookmark);
+        window.location.assign(url);
+        return;
+    }
+}
+
+function choose_per_page(per_page) {
+    if (per_page) {
+        url = Maio.update_url_parameter(window.location.href, 'per_page', per_page);
+        window.location.assign(url);
+        return;
+    }
+}
+
+function love(media_uuid) {
+    var el = $(`#rating_${media_uuid} .maio-love`);
+    var url = maio_conf.get('rating_url');
+    var csrf_token = maio_conf.get('csrf_token');
+
+    if (el.data('loved')) {
+        Maio.log('Unloving:', media_uuid);
+        $.post(url, {
+            csrfmiddlewaretoken: csrf_token,
+            rating_type: 'love',
+            action: 'delete',
+            media_uuid: media_uuid,
+        }, function(response) {
+            Maio.log('Unloving response:', response);
+            if (response.status && response.status == 'OK') {
+                el.removeClass('bi-heart-fill').addClass('bi-heart');
+                el.data('loved', false);
+            }
+        });
+    } else {
+        Maio.log('Loving:', media_uuid);
+        $.post(url, {
+            csrfmiddlewaretoken: csrf_token,
+            rating_type: 'love',
+            action: 'create',
+            media_uuid: media_uuid,
+        }, function(response) {
+            Maio.log('Loving response:', response);
+            if (response.status && response.status == 'OK') {
+                el.addClass('bi-heart-fill').removeClass('bi-heart');
+                el.data('loved', true);
+            }
+        });
+    }
+}
+
+function bookmark(media_uuid) {
+    var el = $(`#rating_${media_uuid} .maio-bookmark`);
+    var url = maio_conf.get('rating_url');
+    var csrf_token = maio_conf.get('csrf_token');
+
+    if (el.data('bookmarked')) {
+        Maio.log('Unbookmarking:', media_uuid);
+        $.post(url, {
+            csrfmiddlewaretoken: csrf_token,
+            rating_type: 'bookmark',
+            action: 'delete',
+            media_uuid: media_uuid,
+        }, function(response) {
+            Maio.log('Unbookmarking response:', response);
+            if (response.status && response.status == 'OK') {
+                el.removeClass('bi-bookmark-check-fill').addClass('bi-bookmark-check');
+                el.data('bookmarked', false);
+            }
+        });
+    } else {
+        Maio.log('Bookmarking:', media_uuid);
+        $.post(url, {
+            csrfmiddlewaretoken: csrf_token,
+            rating_type: 'bookmark',
+            action: 'create',
+            media_uuid: media_uuid,
+        }, function(response) {
+            Maio.log('Bookmarking response:', response);
+            if (response.status && response.status == 'OK') {
+                el.addClass('bi-bookmark-check-fill').removeClass('bi-bookmark-check');
+                el.data('bookmarked', true);
+            }
+        });
+    }
 }

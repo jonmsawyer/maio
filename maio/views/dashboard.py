@@ -49,6 +49,20 @@ def sanitize_filter_media_type(media_type: str) -> str:
     return media_type
 
 
+def sanitize_filter_love(love: str) -> str:
+    '''validate_filter_media_type'''
+    if love not in ('all', 'loved', 'unloved'):
+        love = 'all'
+    return love
+
+
+def sanitize_filter_bookmark(bookmark: str) -> str:
+    '''validate_filter_media_type'''
+    if bookmark not in ('all', 'bookmarked', 'unbookmarked'):
+        bookmark = 'all'
+    return bookmark
+
+
 @login_required
 def dashboard(request: HttpRequest, with_username: Optional[str] = None, is_admin: Optional[bool] = None) -> HttpResponse:
     cd = pre_populate_context_dict(request, {})
@@ -62,7 +76,9 @@ def dashboard(request: HttpRequest, with_username: Optional[str] = None, is_admi
 
     width = 260
     media_type = sanitize_filter_media_type(request.GET.get('media_type', 'all'))
-    media_list = Media.get_all_by_media_type(request, media_type, with_user)
+    love = sanitize_filter_love(request.GET.get('love', 'all'))
+    bookmark = sanitize_filter_bookmark(request.GET.get('bookmark', 'all'))
+    media_list = Media.get_all_by_media_type(request, media_type, with_user, love, bookmark)
     try:
         per_page = int(request.GET.get('per_page', request.user_setting.default_dashboard_per_page))
     except:
@@ -80,10 +96,14 @@ def dashboard(request: HttpRequest, with_username: Optional[str] = None, is_admi
             margin = int(width - y) // 2
             medium.margin_top = margin
             medium.margin_left = 0
+        medium.is_loved = medium.is_loved_by(request.maio_user)
+        medium.is_bookmarked = medium.is_bookmarked_by(request.maio_user)
 
     # Set up query_dict
     qd = request.GET.copy()
     qd['media_type'] = media_type
+    qd['love'] = love
+    qd['bookmark'] = bookmark
     qd['per_page'] = per_page
     # /query_dict
 
@@ -95,6 +115,8 @@ def dashboard(request: HttpRequest, with_username: Optional[str] = None, is_admi
     cd['image_height'] = 800
     cd['image_width'] = 1100
     cd['media_type'] = media_type
+    cd['love'] = love
+    cd['bookmark'] = bookmark
     cd['media'] = media
     cd['num_media'] = media_list.count()
     cd['pages'] = media # for pagination

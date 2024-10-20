@@ -6,9 +6,19 @@
 
 {% if medium and width %}
   <!-- rating -->
-  <div class="card-body p-0 border-bottom clearfix pb-1  border border-dark-subtle" style="font-size: 14pt; padding: 0 5px;">
-    <span class="bi bi-heart" title="Love this image" aria-hidden="true" style="margin: 0 6px;"></span>
-    <span class="bi bi-hand-thumbs-up" title="Like this image" aria-hidden="true" style="margin: 0 6px;"></span>
+  <div id="rating_{{ medium.id }}" class="card-body p-0 border-bottom clearfix pb-1  border border-dark-subtle maio-rating" style="font-size: 14pt; padding: 0 5px;">
+    <span class="bi bi-heart{% if medium.is_loved %}-fill{% endif %} maio-love"
+          data-loved="{% if medium.is_loved %}true{% else %}false{% endif %}"
+          title="Love this image"
+          aria-hidden="true"
+          onclick="love('{{ medium.id }}');"
+    ></span>
+    <span class="bi bi-bookmark-check{% if medium.is_bookmarked %}-fill{% endif %} maio-bookmark"
+          data-bookmarked="{% if medium.is_bookmarked %}true{% else %}false{% endif %}"
+          title="Bookmark this image"
+          aria-hidden="true"
+          onclick="bookmark('{{ medium.id }}');"
+    ></span>
     <span class="bi bi-star float-end" title="Give this image 5 Stars" aria-hidden="true" style="margin: 0 6px 0 0;"></span>
     <span class="bi bi-star float-end" title="Give this image 4 Stars" aria-hidden="true"></span>
     <span class="bi bi-star float-end" title="Give this image 3 Stars" aria-hidden="true"></span>

@@ -6,10 +6,10 @@
     <ul class="pagination justify-content-center" style="width: 100%;">
       {% if pages.has_previous %}
         <li class="page-item">
-          <a class="page-link" href="?page=1&amp;per_page={{ per_page }}{% if media_type %}&amp;media_type={{ media_type }}{% endif %}">&laquo; First</a>
+          <a class="page-link" onclick="choose_page(null, 1);">&laquo; First</a>
         </li>
         <li class="page-item">
-          <a class="page-link" href="?page={{ pages.previous_page_number }}&amp;per_page={{ per_page }}{% if media_type %}&amp;media_type={{ media_type }}{% endif %}">&lsaquo; Previous</a>
+          <a class="page-link" onclick="choose_page(null, {{ pages.previous_page_number }});">&lsaquo; Previous</a>
         </li>
       {% else %}
         <li class="page-item disabled">
@@ -27,7 +27,7 @@
               Page {{ page }} of {{ pages.paginator.num_pages }}
             </a>
             {% else %}
-            <a class="page-link" href="?page={{ page }}&amp;per_page={{ per_page }}{% if media_type %}&amp;media_type={{ media_type }}{% endif %}">
+            <a class="page-link" onclick="choose_page(null, {{ page }});">
               {{ page }}
             </a>
             {% endif %}
@@ -42,10 +42,10 @@
 
       {% if pages.has_next %}
         <li class="page-item">
-          <a class="page-link" href="?page={{ pages.next_page_number }}&amp;per_page={{ per_page }}{% if media_type %}&amp;media_type={{ media_type }}{% endif %}">Next &rsaquo;</a>
+          <a class="page-link" onclick="choose_page(null, {{ pages.next_page_number }});">Next &rsaquo;</a>
         </li>
         <li class="page-item">
-          <a class="page-link" href="?page={{ pages.paginator.num_pages }}&amp;per_page={{ per_page }}{% if media_type %}&amp;media_type={{ media_type }}{% endif %}">Last &raquo;</a>
+          <a class="page-link" onclick="choose_page(null, {{ pages.paginator.num_pages }});">Last &raquo;</a>
         </li>
       {% else %}
         <li class="page-item disabled">

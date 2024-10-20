@@ -29,10 +29,13 @@ from maio import filestore as fs
 
 from .File import File
 from .Tag import Tag
+from .Love import Love
+from .Like import Like
 from .MaioType import MaioType, MaioTypeChoices
 from .MaioMapType import MaioMapType
 from .MaioMimeType import MaioMimeType
 from .Category import Category
+from .MaioUser import MaioUser
 
 
 maio_conf = MaioConf(config=settings.MAIO_SETTINGS)
@@ -179,25 +182,48 @@ class Media(Model, metaclass=MediaMeta):
         request: HttpRequest,
         media_type: str,
         with_user: Optional[User] = None,
+        loved: Optional[str] = None,
+        bookmarked: Optional[str] = None,
     ) -> QuerySet[Media]:
         '''get_all_media_by_media_type'''
+        media = Media.objects.all()
+        if loved == 'loved':
+            media = media.exclude(love__id=None)
+        elif loved == 'unloved':
+            media = media.filter(love__id=None)
+
+        if bookmarked == 'bookmarked':
+            media = media.exclude(like__id=None)
+        elif bookmarked == 'unbookmarked':
+            media = media.filter(like__id=None)
+
         if media_type == 'image':
-            return Media.get_all_images(request, with_user)
+            media = Media.get_all_images(request, with_user, media)
         elif media_type == 'audio':
-            return Media.get_all_audio(request, with_user)
+            media = Media.get_all_audio(request, with_user, media)
         elif media_type == 'video':
-            return Media.get_all_videos(request, with_user)
+            media = Media.get_all_videos(request, with_user, media)
         elif media_type == 'document':
-            return Media.get_all_documents(request, with_user)
+            media = Media.get_all_documents(request, with_user, media)
+        elif media_type == 'other':
+            media = Media.get_all_other_file(request, with_user, media)
         else:
-            return Media.get_all_media(request, with_user)
+            media = Media.get_all_media(request, with_user, media)
+        return media
 
     @staticmethod
-    def get_all_media(request: HttpRequest, with_user: Optional[User] = None) -> QuerySet[Media]:
+    def get_all_media(
+        request: HttpRequest,
+        with_user: Optional[User] = None,
+        with_media: Optional[Media] = None,
+    ) -> QuerySet[Media]:
         user = request.user
         if with_user:
             user = with_user
-        return Media.objects.filter(
+        media = Media.objects.all()
+        if with_media:
+            media = with_media
+        return media.filter(
             owner=user,
             # file__mime_type__in=MaioMimeType.objects.filter(
             #     maio_type__in=MaioType.objects.filter(maio_type=MaioTypeChoices.IMAGE)
@@ -208,11 +234,18 @@ class Media(Model, metaclass=MediaMeta):
         ).order_by(request.user_setting.default_dashboard_sort)
 
     @staticmethod
-    def get_all_images(request: HttpRequest, with_user: Optional[User] = None) -> QuerySet[Media]:
+    def get_all_images(
+        request: HttpRequest,
+        with_user: Optional[User] = None,
+        with_media: Optional[Media] = None,
+    ) -> QuerySet[Media]:
         user = request.user
         if with_user:
             user = with_user
-        return Media.objects.filter(
+        media = Media.objects.all()
+        if with_media:
+            media = with_media
+        return media.filter(
             owner=user,
             file__mime_type__in=MaioMimeType.objects.filter(
                 maio_type__in=MaioType.objects.filter(maio_type=MaioTypeChoices.IMAGE)
@@ -223,11 +256,18 @@ class Media(Model, metaclass=MediaMeta):
         ).order_by(request.user_setting.default_dashboard_sort)
 
     @staticmethod
-    def get_all_audio(request: HttpRequest, with_user: Optional[User] = None) -> QuerySet[Media]:
+    def get_all_audio(
+        request: HttpRequest,
+        with_user: Optional[User] = None,
+        with_media: Optional[Media] = None,
+    ) -> QuerySet[Media]:
         user = request.user
         if with_user:
             user = with_user
-        return Media.objects.filter(
+        media = Media.objects.all()
+        if with_media:
+            media = with_media
+        return media.filter(
             owner=user,
             file__mime_type__in=MaioMimeType.objects.filter(
                 maio_type__in=MaioType.objects.filter(maio_type=MaioTypeChoices.AUDIO)
@@ -238,11 +278,18 @@ class Media(Model, metaclass=MediaMeta):
         ).order_by(request.user_setting.default_dashboard_sort)
 
     @staticmethod
-    def get_all_videos(request: HttpRequest, with_user: Optional[User] = None) -> QuerySet[Media]:
+    def get_all_videos(
+        request: HttpRequest,
+        with_user: Optional[User] = None,
+        with_media: Optional[Media] = None,
+    ) -> QuerySet[Media]:
         user = request.user
         if with_user:
             user = with_user
-        return Media.objects.filter(
+        media = Media.objects.all()
+        if with_media:
+            media = with_media
+        return media.filter(
             owner=user,
             file__mime_type__in=MaioMimeType.objects.filter(
                 maio_type__in=MaioType.objects.filter(maio_type=MaioTypeChoices.VIDEO)
@@ -253,11 +300,18 @@ class Media(Model, metaclass=MediaMeta):
         ).order_by(request.user_setting.default_dashboard_sort)
 
     @staticmethod
-    def get_all_documents(request: HttpRequest, with_user: Optional[User] = None) -> QuerySet[Media]:
+    def get_all_documents(
+        request: HttpRequest,
+        with_user: Optional[User] = None,
+        with_media: Optional[Media] = None,
+    ) -> QuerySet[Media]:
         user = request.user
         if with_user:
             user = with_user
-        return Media.objects.filter(
+        media = Media.objects.all()
+        if with_media:
+            media = with_media
+        return media.filter(
             owner=user,
             file__mime_type__in=MaioMimeType.objects.filter(
                 maio_type__in=MaioType.objects.filter(maio_type=MaioTypeChoices.DOCUMENT)
@@ -269,11 +323,18 @@ class Media(Model, metaclass=MediaMeta):
 
 
     @staticmethod
-    def get_all_other_file(request: HttpRequest, with_user: Optional[User] = None) -> QuerySet[Media]:
+    def get_all_other_file(
+        request: HttpRequest,
+        with_user: Optional[User] = None,
+        with_media: Optional[Media] = None,
+    ) -> QuerySet[Media]:
         user = request.user
         if with_user:
             user = with_user
-        return Media.objects.filter(
+        media = Media.objects.all()
+        if with_media:
+            media = with_media
+        return media.filter(
             owner=user,
             file__mime_type__in=MaioMimeType.objects.filter(
                 maio_type__in=MaioType.objects.filter(maio_type=MaioTypeChoices.OTHER)
@@ -458,3 +519,23 @@ class Media(Model, metaclass=MediaMeta):
         level_one = md5sum[0:2]
         level_two = md5sum[2:4]
         return f"{level_one}/{level_two}/{md5sum}.{extension}"
+
+    def is_loved_by(self, maio_user: MaioUser) -> bool:
+        '''Return True if this Media is Loved by `maio_user`'''
+        try:
+            love = self.love_set.filter(user=maio_user).get()
+            if love:
+                return True
+        except Love.DoesNotExist:
+            pass
+        return False
+
+    def is_bookmarked_by(self, maio_user: MaioUser) -> bool:
+        '''Return True if this Media is Liked by `maio_user`'''
+        try:
+            bookmark = self.like_set.filter(user=maio_user).get()
+            if bookmark:
+                return True
+        except Like.DoesNotExist:
+            pass
+        return False
