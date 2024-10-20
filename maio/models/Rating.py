@@ -13,9 +13,7 @@ from django.db.models import (
 )
 from django.db.models.base import ModelBase
 
-from .MaioUser import MaioUser
-from .Media import Media
-
+from maio.validators import validate_rating
 
 class RatingMeta(ModelBase):
     '''Metaclass for Rating model.'''
@@ -23,7 +21,7 @@ class RatingMeta(ModelBase):
         verbose_name = 'Rating'
         verbose_name_plural = 'Ratings'
         app_label = 'maio'
-        db_table_comment = 'Contains the Playlists for Media.'
+        db_table_comment = 'Contains the Ratings for Media.'
         get_latest_by = ['-date_modified']
         # order_with_respect_to = ['user', 'date_added']
         ordering = ['-date_modified']
@@ -35,9 +33,9 @@ class RatingMeta(ModelBase):
 class Rating(Model, metaclass=RatingMeta):
     '''Rating model.'''
     id = UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user = ForeignKey(to=MaioUser, on_delete=CASCADE)
-    media = ForeignKey(to=Media, on_delete=CASCADE)
-    rating = PositiveSmallIntegerField('Rating', default=0)
+    user = ForeignKey(to='MaioUser', on_delete=CASCADE)
+    media = ForeignKey(to='Media', on_delete=CASCADE)
+    rating = PositiveSmallIntegerField('Rating', default=0, validators=[validate_rating])
     date_added = DateTimeField(auto_now_add=True)
     date_modified = DateTimeField(auto_now=True)
 

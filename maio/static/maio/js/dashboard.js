@@ -100,6 +100,7 @@ function choose_reset() {
     url = Maio.update_url_parameter(url, 'media_type', null);
     url = Maio.update_url_parameter(url, 'love', null);
     url = Maio.update_url_parameter(url, 'bookmark', null);
+    url = Maio.update_url_parameter(url, 'star', null);
     window.location.assign(url);
     return;
 }
@@ -134,6 +135,14 @@ function choose_love(love) {
 function choose_bookmark(bookmark) {
     if (bookmark) {
         url = Maio.update_url_parameter(window.location.href, 'bookmark', bookmark);
+        window.location.assign(url);
+        return;
+    }
+}
+
+function choose_star(star) {
+    if (star) {
+        url = Maio.update_url_parameter(window.location.href, 'star', star);
         window.location.assign(url);
         return;
     }
@@ -214,6 +223,59 @@ function bookmark(media_uuid) {
             if (response.status && response.status == 'OK') {
                 el.addClass('bi-bookmark-check-fill').removeClass('bi-bookmark-check');
                 el.data('bookmarked', true);
+            }
+        });
+    }
+}
+
+function rate(media_uuid, rating) {
+    var el = $(`#rating_${media_uuid} .maio-star-${rating}`);
+    var starred = $(`#rating_${media_uuid} .maio-star`);
+    var url = maio_conf.get('rating_url');
+    var csrf_token = maio_conf.get('csrf_token');
+
+    if (el.data('starred')) {
+        Maio.log('Unstarring:', media_uuid);
+        $.post(url, {
+            csrfmiddlewaretoken: csrf_token,
+            rating_type: 'rate',
+            rating_number: rating,
+            action: 'delete',
+            media_uuid: media_uuid,
+        }, function(response) {
+            Maio.log('Unstarring response:', response);
+            if (response.status && response.status == 'OK') {
+                starred.each(function (index) {
+                    var star = $(this);
+                    star.data('starred', false);
+                    star.data('rating', 0);
+                    star.removeClass('bi-star-fill').addClass('bi-star');
+                });
+            }
+        });
+    } else {
+        Maio.log('Starring:', media_uuid);
+        $.post(url, {
+            csrfmiddlewaretoken: csrf_token,
+            rating_type: 'rate',
+            rating_number: rating,
+            action: 'create',
+            media_uuid: media_uuid,
+        }, function(response) {
+            Maio.log('Starring response:', response);
+            if (response.status && response.status == 'OK') {
+                starred.each(function (index) {
+                    var star = $(this);
+                    star.data('starred', false);
+                    star.data('rating', rating);
+                    if (star.data('starnum') <= rating) {
+                        star.addClass('bi-star-fill').removeClass('bi-star');
+                    } else {
+                        star.removeClass('bi-star-fill').addClass('bi-star');
+                    }
+                });
+                el.addClass('bi-star-fill').removeClass('bi-star');
+                el.data('starred', true);
             }
         });
     }

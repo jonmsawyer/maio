@@ -81,6 +81,43 @@
   </div>
   <!-- /Bookmark -->
 
+  <!-- Rating -->
+  <div class="btn-group" role="group">
+    <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+      Stars
+      {% if star == 'all' %}
+        (All)
+      {% elif star == '5' %}
+        (5)
+      {% elif star == '4' %}
+        (4)
+      {% elif star == '3' %}
+        (3)
+      {% elif star == '2' %}
+        (2)
+      {% elif star == '1' %}
+        (1)
+      {% elif star == 'starred' %}
+        (Starred)
+      {% elif star == 'unstarred' %}
+        (Unstarred)
+      {% else %}
+        (Unknown)
+      {% endif %}
+    </button>
+    <ul class="dropdown-menu">
+      <li><a class="dropdown-item {% if star == 'all' %}bg-primary maio-text-white{% endif %}" onclick="choose_star('all');">All</a></li>
+      <li><a class="dropdown-item {% if star == '5' %}bg-primary maio-text-white{% endif %}" onclick="choose_star('5');">5</a></li>
+      <li><a class="dropdown-item {% if star == '4' %}bg-primary maio-text-white{% endif %}" onclick="choose_star('4');">4</a></li>
+      <li><a class="dropdown-item {% if star == '3' %}bg-primary maio-text-white{% endif %}" onclick="choose_star('3');">3</a></li>
+      <li><a class="dropdown-item {% if star == '2' %}bg-primary maio-text-white{% endif %}" onclick="choose_star('2');">2</a></li>
+      <li><a class="dropdown-item {% if star == '1' %}bg-primary maio-text-white{% endif %}" onclick="choose_star('1');">1</a></li>
+      <li><a class="dropdown-item {% if star == 'starred' %}bg-primary maio-text-white{% endif %}" onclick="choose_star('starred');">Starred</a></li>
+      <li><a class="dropdown-item {% if star == 'unstarred' %}bg-primary maio-text-white{% endif %}" onclick="choose_star('unstarred');">Unstarred</a></li>
+    </ul>
+  </div>
+  <!-- /Bookmark -->
+
   <!-- Per Page -->
   <div class="btn-group" role="group">
     <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">

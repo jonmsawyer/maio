@@ -10,7 +10,7 @@ from django.contrib.auth.models import User, Group, Permission
 
 from maio.models import (
     File, Caption, Media, Playlist, Tag, MaioMap, MaioUser, MaioType, MaioMapType,
-    Love, Like, Rating, MaioMimeType, FileStat, Log, MetaFile, Thumbnail, UserSetting,
+    Love, Bookmark, Rating, MaioMimeType, FileStat, Log, MetaFile, Thumbnail, UserSetting,
     Slideshow, LibraryShare,
 )
 
@@ -28,7 +28,7 @@ from .MaioTypeAdmin import MaioTypeAdmin
 from .MaioMimeTypeAdmin import MaioMimeTypeAdmin
 from .MaioMapTypeAdmin import MaioMapTypeAdmin
 from .LoveAdmin import LoveAdmin
-from .LikeAdmin import LikeAdmin
+from .BookmarkAdmin import BookmarkAdmin
 from .RatingAdmin import RatingAdmin
 from .FileStatAdmin import FileStatAdmin
 from .LogAdmin import LogAdmin
@@ -59,7 +59,7 @@ __all__: list[str] = [
     'MaioMimeTypeAdmin',
     'MaioMapTypeAdmin',
     'LoveAdmin',
-    'LikeAdmin',
+    'BookmarkAdmin',
     'RatingAdmin',
     'FileStatAdmin',
     'LogAdmin',
@@ -89,7 +89,7 @@ admin_site.register(MaioType, MaioTypeAdmin)
 admin_site.register(MaioMimeType, MaioMimeTypeAdmin)
 admin_site.register(MaioMapType, MaioMapTypeAdmin)
 admin_site.register(Love, LoveAdmin)
-admin_site.register(Like, LikeAdmin)
+admin_site.register(Bookmark, BookmarkAdmin)
 admin_site.register(Rating, RatingAdmin)
 admin_site.register(FileStat, FileStatAdmin)
 admin_site.register(Log, LogAdmin)

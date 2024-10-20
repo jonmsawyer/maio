@@ -19,11 +19,46 @@
           aria-hidden="true"
           onclick="bookmark('{{ medium.id }}');"
     ></span>
-    <span class="bi bi-star float-end" title="Give this image 5 Stars" aria-hidden="true" style="margin: 0 6px 0 0;"></span>
-    <span class="bi bi-star float-end" title="Give this image 4 Stars" aria-hidden="true"></span>
-    <span class="bi bi-star float-end" title="Give this image 3 Stars" aria-hidden="true"></span>
-    <span class="bi bi-star float-end" title="Give this image 2 Stars" aria-hidden="true"></span>
-    <span class="bi bi-star float-end" title="Give this image 1 Star" aria-hidden="true" style="margin: 0 0 0 6px;"></span>
+    <span class="bi bi-star{% if medium.rating_number >= 5 %}-fill{% endif %} float-end maio-star maio-star-5"
+          data-starred="{% if medium.rating_number == 5 %}true{% else %}false{% endif %}"
+          data-rating="{{ medium.rating_number }}"
+          data-starnum="5"
+          title="Give this image 5 Stars"
+          aria-hidden="true"
+          onclick="rate('{{ medium.id }}', 5);"
+    ></span>
+    <span class="bi bi-star{% if medium.rating_number >= 4 %}-fill{% endif %} float-end maio-star maio-star-4"
+          data-starred="{% if medium.rating_number == 4 %}true{% else %}false{% endif %}"
+          data-rating="{{ medium.rating_number }}"
+          data-starnum="4"
+          title="Give this image 4 Stars"
+          aria-hidden="true"
+          onclick="rate('{{ medium.id }}', 4);"
+    ></span>
+    <span class="bi bi-star{% if medium.rating_number >= 3 %}-fill{% endif %} float-end maio-star maio-star-3"
+          data-starred="{% if medium.rating_number == 3 %}true{% else %}false{% endif %}"
+          data-rating="{{ medium.rating_number }}"
+          data-starnum="3"
+          title="Give this image 3 Stars"
+          aria-hidden="true"
+          onclick="rate('{{ medium.id }}', 3);"
+    ></span>
+    <span class="bi bi-star{% if medium.rating_number >= 2 %}-fill{% endif %} float-end maio-star maio-star-2"
+          data-starred="{% if medium.rating_number == 2 %}true{% else %}false{% endif %}"
+          data-rating="{{ medium.rating_number }}"
+          data-starnum="2"
+          title="Give this image 2 Stars"
+          aria-hidden="true"
+          onclick="rate('{{ medium.id }}', 2);"
+    ></span>
+    <span class="bi bi-star{% if medium.rating_number >= 1 %}-fill{% endif %} float-end maio-star maio-star-1"
+          data-starred="{% if medium.rating_number == 1 %}true{% else %}false{% endif %}"
+          data-rating="{{ medium.rating_number }}"
+          data-starnum="1"
+          title="Give this image 1 Star"
+          aria-hidden="true"
+          onclick="rate('{{ medium.id }}', 1);"
+    ></span>
   </div>
   <div class="card-body p-0 border-bottom clearfix pb-1 border border-dark-subtle" style="font-size: 14pt; padding: 0 5px;">
     <span class="bi bi-share" title="Share this media with another Maio User." style="margin: 0 0 0 6px;"></span>

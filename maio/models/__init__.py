@@ -20,7 +20,7 @@ from .MaioMap import MaioMap
 from .MaioUser import MaioUser
 from .MaioType import MaioType, MaioTypeChoices
 from .Love import Love
-from .Like import Like
+from .Bookmark import Bookmark
 from .Rating import Rating
 from .Thumbnail import Thumbnail
 from .MetaFile import MetaFile
@@ -44,7 +44,7 @@ __all__: list[str] = [
     'MaioUser',
     'MaioType', 'MaioTypeChoices',
     'Love',
-    'Like',
+    'Bookmark',
     'Rating',
     'Thumbnail',
     'MetaFile',

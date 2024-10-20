@@ -32,28 +32,59 @@ def _love(request: HttpRequest, media: Media, action: str) -> JsonResponse:
     return JsonResponse({'error': f'Unknown action: {action}'}, status=400)
 
 def _bookmark(request: HttpRequest, media: Media, action: str) -> JsonResponse:
-    '''Like the Media.'''
+    '''Bookmark the Media.'''
     maio_user = MaioUser.objects.get(user=request.user)
     if action == 'delete':
-        num = media.like_set.filter(user=maio_user).delete()
+        num = media.bookmark_set.filter(user=maio_user).delete()
         return JsonResponse({
             'media_uuid': str(media.id),
             'num_deleted': num,
             'status': 'OK',
         })
     elif action == 'create':
-        like, is_created = media.like_set.get_or_create(user=maio_user, media=media)
+        bookmark, is_created = media.bookmark_set.get_or_create(user=maio_user, media=media)
         return JsonResponse({
             'media_uuid': str(media.id),
-            'like': str(like),
+            'bookmark': str(bookmark),
             'is_created': is_created,
             'status': 'OK',
         })
     return JsonResponse({'error': f'Unknown action: {action}'}, status=400)
 
-def _star(request: HttpRequest, media: Media, action: str) -> JsonResponse:
-    '''Star the Media.'''
-    return JsonResponse({'error': 'Rating type "star" is not implemented.'})
+def _rate(request: HttpRequest, media: Media, action: str) -> JsonResponse:
+    '''Rate the Media.'''
+    maio_user = MaioUser.objects.get(user=request.user)
+    if action == 'delete':
+        num = media.rating_set.filter(user=maio_user).delete()
+        return JsonResponse({
+            'media_uuid': str(media.id),
+            'num_deleted': num,
+            'status': 'OK',
+        })
+    elif action == 'create':
+        rating_number = request.POST.get('rating_number')
+        if not rating_number:
+            return JsonResponse({'error': 'Missing parameter `rating_number`.'}, status=400)
+        try:
+            rating_number = int(rating_number)
+            if rating_number < 1 or rating_number > 5:
+                raise ValueError('Rating number must an integer between 1 and 5, inclusive.')
+        except ValueError as e:
+            return JsonResponse({'error': str(e)}, status=400)
+        rated, is_created = media.rating_set.get_or_create(
+            user=maio_user,
+            media=media,
+        )
+        rated.rating = int(rating_number)
+        rated.save()
+        return JsonResponse({
+            'media_uuid': str(media.id),
+            'rating': rated.rating,
+            'is_created': is_created,
+            'status': 'OK',
+        })
+
+    return JsonResponse({'error': f'Unknown action: {action}'}, status=400)
 
 def rating(request: HttpRequest) -> JsonResponse:
     '''Set the rating for a given Media.'''
@@ -69,8 +100,8 @@ def rating(request: HttpRequest) -> JsonResponse:
             return _love(request, media, action)
         elif rating_type == 'bookmark':
             return _bookmark(request, media, action)
-        elif rating_type == 'star':
-            return _star(request, media, action)
+        elif rating_type == 'rate':
+            return _rate(request, media, action)
         else:
             return JsonResponse({'error': f"Unknown rating type: {rating_type}"}, status=400)
     return JsonResponse({'error': 'I only understand POST requests.'}, status=400)

@@ -30,7 +30,8 @@ from maio import filestore as fs
 from .File import File
 from .Tag import Tag
 from .Love import Love
-from .Like import Like
+from .Bookmark import Bookmark
+from .Rating import Rating
 from .MaioType import MaioType, MaioTypeChoices
 from .MaioMapType import MaioMapType
 from .MaioMimeType import MaioMimeType
@@ -184,18 +185,34 @@ class Media(Model, metaclass=MediaMeta):
         with_user: Optional[User] = None,
         loved: Optional[str] = None,
         bookmarked: Optional[str] = None,
+        starred: Optional[str] = None,
     ) -> QuerySet[Media]:
         '''get_all_media_by_media_type'''
         media = Media.objects.all()
         if loved == 'loved':
-            media = media.exclude(love__id=None)
+            media = media.exclude(love__user=request.maio_user, love__id=None)
         elif loved == 'unloved':
-            media = media.filter(love__id=None)
+            media = media.filter(love__user=request.maio_user, love__id=None)
 
         if bookmarked == 'bookmarked':
-            media = media.exclude(like__id=None)
+            media = media.exclude(bookmark__user=request.maio_user, bookmark__id=None)
         elif bookmarked == 'unbookmarked':
-            media = media.filter(like__id=None)
+            media = media.filter(bookmark__user=request.maio_user, bookmark__id=None)
+
+        if starred == '5':
+            media = media.filter(rating__user=request.maio_user, rating__rating=5)
+        elif starred == '4':
+            media = media.filter(rating__user=request.maio_user, rating__rating=4)
+        elif starred == '3':
+            media = media.filter(rating__user=request.maio_user, rating__rating=3)
+        elif starred == '2':
+            media = media.filter(rating__user=request.maio_user, rating__rating=2)
+        elif starred == '1':
+            media = media.filter(rating__user=request.maio_user, rating__rating=1)
+        elif starred == 'starred':
+            media = media.exclude(rating__user=request.maio_user, rating__id=None)
+        elif starred == 'unstarred':
+            media = media.filter(rating__user=request.maio_user, rating__id=None)
 
         if media_type == 'image':
             media = Media.get_all_images(request, with_user, media)
@@ -531,11 +548,21 @@ class Media(Model, metaclass=MediaMeta):
         return False
 
     def is_bookmarked_by(self, maio_user: MaioUser) -> bool:
-        '''Return True if this Media is Liked by `maio_user`'''
+        '''Return True if this Media is Bookmarked by `maio_user`'''
         try:
-            bookmark = self.like_set.filter(user=maio_user).get()
+            bookmark = self.bookmark_set.filter(user=maio_user).get()
             if bookmark:
                 return True
-        except Like.DoesNotExist:
+        except Bookmark.DoesNotExist:
             pass
         return False
+
+    def is_rated_by(self, maio_user: MaioUser) -> tuple[bool, int]:
+        '''Return True if this Media is Rated by `maio_user`'''
+        try:
+            rating = self.rating_set.filter(user=maio_user).get()
+            if rating:
+                return True, rating.rating
+        except Rating.DoesNotExist:
+            pass
+        return False, 0

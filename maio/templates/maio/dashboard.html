@@ -21,12 +21,18 @@
 {% endblock script %}
 
 {% block content %}
+  <a class="btn btn-secondary maio-offcanvas-button" data-bs-toggle="offcanvas" href="#offcanvasExample" role="button" aria-controls="offcanvasExample">
+    <i class="bi bi-indent"></i>
+  </a>
   <div class="container"> <!-- container -->
-    <h1>{% if is_admin %}Maio Admin: User Dashboard ({{ with_user.username }}){% else %}Dashboard{% if with_user %} ({{ with_user.username }}){% endif%}{% endif %}</h1>
+    {% include 'maio/_off_canvas.html' %}
 
+    <h1>{% if is_admin %}Maio Admin: User Dashboard ({{ with_user.username }}){% else %}Dashboard{% if with_user %} ({{ with_user.username }}){% endif%}{% endif %}</h1>
     <h4>{{ num_media }} media found</h4>
+
     {% include 'maio/_pagination.html' with instance=1 %}
     {% include 'maio/_filters.html' with medium=medium media_type=media_type love=love bookmark=bookmark %}
+
     <div class="row justify-content-center">
       {% for medium in media %}
         {% if user_setting.default_dashboard_view == 'default' %}
@@ -46,6 +52,7 @@
         </div>
       {% endfor %}
     </div> <!-- /row -->
+
     {% include 'maio/_pagination.html' with instance=2 %}
     {% include 'maio/_stats.html' %}
   </div> <!-- /container -->

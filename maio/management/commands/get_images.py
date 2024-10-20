@@ -94,8 +94,8 @@ class Command(MaioBaseCommand):
         )
 
         parser.add_argument(
-            '--like', '-lk', action='store_true',
-            help=('Mark each image with a "Like" rating.')
+            '--bookmark', '-bm', action='store_true',
+            help=('Mark each image with a "Bookmark" rating.')
         )
 
         parser.add_argument(

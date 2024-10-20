@@ -287,6 +287,25 @@ html.maio {
         border: 1px solid rgb(30, 77, 166, 0.8);
     }
 
+    & .maio-rating .maio-star {
+        cursor: pointer;
+        color: rgb(183, 163, 32);
+        border: 1px solid white;
+        border-radius: 5px;
+    }
+
+    & .maio-rating .maio-star:hover {
+        border: 1px solid rgb(183, 163, 32, 0.8);
+    }
+
+    & .maio-rating .maio-star-1 {
+        margin-left: 6px;
+    }
+
+    & .maio-rating .maio-star-5 {
+        margin-right: 6px;
+    }
+
     & .maio-filters {
         text-align: center;
     }
@@ -299,5 +318,13 @@ html.maio {
     & .maio-filters a,
     nav a {
         cursor: pointer;
+    }
+
+    & .maio-offcanvas-button {
+        border-radius: 0 0.5rem 0.5rem 0;
+        position: fixed;
+        top: 4em;
+        z-index: 100;
+        background-color: rgb(43, 48, 53);
     }
 }

@@ -25,3 +25,17 @@ def validate_per_page(value: int) -> None:
             raise ve
     if value < 12 or value > 200:
         raise ve
+
+def validate_rating(value: int) -> None:
+    '''Validate per page.'''
+    ve = ValidationError(
+        _T('%(value)s must be an integer between 1 and 5, inclusive.'),
+        params={'value': value}
+    )
+    if not isinstance(value, int):
+        try:
+            value = int(value)
+        except TypeError:
+            raise ve
+    if value < 1 or value > 5:
+        raise ve

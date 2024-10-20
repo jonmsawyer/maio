@@ -63,6 +63,13 @@ def sanitize_filter_bookmark(bookmark: str) -> str:
     return bookmark
 
 
+def sanitize_filter_star(star: str) -> str:
+    '''validate_filter_media_type'''
+    if star not in ('all', '5', '4', '3', '2', '1', 'starred', 'unstarred'):
+        star = 'all'
+    return star
+
+
 @login_required
 def dashboard(request: HttpRequest, with_username: Optional[str] = None, is_admin: Optional[bool] = None) -> HttpResponse:
     cd = pre_populate_context_dict(request, {})
@@ -78,7 +85,8 @@ def dashboard(request: HttpRequest, with_username: Optional[str] = None, is_admi
     media_type = sanitize_filter_media_type(request.GET.get('media_type', 'all'))
     love = sanitize_filter_love(request.GET.get('love', 'all'))
     bookmark = sanitize_filter_bookmark(request.GET.get('bookmark', 'all'))
-    media_list = Media.get_all_by_media_type(request, media_type, with_user, love, bookmark)
+    star = sanitize_filter_star(request.GET.get('star', 'all'))
+    media_list = Media.get_all_by_media_type(request, media_type, with_user, love, bookmark, star)
     try:
         per_page = int(request.GET.get('per_page', request.user_setting.default_dashboard_per_page))
     except:
@@ -98,12 +106,16 @@ def dashboard(request: HttpRequest, with_username: Optional[str] = None, is_admi
             medium.margin_left = 0
         medium.is_loved = medium.is_loved_by(request.maio_user)
         medium.is_bookmarked = medium.is_bookmarked_by(request.maio_user)
+        is_rated, rating_number = medium.is_rated_by(request.maio_user)
+        medium.is_rated = is_rated
+        medium.rating_number = rating_number
 
     # Set up query_dict
     qd = request.GET.copy()
     qd['media_type'] = media_type
     qd['love'] = love
     qd['bookmark'] = bookmark
+    qd['star'] = star
     qd['per_page'] = per_page
     # /query_dict
 
@@ -117,6 +129,7 @@ def dashboard(request: HttpRequest, with_username: Optional[str] = None, is_admi
     cd['media_type'] = media_type
     cd['love'] = love
     cd['bookmark'] = bookmark
+    cd['star'] = star
     cd['media'] = media
     cd['num_media'] = media_list.count()
     cd['pages'] = media # for pagination
