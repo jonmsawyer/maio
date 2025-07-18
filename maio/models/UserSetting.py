@@ -119,6 +119,22 @@ USER_SETTINGS: dict[str, Any] = {
             'Set whether or not to automatically upload media when choosing files.'
         ),
     },
+    'auto_add_to_collection': {
+        'name': _T('Auto Add to Collection'),
+        'maio_type': MaioMapTypeChoices.BOOL,
+        'default': False,
+        'help': _T(
+            'Set whether or not to automatically add media to your default collection.'
+        ),
+    },
+    'auto_replace_media': {
+        'name': _T('Auto Replace Duplicate Media'),
+        'maio_type': MaioMapTypeChoices.BOOL,
+        'default': False,
+        'help': _T(
+            'Set whether or not to automatically replace existing media when uploading duplicates.'
+        ),
+    },
     'redirect_to_previous_page_after_setting_save': {
         'name': _T('Redirect to Previous Page After Profile/Settings Save'),
         'maio_type': MaioMapTypeChoices.BOOL,
@@ -208,6 +224,16 @@ class UserSetting(Model, metaclass=UserSettingMeta):
     auto_upload_media = BooleanField(
         _T('Auto Upload Media'),
         default=USER_SETTINGS['auto_upload_media']['default'],
+    )
+
+    auto_add_to_collection = BooleanField(
+        _T('Auto Add to Collection'),
+        default=USER_SETTINGS['auto_add_to_collection']['default'],
+    )
+
+    auto_replace_media = BooleanField(
+        _T('Auto Replace Duplicate Media'),
+        default=USER_SETTINGS['auto_replace_media']['default'],
     )
 
     redirect_to_previous_page_after_setting_save = BooleanField(

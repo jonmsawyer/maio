@@ -24,6 +24,8 @@ class UserSettingForm(ModelForm):
             'default_dashboard_per_page',
             'default_upload_media_view',
             'auto_upload_media',
+            'auto_add_to_collection',
+            'auto_replace_media',
             'redirect_to_previous_page_after_setting_save',
             'display_debug',
         ]
@@ -35,6 +37,8 @@ class UserSettingForm(ModelForm):
             'default_dashboard_per_page': US['default_dashboard_per_page']['name'],
             'default_upload_media_view': US['default_upload_media_view']['name'],
             'auto_upload_media': US['auto_upload_media']['name'],
+            'auto_add_to_collection': US['auto_add_to_collection']['name'],
+            'auto_replace_media': US['auto_replace_media']['name'],
             'redirect_to_previous_page_after_setting_save':
                 US['redirect_to_previous_page_after_setting_save']['name'],
             'previous_page': US['previous_page']['name'],
@@ -48,6 +52,8 @@ class UserSettingForm(ModelForm):
             'default_dashboard_per_page': US['default_dashboard_per_page']['help'],
             'default_upload_media_view': US['default_upload_media_view']['help'],
             'auto_upload_media': US['auto_upload_media']['help'],
+            'auto_add_to_collection': US['auto_add_to_collection']['help'],
+            'auto_replace_media': US['auto_replace_media']['help'],
             'redirect_to_previous_page_after_setting_save':
                 US['redirect_to_previous_page_after_setting_save']['help'],
             'previous_page': US['previous_page']['help'],

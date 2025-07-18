@@ -1,0 +1,33 @@
+{# collections select partial #}
+{# Requires a `collections` iterable of `Collection` objects. #}
+
+{% load static %}
+{% load maio_extras %}
+
+{% if parent %}
+<div class="parent">
+{% else %}
+<div class="child">
+{% endif %}
+
+{% for collection in collections %}
+  {% if collection.collection_set.all|length == 0 %}
+  <div class="no-wrap">
+  {% else %}
+  <div style="wrap">
+  {% endif %}
+    <input type="checkbox"
+          class="btn-check maio-collections"
+          id="collection_{{ collection.id }}"
+          data-id="{{ collection.id }}"
+          autocomplete="off"
+          {% if collection.is_default %}checked{% endif %}
+    >
+    <label class="btn btn-outline-primary"
+          for="collection_{{ collection.id }}"
+    >{{ collection.name }}</label>
+
+    {% include 'maio/_collections_toggle.html' with collections=collection.collection_set.all parent=False %}
+  </div>
+{% endfor %}
+</div>

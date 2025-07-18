@@ -327,4 +327,58 @@ html.maio {
         z-index: 100;
         background-color: rgb(43, 48, 53);
     }
+
+    & .maio-new-collection {
+        padding: 0.5em;
+        margin: 1em 0 0 0;
+        display: none;
+    }
+
+    & .maio-new-collection div.col {
+        background-color: var(--bs-info-bg-subtle);
+    }
+
+    & .maio-new-collection div.col-5 {
+        text-align: right;
+    }
+
+    & .maio-new-collection .maio-collection-close {
+        position: absolute;
+        right: 0.5em;
+        top: 0.5em;
+    }
+
+    & .maio-collection {
+        margin: 0.2em 0em 0em 0.2em;
+        padding: 0.3em 0.3em 0.3em 0;
+        border: 0;
+    }
+
+    & .maio-collection > .col {
+        padding-left: 0;
+        margin-left: 5px;
+    }
+
+    & .maio-collection .row {
+        margin: 0.1em 0 0 0.0em !important;
+        padding: 0 0 0 0 !important;
+    }
+
+    & .maio-collection .col {
+        background-color: rgb(209, 209, 209);
+    }
+
+    & .maio-collection .col-3 {
+        padding-left: 0.5em;
+    }
+
+    & .maio-collection .col-4 {
+        padding: 0;
+    }
+
+    & .maio-collection-select {
+        display: block;
+        width: 100%;
+        height: 10em;
+    }
 }

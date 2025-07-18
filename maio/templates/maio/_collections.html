@@ -1,0 +1,147 @@
+{# collections partial #}
+{# Requires a `collections` iterable of `Collection` objects. #}
+
+{% load static %}
+{% load maio_extras %}
+
+{% for collection in collections %}
+{% include 'maio/_modal_delete_collection.html' %}
+<div id="collection_{{ collection.id }}"
+     data-parentid="{{ collection.parent.id }}"
+     data-parentname="{{ parent.name }}"
+     class="alert alert-secondary row maio-collection"
+     style="margin-left: {{ indent|mult:35.0|add:5 }}px;"
+     title="Collection Name"
+>
+  <div class="col maio-col">
+    {% if indent > 0 %}
+      {% if indent == 1 %}
+        <button class="btn btn-warning bg-warning-subtle btn-sm"
+                title="This collection belongs to '{{ parent.name }}'."
+        >
+          <i class="bi bi-arrow-return-right"></i>
+        </button>
+      {% else %}
+        {% with ml=indent|add:"-1"|mult:35.0 %}
+          <button class="btn btn-warning bg-warning-subtle btn-sm"
+                  style="margin-left: {{ ml }}px;"
+                  title="This collection belongs to '{{ parent.name }}'."
+          >
+            <i class="bi bi-arrow-return-right"></i>
+          </button>
+        {% endwith %}
+      {% endif %}
+    {% endif %}
+    <button class="btn btn-sm btn-primary"
+            onclick="new_collection('{{ collection.id }}', true);"
+            title="Create new collection within '{{ collection.name }}'."
+    >
+      <i class="bi bi-plus"></i>
+    </button>
+    <button class="btn btn-sm btn-danger"
+            data-bs-toggle="modal"
+            data-bs-target="#modal_delete_collection_{{ collection.id }}"
+            title="Delete collection '{{ collection.name }}'?"
+    >
+      <i class="bi bi-x"></i>
+    </button>
+    {% if collection.is_default %}
+      <button class="btn btn-sm btn-success maio-collection-default"
+              id="default_{{ collection.id }}"
+              data-default="true"
+              title="Is Default. Undefault?"
+              onclick="toggle_default('{{ collection.id }}');"
+      >
+        <i class="bi bi-check"></i>
+      </button>
+    {% else %}
+      <button class="btn btn-sm btn-secondary maio-collection-default"
+              id="default_{{ collection.id }}"
+              data-default="false"
+              title="Not default. Make Default?"
+              onclick="toggle_default('{{ collection.id }}');"
+      >
+        <i class="bi bi-slash-circle"></i>
+      </button>
+    {% endif %}
+    {% if collection.is_favorite %}
+      <button class="btn btn-sm btn-warning maio-collection-favorite"
+              id="favorite_{{ collection.id }}"
+              data-favorite="true"
+              title="Is Favorite. Make unfavored?"
+              onclick="toggle_favorite('{{ collection.id }}');"
+      >
+        <i class="bi bi-star"></i>
+      </button>
+    {% else %}
+      <button class="btn btn-sm btn-secondary maio-collection-favorite"
+              id="favorite_{{ collection.id }}"
+              data-favorite="false"
+              title="Not favorite. Make favorite?"
+              onclick="toggle_favorite('{{ collection.id }}');"
+      >
+        <i class="bi bi-star"></i>
+      </button>
+    {% endif %}
+    <strong id="collection_name_{{ collection.id }}"
+            data-id="{{ collection.id }}"
+            data-name="{{ collection.name }}"
+            onclick="focus_name('{{ collection.id }}');"
+    >{{ collection.name }}</strong>
+    <span id="collection_rename_{{ collection.id }}" style="display: none;">
+      <input id="change_name_{{ collection.id }}" type="text" value="{{ collection.name }}">
+      <button class="btn btn-primary btn-sm" onclick="change_name('{{ collection.id }}');">Rename</button>
+      <button class="btn btn-secondary btn-sm" onclick="revert_name('{{ collection.id }}');">Cancel</button>
+  </span>
+  </div>
+  <div class="col col-2">
+    <div class="row">
+      <div class="col col-4" style="text-align: center;" title="Sort Order (0-9)">
+        <small>{{ collection.sort }}</small>
+      </div>
+      <div class="col col-4" style="text-align: center;" title="Collection Count">
+        <small>{{ collection.media_set.count|default:0 }}</small>
+      </div>
+      <div class="col col-4" style="text-align: center;" title="Open Collection in a New Tab">
+        <a href="{% url 'dashboard' %}?collection={{ collection.id }}"
+            class="btn btn-sm"
+            target="_new"
+        ><i class="bi bi-box-arrow-up-right"></i></a>
+      </div>
+    </div>
+  </div>
+  <div class="col col-3 maio-col" title="Date Added" style="text-align: center">
+    {{ collection.date_added }}
+  </div>
+  <div id="new_collection_{{ collection.id }}"
+       class="alert alert-info maio-new-collection"
+  >
+    <button class="btn btn-close maio-collection-close"
+            aria-hidden="true"
+            onclick="dismiss_new_collection('{{ collection.id }}');"
+            title="Close"
+    ></button>
+    <div class="row">
+      <div class="col col-1">Default?</div>
+      <div class="col col-3">Sort</div>
+      <div class="col col-3">Name</div>
+      <div class="col col-5"></div>
+    </div>
+    <div class="row">
+      <div class="col col-1"><input type="checkbox" id="new_default_{{ collection.id }}"></div>
+      <div class="col col-3"><input type="number" id="new_sort_{{ collection.id }}"></div>
+      <div class="col col-3"><input type="text" id="new_name_{{ collection.id }}"></div>
+      <div class="col col-5">
+        <button class="btn btn-primary" onclick="new_collection('{{ collection.id }}');">
+          Create Subcollection under "{{ collection.name }}" <i class="bi bi-folder-plus"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div id="children_{{ collection.id }}" class="row">
+    {% with indent=indent|add:1 %}
+      {% include 'maio/_collections.html' with collections=collection.collection_set.all parent=collection %}
+    {% endwith %}
+  </div>
+</div>
+{% endfor %}

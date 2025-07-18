@@ -10,15 +10,17 @@ from typing import Optional
 import os
 import uuid
 import subprocess
+from decimal import Decimal
 
 from PIL import Image
+import ffmpeg
 
 from django.conf import settings
 from django.http import HttpRequest
 from django.core.files.uploadedfile import UploadedFile
 from django.db.models import (
     Model, UUIDField, ForeignKey, ManyToManyField, CharField, FloatField, PositiveIntegerField,
-    PositiveSmallIntegerField, DateTimeField, BooleanField, URLField, TextField,
+    PositiveSmallIntegerField, DateTimeField, BooleanField, URLField, TextField, DecimalField,
     CASCADE, DO_NOTHING,
 )
 from django.db.models.base import ModelBase
@@ -29,13 +31,13 @@ from maio import filestore as fs
 
 from .File import File
 from .Tag import Tag
+from .Collection import Collection
 from .Love import Love
 from .Bookmark import Bookmark
 from .Rating import Rating
 from .MaioType import MaioType, MaioTypeChoices
 from .MaioMapType import MaioMapType
 from .MaioMimeType import MaioMimeType
-from .Category import Category
 from .MaioUser import MaioUser
 
 
@@ -80,11 +82,10 @@ class Media(Model, metaclass=MediaMeta):
     #: Owner of the File
     owner = ForeignKey(to=User, on_delete=DO_NOTHING)
 
-    #: Category
-    category = ForeignKey(to=Category, on_delete=DO_NOTHING, null=True, blank=True)
-
     #: The media's tags
     tags: ManyToManyField[Tag, Media] = ManyToManyField(Tag)
+
+    collections: ManyToManyField[Collection, Media] = ManyToManyField(Collection)
 
     #: The base name for the File.
     name = CharField('Name', max_length=1024)
@@ -120,7 +121,7 @@ class Media(Model, metaclass=MediaMeta):
     slideshow_tn_uri = URLField('Slideshow Thumbnail URI', null=True, blank=True)
 
     #: The length (in seconds for Audio or Video, null for Image and Document)
-    length = FloatField('Length (Seconds)', null=True, blank=True)
+    length = DecimalField('Length (Seconds)', max_digits=22, decimal_places=15, null=True, blank=True)
 
     #: The author of this Media, if there is one.
     author = CharField('Author', max_length=1024, null=True, blank=True)
@@ -186,6 +187,7 @@ class Media(Model, metaclass=MediaMeta):
         loved: Optional[str] = None,
         bookmarked: Optional[str] = None,
         starred: Optional[str] = None,
+        collection: Optional[list[str] | str] = None,
     ) -> QuerySet[Media]:
         '''get_all_media_by_media_type'''
         media = Media.objects.all()
@@ -213,6 +215,17 @@ class Media(Model, metaclass=MediaMeta):
             media = media.exclude(rating__user=request.maio_user, rating__id=None)
         elif starred == 'unstarred':
             media = media.filter(rating__user=request.maio_user, rating__id=None)
+
+        if collection == 'all':
+            media = media.filter(collections__user=request.maio_user)
+        elif collection == 'uncollected':
+            media = media.exclude(collections_user=request.maio_user, collections=None)
+        elif collection:
+            media = (
+                media
+                    .filter(collections__user=request.maio_user, collections__in=collection)
+                    .distinct()
+            )
 
         if media_type == 'image':
             media = Media.get_all_images(request, with_user, media)
@@ -368,6 +381,10 @@ class Media(Model, metaclass=MediaMeta):
         content_file: UploadedFile,
     ) -> Media:
         '''Create a new Media record for the given File and UploadedFile.'''
+        collections = request.POST.get('collections', '').split(',')
+        if collections == ['']:
+            collections = []
+        replace_media = request.POST.get('replace_media', 'false')
         name = '.'.join(content_file.name.split('.')[:-1])
         extension = ''.join(content_file.name.split('.')[-1])
         width = None
@@ -400,56 +417,64 @@ class Media(Model, metaclass=MediaMeta):
                 f".{slideshow_tn_uri.split('.')[-1]}"
             )
             video_path = os.path.join(fs.mk_md5_dir_media(maio_file.md5sum), maio_file.get_filename())
-            ffprobe_cmd: list[str] = [
-                maio_conf.get_ffprobe_bin_path(),
-                "-v", "error",
-                "-select_streams", "v",
-                "-show_entries", "stream=width,height",
-                "-of", "csv=p=0:s=x",
-                video_path,
-            ]
+
             try:
-                output = subprocess.run(ffprobe_cmd, capture_output=True)
-                output = str(output.stdout, encoding='UTF-8').strip()
-                width = output.split('x')[0]
-                height = output.split('x')[1]
-            except subprocess.CalledProcessError:
-                raise
-            ffprobe_cmd = [
-                maio_conf.get_ffprobe_bin_path(),
-                "-show_entries", "format=duration",
-                "-v", "quiet",
-                "-of", "csv=p=0",
-                "-i", video_path,
-            ]
+                probe = ffmpeg.probe(video_path, **{'show_entries': 'stream=width,height'})
+            except ffmpeg.Error as e:
+                _deets = f'''
+                    In Filename: {video_path}
+                    Width: {width}
+                    Height: {height}
+                    Length: {length}
+                '''
+                raise Exception(f'''
+                    Error:
+                    {e.stderr.decode()}
+                    {_deets}
+                ''')
+            width = probe.get('streams')[0].get('width')
+            height = probe.get('streams')[0].get('height')
             try:
-                output = subprocess.run(ffprobe_cmd, capture_output=True)
-                output = str(output.stdout, encoding='UTF-8')
-                try:
-                    length = float(output.strip())
-                except ValueError:
-                    length = 1.0
-            except subprocess.CalledProcessError:
-                raise
+                probe = ffmpeg.probe(video_path, **{'show_entries': 'stream=duration'})
+            except ffmpeg.Error as e:
+                _deets = f'''
+                    In Filename: {video_path}
+                    Width: {width}
+                    Height: {height}
+                    Length: {length}
+                '''
+                raise Exception(f'''
+                    Error:
+                    {e.stderr.decode()}
+                    {_deets}
+                ''')
+            try:
+                length = Decimal(probe.get('streams')[0].get('duration'))
+            except TypeError:
+                length = Decimal(0)
+
         if maio_file.mime_type.get_maio_type_choice() == MaioTypeChoices.AUDIO:
             audio_path = os.path.join(fs.mk_md5_dir_media(maio_file.md5sum), maio_file.get_filename())
-            ffprobe_cmd = [
-                maio_conf.get_ffprobe_bin_path(),
-                "-show_entries", "format=duration",
-                "-v", "quiet",
-                "-of", "csv=p=0",
-                "-i", audio_path,
-            ]
             try:
-                output = subprocess.run(ffprobe_cmd, capture_output=True)
-                output = str(output.stdout, encoding='UTF-8')
-                length = float(output.strip())
-            except subprocess.CalledProcessError:
-                raise
+                probe = ffmpeg.probe(audio_path, **{'show_entries': 'stream=duration'})
+                length = Decimal(probe.get('streams')[0].get('duration'))
+            except ffmpeg.Error as e:
+                _deets = f'''
+                    In Filename: {video_path}
+                    Length: {length}
+                '''
+                raise Exception(f'''
+                    Error:
+                    {e.stderr.decode()}
+                    {_deets}
+                ''')
 
         tn_path, _is_created = maio_file.process_thumbnail()
         tn_image = Image.open(tn_path)
         tn_image.load()
+
+        if replace_media == 'true':
+            Media.objects.filter(file=maio_file, owner=request.user).delete()
 
         media = Media.objects.create(
             file=maio_file,
@@ -467,6 +492,10 @@ class Media(Model, metaclass=MediaMeta):
         )
 
         tn_image.close()
+
+        collections = Collection.objects.filter(pk__in=collections, user=request.maio_user).all()[:]
+        media.collections.add(*collections)
+
         return media
 
     def get_static_media_uri(self) -> str | None:

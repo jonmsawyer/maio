@@ -32,6 +32,7 @@
       preview_view: '{{ preview_view }}',
       global_index: 0,
       files_to_upload: new Config({}),
+      selected_collections: [],
     });
 
     // Handle `dropArea` events.
@@ -105,8 +106,20 @@
                    type="checkbox"
                    role="switch"
                    name="skip_duplicates"
-                   checked>
+                   {% if not user_setting.auto_replace_media %}checked{% endif %}
+                   onclick="toggle_replace_media(this);"
+            >
             <label class="form-check-label" for="id_skip_duplicates">Skip duplicate media?</label>
+          </div>
+          <div class="form-check form-switch" style="margin-top: 0.5em;">
+            <input id="id_replace_media"
+                   class="form-check-input"
+                   type="checkbox"
+                   role="switch"
+                   {% if user_setting.auto_replace_media %}checked{% endif %}
+                   onclick="toggle_skip_duplicates(this);"
+            >
+            <label class="form-check-label" for="id_replace_media">Replace duplicate media?</label>
           </div>
           <div class="form-check form-switch" style="margin-top: 0.5em;">
             <input id="id_auto_upload_media"
@@ -115,6 +128,27 @@
                    role="switch"
                    {% if user_setting.auto_upload_media %}checked{% endif %}>
             <label class="form-check-label" for="id_auto_upload_media">Auto upload media?</label>
+          </div>
+          <div class="form-check form-switch" style="margin-top: 0.5em; vertical-align: top;">
+            <input id="id_add_to_collection"
+                   class="form-check-input"
+                   type="checkbox"
+                   role="switch"
+                   onclick="toggle_collections(this);"
+                   {% if user_setting.auto_add_to_collection %}checked{% endif %}>
+            {% if collections %}
+            <label class="form-check-label" for="id_add_to_collection">Add to collection?</label>
+            You may select multiple collections by clicking or tapping on them. Click or tap on
+            the collection again to deselect.
+            <div id="id_add_to_collection_group"
+                 {% if not user_setting.auto_add_to_collection %}
+                 style="display: none;"
+                 {% endif %}
+            >
+              {% include 'maio/_collections_toggle.html' with parent=True %}
+            </div>
+            <!-- </select> -->
+            {% endif %}
           </div>
           <div class="row" style="margin-top: 1em;">
             <div class="col col-lg-2 col-md-3">

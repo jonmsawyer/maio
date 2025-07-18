@@ -19,7 +19,7 @@ from django.core.paginator import Page, Paginator
 from django.db.models import QuerySet
 
 from maio.lib import pre_populate_context_dict
-from maio.models import Media
+from maio.models import Media, Collection
 
 
 logger = logging.getLogger('maio.DEBUG')
@@ -71,7 +71,11 @@ def sanitize_filter_star(star: str) -> str:
 
 
 @login_required
-def dashboard(request: HttpRequest, with_username: Optional[str] = None, is_admin: Optional[bool] = None) -> HttpResponse:
+def dashboard(
+    request: HttpRequest,
+    with_username: Optional[str] = None,
+    is_admin: Optional[bool] = None,
+) -> HttpResponse:
     cd = pre_populate_context_dict(request, {})
 
     with_user = None
@@ -86,7 +90,35 @@ def dashboard(request: HttpRequest, with_username: Optional[str] = None, is_admi
     love = sanitize_filter_love(request.GET.get('love', 'all'))
     bookmark = sanitize_filter_bookmark(request.GET.get('bookmark', 'all'))
     star = sanitize_filter_star(request.GET.get('star', 'all'))
-    media_list = Media.get_all_by_media_type(request, media_type, with_user, love, bookmark, star)
+    collections = request.GET.get('collection', '').split(',')
+    if collections in (None, [''], ['all']):
+        collection_name = 'All'
+        collections = None
+    elif collections == ['uncollected']:
+        collection_name = 'Uncollected'
+        collections = Collection.objects.exclude(user=request.maio_user)
+    elif len(collections) == 1:
+        try:
+            collection_name = Collection.objects.get(pk=collections[0]).name
+            collections = Collection.objects.filter(pk__in=collections)
+        except Collection.DoesNotExist:
+            collection_name = 'Unknown'
+            collections = []
+    elif len(collections) > 1:
+        collection_name = 'Multiple'
+        collections = Collection.objects.filter(pk__in=collections)
+    favorites = Collection.objects.filter(user=request.maio_user, is_favorite=True)
+    # collections = Collection.objects.filter(user=request.maio_user, parent=None)
+    media_list = Media.get_all_by_media_type(
+        request,
+        media_type,
+        with_user,
+        love,
+        bookmark,
+        star,
+        collections,
+    )
+    collections = Collection.objects.filter(user=request.maio_user, parent=None)
     try:
         per_page = int(request.GET.get('per_page', request.user_setting.default_dashboard_per_page))
     except:
@@ -134,4 +166,7 @@ def dashboard(request: HttpRequest, with_username: Optional[str] = None, is_admi
     cd['num_media'] = media_list.count()
     cd['pages'] = media # for pagination
     cd['per_page'] = per_page
+    cd['favorites'] = favorites
+    cd['collection_name'] = collection_name
+    cd['collections'] = collections
     return render(request, 'maio/dashboard.html', cd)

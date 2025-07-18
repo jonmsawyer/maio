@@ -9,6 +9,7 @@ from .dashboard import dashboard
 from .logout import logout
 from .edit_profile import edit_profile
 from .library_share import library_share
+from .collections import collections
 from .upload_media import UploadMediaView
 from .search import search
 from .password_change import PasswordChangeView, PasswordChangeDoneView
@@ -19,6 +20,7 @@ __all__: list[str] = [
     'logout',
     'edit_profile',
     'library_share',
+    'collections',
     'UploadMediaView',
     'search',
     'PasswordChangeView',

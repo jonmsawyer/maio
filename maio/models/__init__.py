@@ -14,6 +14,7 @@ from .Caption import Caption
 from .Media import Media
 from .Playlist import Playlist
 from .Tag import Tag
+from .Collection import Collection
 from .MaioMapType import MaioMapType, MaioMapTypeChoices
 from .MaioMimeType import MaioMimeType
 from .MaioMap import MaioMap
@@ -38,6 +39,7 @@ __all__: list[str] = [
     'Media',
     'Playlist',
     'Tag',
+    'Collection',
     'MaioMapType', 'MaioMapTypeChoices',
     'MaioMimeType',
     'MaioMap',
@@ -63,4 +65,3 @@ def create_maio_user(sender, instance=None, created=False, **kwargs) -> None: # 
     if created:
         maio_user = MaioUser.objects.create(user=instance)
         _user_setting = UserSetting.objects.create(user=maio_user)
-        _category = Category.objects.create(user=maio_user)

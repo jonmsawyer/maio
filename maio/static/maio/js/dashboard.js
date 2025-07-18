@@ -101,6 +101,7 @@ function choose_reset() {
     url = Maio.update_url_parameter(url, 'love', null);
     url = Maio.update_url_parameter(url, 'bookmark', null);
     url = Maio.update_url_parameter(url, 'star', null);
+    url = Maio.update_url_parameter(url, 'collection', null);
     window.location.assign(url);
     return;
 }
@@ -143,6 +144,14 @@ function choose_bookmark(bookmark) {
 function choose_star(star) {
     if (star) {
         url = Maio.update_url_parameter(window.location.href, 'star', star);
+        window.location.assign(url);
+        return;
+    }
+}
+
+function choose_collection(collection) {
+    if (collection) {
+        url = Maio.update_url_parameter(window.location.href, 'collection', collection);
         window.location.assign(url);
         return;
     }
@@ -279,4 +288,8 @@ function rate(media_uuid, rating) {
             }
         });
     }
+}
+
+function toggle_collection_select(collection_id) {
+    return choose_collection(collection_id);
 }

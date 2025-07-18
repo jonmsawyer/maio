@@ -1,0 +1,67 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Collections{% endblock title %}
+
+{% block scripts %}
+<script src="{% static 'maio/js/collections.js' %}" type="application/javascript"></script>
+{% endblock scripts %}
+
+{% block script %}
+<script>
+maio_conf = new Config({
+  'js_debug': Boolean({{ js_debug }}),
+  'csrf_token': '{{ csrf_token }}',
+  'collections_url': '{% url "collections" %}',
+});
+</script>
+{% endblock script %}
+
+{% block content %}
+  <div class="container">
+    <h1 class="display-3" style="margin-top: 0em;">Collections</h1>
+    <div class="card">
+      <h4 class="card-title">My Collections</h4>
+      <div class="card-body">
+        <div>
+          <button class="btn btn-primary"
+                  onclick="new_collection();"
+                  title="Create new collection."
+          >
+            New Collection <i class="bi bi-folder-plus"></i>
+          </button>
+          <button class="btn btn-primary"
+                  onclick="sort_collections();"
+                  title="Sort all collections."
+          >
+            Sort Collections <i class="bi bi-sort-numeric-down"></i>
+          </button>
+        </div>
+        <div id="new_collection" class="alert alert-info maio-new-collection">
+          <button class="btn btn-close maio-collection-close"
+                  aria-hidden="true"
+                  onclick="dismiss_new_collection();"
+                  title="Close"
+          ></button>
+          <div class="row">
+            <div class="col">Default?</div>
+            <div class="col">Sort</div>
+            <div class="col">Name</div>
+            <div class="col"></div>
+          </div>
+          <div class="row">
+            <div class="col"><input type="checkbox" id="new_default"></div>
+            <div class="col"><input type="number" id="new_sort"></div>
+            <div class="col"><input type="text" id="new_name"></div>
+            <div class="col">
+              <button class="btn btn-primary" onclick="new_collection('new');" title="Create Collection">
+                Create Collection <i class="bi bi-folder-plus"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        {% include 'maio/_collections.html' with indent=0 parent_name=None %}
+      </div>
+    </div>
+  </div>
+{% endblock content %}

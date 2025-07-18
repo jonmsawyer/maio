@@ -324,7 +324,18 @@ function handleDrop(evt) {
 }
 
 function handlePaste(evt) {
+  Maio.log('Paste Event:', evt);
+  var data = evt.clipboardData.getData('Text');
+  Maio.log('Data:', data);
   handleFileSelect(evt, 'choose');
+}
+
+function get_collections_list() {
+  var collections = [];
+  $('input.maio-collections:checked').each(function(_idx, el) {
+    collections.push($(el).data('id'));
+  })
+  return collections;
 }
 
 function uploadFile(file, idx, config, file_index) {
@@ -392,6 +403,8 @@ function uploadFile(file, idx, config, file_index) {
 
   formData.append('csrfmiddlewaretoken', config.get('csrf_token'));
   formData.append('skip_duplicates', $('#id_skip_duplicates').is(':checked'));
+  formData.append('replace_media', $('#id_replace_media').is(':checked'));
+  formData.append('collections', get_collections_list());
   formData.append('from_ajax', true);
   formData.append('file_index', file_index);
   formData.append('content_file', file);
@@ -492,5 +505,49 @@ function upload_files(evt) {
   }
   if (num == 0) {
     onload_timer('upload', num);
+  }
+}
+
+function toggle_collections(el) {
+  el = $(el);
+  if (el.is(':checked')) {
+    $('#id_add_to_collection_group').slideDown();
+  }
+  else {
+    $('#id_add_to_collection_group').slideUp();
+  }
+}
+
+function toggle_collection_select(collection_id) {
+  var collections = maio_conf.get('selected_collections');
+  var idx = collections.indexOf(collection_id);
+  if (idx < 0) {
+    collections.push(collection_id);
+  } else {
+    delete collections[idx];
+  }
+  maio_conf.set('selected_collections', collections);
+  Maio.log('Selected Collections:', collections)
+  $('select option').each(function(_idx, el) {
+    $(el).prop('selected', null);
+  });
+  setTimeout(function() {
+    $(collections).each(function(_idx, id) {
+      $(`#collection_option_${id}`).prop('selected', true);
+    })
+  });
+}
+
+function toggle_skip_duplicates(el) {
+  el = $(el);
+  if (el.is(':checked')) {
+    $('#id_skip_duplicates').prop('checked', false);
+  }
+}
+
+function toggle_replace_media(el) {
+  el = $(el);
+  if (el.is(':checked')) {
+    $('#id_replace_media').prop('checked', false);
   }
 }

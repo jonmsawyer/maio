@@ -6,9 +6,45 @@
 
 <!-- Filters -->
 <div class="maio-filters">
+  <h4 style="display: inline-block;">Filters: &nbsp;</h4>
+
+  <!-- Collections -->
+  <div class="btn-group" role="group">
+    <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+      Collections ({{ collection_name }})
+    </button>
+    <div class="dropdown-menu" style="width: 20em;">
+      <select id="id_add_to_collection_select"
+              class="maio-collection-select"
+              multiple
+        >
+          <option value="all" onclick="toggle_collection_select('all');">
+            All
+          </option>
+          <option value="uncollected" onclick="toggle_collection_select('uncollected');">
+            Uncollected
+          </option>
+        {% if favorites %}
+          <option value=""
+                  id="collection_option_favorites"
+                  {% if collection.is_default %}selected{% endif %}
+                  onclick="toggle_collection_select('favorites');"
+          >-- Favorites --</option>
+          {% include 'maio/_collections_select.html' with collections=favorites indent=None %}
+        {% endif %}
+        <option value=""
+                id="collection_option_all_collections"
+                {% if collection.is_default %}selected{% endif %}
+                onclick="toggle_collection_select('all');"
+        >-- All Collections --</option>
+        {% include 'maio/_collections_select.html' with indent=0 %}
+      </select>
+    </div>
+  </div>
+
   <!-- Media Type -->
   <div class="btn-group" role="group">
-    Filters: &nbsp; <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+    <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
       Media Type
       {% if media_type == 'all' %}
         (All)

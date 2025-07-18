@@ -86,9 +86,32 @@ html.maio {
     & #id_content_file {
         display: none;
     }
-    
+
     & #content_file_label,
     #id_upload {
         width: 100%;
+    }
+
+    & div.no-wrap {
+        text-wrap: nowrap;
+        display: inline-block;
+        margin-left: 0em;
+    }
+
+    & div.wrap {
+        margin-left: 1em;
+    }
+
+    & div.parent {
+        margin-top: 5px;
+        margin-bottom: 5px;
+    }
+
+    & div.child {
+        margin-top: 5px;
+        margin-left: 1em;
+        margin-bottom: 5px;
+        padding-left: 1em;
+        border-left: 2px solid #666;
     }
 }

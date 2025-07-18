@@ -31,6 +31,8 @@ class FileForm(forms.ModelForm):
     '''Media form.'''
     content_file = MultipleFileField(label='Select files...', required=False)
     skip_duplicates = forms.BooleanField(label='Skip duplicate media?', required=False, initial=True)
+    replace_media = forms.BooleanField(label='Replace duplicate media?', required=False)
+    collections = forms.CharField(label='Collections', required=False)
     from_ajax = forms.BooleanField(label='From AJAX?', required=False, initial=False);
     file_index = forms.IntegerField(label='The File Index', required=False)
 
@@ -40,6 +42,8 @@ class FileForm(forms.ModelForm):
         fields = [
             'content_file',
             'skip_duplicates',
+            'replace_media',
+            'collections',
             'from_ajax',
             'file_index',
         ]

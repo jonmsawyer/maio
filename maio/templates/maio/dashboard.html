@@ -31,7 +31,7 @@
     <h4>{{ num_media }} media found</h4>
 
     {% include 'maio/_pagination.html' with instance=1 %}
-    {% include 'maio/_filters.html' with medium=medium media_type=media_type love=love bookmark=bookmark %}
+    {% include 'maio/_filters.html' %}
 
     <div class="row justify-content-center">
       {% for medium in media %}

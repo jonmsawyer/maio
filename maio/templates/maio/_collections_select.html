@@ -1,0 +1,25 @@
+{# collections select partial #}
+{# Requires a `collections` iterable of `Collection` objects. #}
+
+{% load static %}
+{% load maio_extras %}
+
+{% for collection in collections %}
+  <option value="{{ collection.id }}"
+          id="collection_option_{{ collection.id }}"
+          {% if collection.is_default %}selected{% endif %}
+          onclick="toggle_collection_select('{{ collection.id }}');"
+  >
+    {% if indent is not None %}
+      {{ "&nbsp;"|repeat:indent|safe }}{{ collection.name }}
+    {% else %}
+      {{ collection.name }}
+    {% endif %}
+    ({{ collection.media_set.count|default:0}})
+  </option>
+  {% if indent is not None %}
+    {% with indent=indent|add:"4"  %}
+      {% include 'maio/_collections_select.html' with collections=collection.collection_set.all %}
+    {% endwith %}
+  {% endif %}
+{% endfor %}

@@ -16,7 +16,7 @@ from django.views.generic.edit import FormView
 from django.utils.safestring import mark_safe
 
 from maio.forms import FileForm
-from maio.models import File, Media
+from maio.models import File, Media, Collection
 from maio.lib import pre_populate_context_dict
 
 from conf import MaioConf
@@ -29,9 +29,13 @@ def _get_context(request: HttpRequest) -> dict[str, Any]:
     '''get context'''
     js_debug = 'true' if request.user.is_superuser and request.user_setting.display_debug else 'false'
     render_div_index = 'true' if request.user.is_superuser and request.user_setting.display_debug else 'false'
+    collections = Collection.objects.filter(user=request.maio_user, parent=None)
+    favorites = Collection.objects.filter(user=request.maio_user, is_favorite=True)
     context = {
         'js_debug': js_debug,
         'render_div_index': render_div_index,
+        'collections': collections,
+        'favorites': favorites,
         'form': FileForm(request.POST, request.FILES),
         'restricted_extensions': mark_safe(maio_conf.get_chain('upload', 'restricted', 'extensions')),
         'restricted_mime_types': mark_safe(maio_conf.get_chain('upload', 'restricted', 'mime_types')),

@@ -6,13 +6,39 @@
 
 <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
   <div class="offcanvas-header">
-    <h5 class="offcanvas-title" id="offcanvasExampleLabel">Offcanvas</h5>
+    <h5 class="offcanvas-title" id="offcanvasExampleLabel">
+      <a class="navbar-brand" href="{% url 'home' %}" style="vertical-align: center;">
+        <img src="{% static 'icons/maio_32.png' %}" type="image/png" style="width: 28px; margin-top: -0.4em;">
+        <span style="margin: 0.2em 0 0.2em 0.2em; display: inline-block">Maio</span>
+      </a>
+    </h5>
     <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
   </div>
   <div class="offcanvas-body">
-    <div>
-      Some text as placeholder. In real life you can have the elements you have chosen. Like, text, images, lists, etc.
+    <div class="btn-group">
+      <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+        {{ request.user }}
+      </button>
+      <ul class="dropdown-menu">
+        <li><a class="dropdown-item" href="{% url 'dashboard' %}">Dashboard</a></li>
+        <li><a class="dropdown-item" href="{% url 'upload_media' %}">Upload Media</a></li>
+        <li><a class="dropdown-item" href="{% url 'library_share' %}">Library Share</a></li>
+        <li><a class="dropdown-item" href="{% url 'collections' %}">Collections</a></li>
+
+        <li><hr class="dropdown-divider"></li>
+        <li><a class="dropdown-item" href="{% url 'edit_profile' %}">Edit Profile</a></li>
+
+        {% if request.user.is_superuser %}
+        <li><hr class="dropdown-divider"></li>
+        <li><a class="dropdown-item" href="{% url 'admin:index' %}">Django Admin</a></li>
+        <li><a class="dropdown-item" href="{% url 'maio_admin:home' %}">Maio Admin</a></li>
+        {% endif %}
+
+        <li><hr class="dropdown-divider"></li>
+        <li><a class="dropdown-item" href="{% url 'logout' %}">Log Out</a></li>
+      </ul>
     </div>
+
     <div class="dropdown mt-3">
       <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
         Dropdown button
